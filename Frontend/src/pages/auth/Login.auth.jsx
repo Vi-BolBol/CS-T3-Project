@@ -104,14 +104,14 @@ export default function Login() {
               onClick={() => alert("OAuth handshake initializing via Google server nodes.")}
               className="flex items-center justify-center gap-2 rounded-xl border border-white/5 bg-[#070B19]/50 px-3 py-2 text-xs font-semibold text-gray-300 hover:bg-white/[0.02] hover:text-white hover:border-white/10 transition duration-150"
             >
-              <span>🌐</span> Google
+              <span><i class="bi bi-google"></i></span> Google
             </button>
             <button
               type="button"
               onClick={() => alert("OAuth handshake initializing via GitHub repositories.")}
               className="flex items-center justify-center gap-2 rounded-xl border border-white/5 bg-[#070B19]/50 px-3 py-2 text-xs font-semibold text-gray-300 hover:bg-white/[0.02] hover:text-white hover:border-white/10 transition duration-150"
             >
-              <span>🐙</span> GitHub
+              <span><i class="bi bi-github"></i></span> GitHub
             </button>
           </div>
 

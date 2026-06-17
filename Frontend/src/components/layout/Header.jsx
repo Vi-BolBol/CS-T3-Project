@@ -9,7 +9,7 @@ export default function Header() {
     <header className="px-8 py-5">
       <div className="flex items-center justify-between gap-4">
         <Link to="/" className="text-2xl font-bold text-greenMain">
-          Fast-Internship
+          Internship Finder
         </Link>
 
         <nav className="hidden gap-6 md:flex">

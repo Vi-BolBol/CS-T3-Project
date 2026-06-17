@@ -64,7 +64,7 @@ export default function Signup() {
                   : "text-gray-400 border border-transparent hover:text-white hover:bg-white/[0.02]"
               }`}
             >
-              🎓 Student Node
+              🎓 Student 
             </button>
             <button
               type="button"
@@ -75,7 +75,7 @@ export default function Signup() {
                   : "text-gray-400 border border-transparent hover:text-white hover:bg-white/[0.02]"
               }`}
             >
-              🏢 Corporate Node
+              🏢 Company
             </button>
           </div>
 
@@ -132,14 +132,14 @@ export default function Signup() {
               onClick={() => alert(`Federating ${role} account baseline via Google Cloud.`)}
               className="flex items-center justify-center gap-2 rounded-xl border border-white/5 bg-[#070B19]/50 px-3 py-2 text-xs font-semibold text-gray-300 hover:bg-white/[0.02] hover:text-white hover:border-white/10 transition duration-150"
             >
-              <span>🌐</span> Google
+              <span><i class="bi bi-google"></i></span> Google
             </button>
             <button
               type="button"
               onClick={() => alert(`Federating ${role} account baseline via GitHub systems.`)}
               className="flex items-center justify-center gap-2 rounded-xl border border-white/5 bg-[#070B19]/50 px-3 py-2 text-xs font-semibold text-gray-300 hover:bg-white/[0.02] hover:text-white hover:border-white/10 transition duration-150"
             >
-              <span>🐙</span> GitHub
+              <span><i class="bi bi-github"></i></span> GitHub
             </button>
           </div>
 

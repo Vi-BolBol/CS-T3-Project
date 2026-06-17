@@ -13,7 +13,7 @@ export default function About() {
           Our Story
         </span>
         <h1 className="mt-2 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
-          About <span className="text-greenMain">Fast Internship</span>
+          About <span className="text-greenMain">Internship Finder</span>
         </h1>
       </section>
 
