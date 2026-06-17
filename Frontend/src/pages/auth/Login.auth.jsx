@@ -14,7 +14,7 @@ export default function Login() {
   };
 
   return (
-      <div className="min-h-screen overflow-y-scroll bg-[#070B19] text-white flex flex-col justify-between selection:bg-emerald-500 selection:text-[#070B19] antialiased">
+      <div className="min-h-screen bg-[#070B19] text-white flex flex-col justify-between selection:bg-emerald-500 selection:text-[#070B19] antialiased">
       {/* Platform Level Global Shell Header Navigation */}
       <Header />
 
