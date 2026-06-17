@@ -31,7 +31,7 @@ export default function Company() {
   });
 
   return (
-    <div className="min-h-screen bg-darkBlue text-white flex flex-col justify-between">
+    <div className="min-h-screen bg-[#070B19] text-white flex flex-col justify-between">
       <div>
         <Header />
 

@@ -8,7 +8,7 @@ import Input from "../components/common/Input";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#0F172A] text-white selection:bg-greenMain selection:text-darkBlue">
+    <div className="min-h-screen bg-[#070B19] text-white selection:bg-greenMain selection:text-darkBlue">
       <Header />
 
       {/* Hero Wrapper */}
