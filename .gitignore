@@ -1,3 +1,8 @@
 node_modules/
 
 .env
+.vscode/
+NormalUser-Feature/
+Frontend/Frontend-Feature/
+Frontend/package.json
+Frontend/package-lock.json
