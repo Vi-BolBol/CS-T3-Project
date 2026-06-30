@@ -10,7 +10,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://postgres:Rathanak02@localhost:5432/Internship_Finder"
+  url: env("DATABASE_LOCAL_URL")
 }
 
 enum UserRole {
