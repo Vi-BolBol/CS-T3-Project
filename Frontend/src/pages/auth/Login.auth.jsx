@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Input from "../../components/common/Input";
 import Button from "../../components/common/Button";
 import Header from "../../components/layout/Header";
@@ -7,6 +7,7 @@ import { loginUser, registerUser } from "../../api/authApi";
 
 export default function Login() {
   const [credentials, setCredentials] = useState({ email: "", password: "" });
+  const navigate = useNavigate();
 
 const handleLogin = async (e) => {
   e.preventDefault();
@@ -16,15 +17,18 @@ const handleLogin = async (e) => {
     password: credentials.password,
   });
 
-  if (result.success) {
-    localStorage.setItem("token", result.token);
-    localStorage.setItem("user", JSON.stringify(result.user));
+   if (result.success) {
+  localStorage.setItem("token", result.token);
+  localStorage.setItem("user", JSON.stringify(result.user));
 
-    alert("Login successful");
-    window.location.href = "/";
+  if (result.user.role === "student") {
+    window.location.href = "http://localhost:3001/home";
+  } else if (result.user.role === "company") {
+    window.location.href = "http://localhost:5174/home";
   } else {
-    alert(result.message || "Login failed");
+    alert("Unknown role");
   }
+}
 };
 
   return (
