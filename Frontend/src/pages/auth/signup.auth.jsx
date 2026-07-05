@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Input from "../../components/common/Input";
 import Button from "../../components/common/Button";
 import Header from "../../components/layout/Header";
+import { loginUser, registerUser } from "../../api/authApi";
 
 export default function Signup() {
   const [role, setRole] = useState("student"); // "student" | "company"
@@ -12,12 +13,22 @@ export default function Signup() {
     password: ""
   });
 
-  const handleSignup = (e) => {
-    e.preventDefault();
-    const runtimePayload = { ...formData, accountRole: role };
-    console.log("Transmitting operational enrollment data packet:", runtimePayload);
-    alert(`Account registration initiated for role: ${role.toUpperCase()}`);
-  };
+const handleRegister = async (e) => {
+  e.preventDefault();
+
+  const result = await registerUser({
+    name: formData.name,
+    email: formData.email,
+    password: formData.password,
+    role: role,
+  });
+
+  if (result.success) {
+    alert("Register successful, please login");
+  } else {
+    alert(result.message || "Registration failed");
+  }
+};
 
   return (
     <div className="min-h-screen bg-[#070B19] text-white flex flex-col justify-between selection:bg-emerald-500 selection:text-[#070B19] antialiased">
@@ -54,6 +65,7 @@ export default function Signup() {
           </div>
 
           {/* Interactive User Role Selection Matrix */}
+          
           <div className="grid grid-cols-2 gap-2 p-1 bg-[#070B19]/30 rounded-xl border border-white/[0.02] mb-5">
             <button
               type="button"
@@ -80,7 +92,7 @@ export default function Signup() {
           </div>
 
           {/* Secure Onboarding Sign-Up Form Form */}
-          <form className="space-y-4" onSubmit={handleSignup}>
+          <form className="space-y-4" onSubmit={handleRegister}>
             <Input 
               label="Full Name Reference" 
               type="text" 
