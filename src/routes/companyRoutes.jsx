@@ -2,7 +2,7 @@ import CompanyHome from '../Pages/CompanyHome';
 import CompanyDashboard from '../Pages/CompanyDashboard';
 import CompanyProfile from '../Pages/CompanyProfile';
 import CompanySetting from '../Pages/CompanySetting';
-import CreateSetting from '../Pages/CreateSetting';
+import CreateInternship from '../Pages/CreateInternship';
 
 const routes = {
   '/': CompanyHome,
@@ -10,7 +10,7 @@ const routes = {
   '/company-dashboard': CompanyDashboard,
   '/company-profile': CompanyProfile,
   '/company-settings': CompanySetting,
-  '/create-wizard': CreateSetting
+  '/create-wizard': CreateInternship
 };
 
 export function getCompanyRoute(pathname) {
