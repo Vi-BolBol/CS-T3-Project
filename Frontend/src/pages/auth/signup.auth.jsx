@@ -30,9 +30,11 @@ export default function Signup() {
   localStorage.setItem("user", JSON.stringify(result.user));
 
   if (result.user.role === "student") {
-    window.location.href = "http://localhost:3001/home";
+    // window.location.href = "http://localhost:3001/home";
+    navigate('/user/home')
   } else if (result.user.role === "company") {
-    window.location.href = "http://localhost:5174/home";
+    // window.location.href = "http://localhost:5174/home";
+    navigate('/company/home')
   } else {
     alert("Unknown role");
   }
