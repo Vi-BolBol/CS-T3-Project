@@ -10,15 +10,49 @@ import Signup from "../pages/auth/signup.auth";
 
 import Company from "../pages/company/company";
 import CompanyDetail from "../pages/company/companyDetail";
+import CompanyHome from "../pages/company/CompanyHome";
+import CompanyDashboard from "../pages/company/CompanyDashboard";
+import CompanyProfile from "../pages/company/CompanyProfile";
+import CompanySetting from "../pages/company/CompanySetting";
+import CreateSetting from "../pages/company/CreateSetting";
 
 import UserHome from "../pages/user/UserHome";
 import UserProfile from "../pages/user/UserProfile";
 import UserSetting from "../pages/user/UserSetting";
 import UserApplication from "../pages/user/UserApplication";
+import Pipeline from "../pages/user/Pipeline";
+import ViewDetail from "../pages/user/ViewDetail";
 
-import CVChoice from "../pages/CV/CVChoice";
-import CVMarker from "../pages/CV/CVMarker";
-import CSPreview from "../pages/CV/CSPreview";
+import StudentNavbar from "../components/layout/StudentNavbar";
+import StudentFooter from "../components/layout/StudentFooter";
+import { CVBuilderProvider } from "../context/CVBuilderContext";
+import CVChoice from "../pages/cv/CVChoice";
+import CVUploadReview from "../pages/cv/CVUploadReview";
+import CVDashboard from "../pages/cv/CVDashboard";
+import CVStep1Photo from "../pages/cv/CVStep1Photo";
+import CVStep2Personal from "../pages/cv/CVStep2Personal";
+import CVStep3About from "../pages/cv/CVStep3About";
+import CVStep4Experience from "../pages/cv/CVStep4Experience";
+import CVStep5Preview from "../pages/cv/CVStep5Preview";
+
+function CVBuilderRoutes() {
+  return (
+    <CVBuilderProvider>
+      <StudentNavbar />
+      <Routes>
+        <Route path="/" element={<CVChoice />} />
+        <Route path="/upload-review" element={<CVUploadReview />} />
+        <Route path="/manage" element={<CVDashboard />} />
+        <Route path="/step1" element={<CVStep1Photo />} />
+        <Route path="/step2" element={<CVStep2Personal />} />
+        <Route path="/step3" element={<CVStep3About />} />
+        <Route path="/step4" element={<CVStep4Experience />} />
+        <Route path="/step5" element={<CVStep5Preview />} />
+      </Routes>
+      <StudentFooter />
+    </CVBuilderProvider>
+  );
+}
 
 export default function AppRoute() {
   return (
@@ -35,14 +69,20 @@ export default function AppRoute() {
         <Route path="/company" element={<Company />} />
         <Route path="/company/:id" element={<CompanyDetail />} />
 
+        <Route path="/company/home" element={<CompanyHome />} />
+        <Route path="/company/dashboard" element={<CompanyDashboard />} />
+        <Route path="/company/profile" element={<CompanyProfile />} />
+        <Route path="/company/settings" element={<CompanySetting />} />
+        <Route path="/company/create-wizard" element={<CreateSetting />} />
+
         <Route path="/user/home" element={<UserHome />} />
         <Route path="/user/profile" element={<UserProfile />} />
         <Route path="/user/settings" element={<UserSetting />} />
         <Route path="/user/applications" element={<UserApplication />} />
+        <Route path="/pipeline" element={<Pipeline />} />
+        <Route path="/view-detail" element={<ViewDetail />} />
 
-        <Route path="/cv-choice" element={<CVChoice />} />
-        <Route path="/cv-maker" element={<CVMarker />} />
-        <Route path="/cv-preview" element={<CSPreview />} />
+        <Route path="/cv/*" element={<CVBuilderRoutes />} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>

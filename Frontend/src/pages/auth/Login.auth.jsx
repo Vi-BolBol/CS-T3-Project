@@ -1,17 +1,37 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Input from "../../components/common/Input";
 import Button from "../../components/common/Button";
 import Header from "../../components/layout/Header";
+import { loginUser, registerUser } from "../../api/authApi";
 
 export default function Login() {
   const [credentials, setCredentials] = useState({ email: "", password: "" });
+  const navigate = useNavigate();
 
-  const handleSignIn = (e) => {
-    e.preventDefault();
-    console.log("Transmitting identity vector verification:", credentials);
-    alert("Authentication validation processed.");
-  };
+const handleLogin = async (e) => {
+  e.preventDefault();
+
+  const result = await loginUser({
+    email: credentials.email,
+    password: credentials.password,
+  });
+
+   if (result.success) {
+  localStorage.setItem("token", result.token);
+  localStorage.setItem("user", JSON.stringify(result.user));
+
+  if (result.user.role === "student") {
+    // window.location.href = "http://localhost:3001/home";
+    navigate('/user/home')
+  } else if (result.user.role === "company") {
+    // window.location.href = "http://localhost:5174/home";
+    navigate('/company/home')
+  } else {
+    alert("Unknown role");
+  }
+}
+};
 
   return (
       <div className="min-h-screen bg-[#070B19] text-white flex flex-col justify-between selection:bg-emerald-500 selection:text-[#070B19] antialiased">
@@ -48,7 +68,7 @@ export default function Login() {
           </div>
 
           {/* Interactive Form Matrix */}
-          <form className="space-y-4" onSubmit={handleSignIn}>
+          <form className="space-y-4" onSubmit={handleLogin}>
             <Input 
               label="Email Address" 
               type="email" 

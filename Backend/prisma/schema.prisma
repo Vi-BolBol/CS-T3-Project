@@ -1,0 +1,182 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  student
+  company
+  admin
+}
+
+enum UserStatus {
+  active
+  inactive
+  suspended
+}
+
+enum WorkEnvironmentType {
+  remote
+  onsite
+  hybrid
+}
+
+enum InternshipStatus {
+  open
+  closed
+  draft
+}
+
+enum ApplicationStatus {
+  pending
+  reviewed
+  accepted
+  rejected
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique @db.VarChar(255)
+  passwordHash String   @db.VarChar(255)
+  role         UserRole
+  status       UserStatus @default(active)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  studentProfile  StudentProfile?
+  companyProfile  CompanyProfile[]
+  cvs             Cv[]
+  applications    Application[]
+  savedInternships SavedInternship[]
+  auditLogs       AuditLog[]
+
+  @@map("users")
+}
+
+model StudentProfile {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @unique
+  fullName     String?  @db.VarChar(150)
+  phone        String?  @db.VarChar(20)
+  bio          String?
+  education    String?
+  skills       String?
+  profileImage String?  @db.VarChar(500)
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("student_profiles")
+}
+
+model CompanyProfile {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  companyName String?  @db.VarChar(200)
+  industry    String?  @db.VarChar(100)
+  description String?
+  website     String?  @db.VarChar(255)
+  contact     String?  @db.VarChar(50)
+  telegramLink String? @db.VarChar(255)
+  logoUrl     String?  @db.VarChar(500)
+  createdAt   DateTime @default(now())
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  internships  Internship[]
+
+  @@map("company_profiles")
+}
+
+model Cv {
+  id         Int      @id @default(autoincrement())
+  studentId  Int
+  fileUrl    String?  @db.VarChar(500)
+  score      Decimal? @db.Decimal(5, 2)
+  userCvData Json?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  student      User          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  applications Application[]
+
+  @@map("cvs")
+}
+
+model Internship {
+  id                 Int                  @id @default(autoincrement())
+  companyId          Int
+  title              String               @db.VarChar(255)
+  internshipCategory String?              @db.VarChar(100)
+  workEnvironment    WorkEnvironmentType?
+  location           String?              @db.VarChar(255)
+  jobDescription     String?
+  requirements       String?
+  salary             Decimal?             @db.Decimal(10, 2)
+  deadline           DateTime?            @db.Date
+  status             InternshipStatus     @default(open)
+  skills             String?
+  education          String?
+  benefit            String?
+  companyCulture     String?
+  companyEmailLink   String?              @db.VarChar(255)
+  telegramLink       String?              @db.VarChar(255)
+  createdAt          DateTime             @default(now())
+
+  company          CompanyProfile    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  applications     Application[]
+  savedInternships SavedInternship[]
+
+  @@map("internships")
+}
+
+model Application {
+  id           Int               @id @default(autoincrement())
+  studentId    Int
+  internshipId Int
+  cvId         Int?
+  status       ApplicationStatus @default(pending)
+  appliedAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  student    User       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  internship Internship @relation(fields: [internshipId], references: [id], onDelete: Cascade)
+  cv         Cv?        @relation(fields: [cvId], references: [id], onDelete: SetNull)
+
+  @@unique([studentId, internshipId])
+  @@map("applications")
+}
+
+model SavedInternship {
+  userId       Int
+  internshipId Int
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  internship Internship @relation(fields: [internshipId], references: [id], onDelete: Cascade)
+
+  @@id([userId, internshipId])
+  @@map("saved_internships")
+}
+
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  userId     Int?
+  action     String?  @db.VarChar(100)
+  entityType String?  @db.VarChar(100)
+  entityId   Int?
+  createdAt  DateTime @default(now())
+  actionDate DateTime @default(now()) @db.Date
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("audit_logs")
+}
