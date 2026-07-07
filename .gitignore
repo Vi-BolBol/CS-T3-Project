@@ -2,7 +2,6 @@
 node_modules/
 
 # Features folder (generated/visual content)
-Frontend/features/
 
 # Environment files
 .env
