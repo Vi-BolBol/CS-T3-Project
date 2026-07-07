@@ -15,6 +15,7 @@ import CompanyDashboard from "../pages/company/CompanyDashboard";
 import CompanyProfile from "../pages/company/CompanyProfile";
 import CompanySetting from "../pages/company/CompanySetting";
 import CreateSetting from "../pages/company/CreateSetting";
+import CreateInternship from "../pages/company/CreateInternship";
 
 import UserHome from "../pages/user/UserHome";
 import UserProfile from "../pages/user/UserProfile";
@@ -74,6 +75,7 @@ export default function AppRoute() {
         <Route path="/company/profile" element={<CompanyProfile />} />
         <Route path="/company/settings" element={<CompanySetting />} />
         <Route path="/company/create-wizard" element={<CreateSetting />} />
+        <Route path="/company/create-internship" element={<CreateInternship />} />
 
         <Route path="/user/home" element={<UserHome />} />
         <Route path="/user/profile" element={<UserProfile />} />

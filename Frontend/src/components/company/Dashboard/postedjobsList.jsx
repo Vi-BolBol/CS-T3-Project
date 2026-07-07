@@ -1,6 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function PostedJobsList({ jobs, selectedJobId, onSelectJob }) {
+  const navigate = useNavigate();
+
   return (
     <div className="rounded-2xl border border-white/5 bg-[#111B34]/40 p-4 shadow-xl backdrop-blur-sm">
       <div className="flex items-center justify-between pb-4 border-b border-white/5 mb-4">
@@ -46,7 +49,11 @@ export default function PostedJobsList({ jobs, selectedJobId, onSelectJob }) {
         })}
       </div>
 
-      <button className="w-full mt-4 bg-emerald-500 hover:bg-emerald-400 text-[#070B19] font-bold text-xs py-3 rounded-xl transition duration-200 flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/10">
+      <button
+        type="button"
+        onClick={() => navigate('/company/create-internship')}
+        className="w-full mt-4 bg-emerald-500 hover:bg-emerald-400 text-[#070B19] font-bold text-xs py-3 rounded-xl transition duration-200 flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/10"
+      >
         <span>+</span> Post a New Job
       </button>
     </div>
