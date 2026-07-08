@@ -122,6 +122,11 @@ model Internship {
   jobDescription     String?
   requirements       String?
   salary             Decimal?             @db.Decimal(10, 2)
+  salaryMin          Decimal?             @db.Decimal(10, 2)
+  salaryMax          Decimal?             @db.Decimal(10, 2)
+  durationValue      Int?
+  durationUnit       String?              @db.VarChar(20)
+  plan               String?              @db.VarChar(20)
   deadline           DateTime?            @db.Date
   status             InternshipStatus     @default(open)
   skills             String?

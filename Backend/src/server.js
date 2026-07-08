@@ -4,6 +4,7 @@ import cors from "cors";
 import { PrismaClient } from "@prisma/client";
 import authRoutes from "../routes/auth.routes.js";
 import cvRoutes from "../routes/cv.routes.js";
+import internshipRoutes from "../routes/internship.routes.js";
 
 const prisma = new PrismaClient();
 const app = express();
@@ -14,6 +15,7 @@ app.use(express.urlencoded({ extended: true, limit: "22mb" }));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/cv", cvRoutes);
+app.use("/api/internships", internshipRoutes);
 
 // Routes
 app.get("/", (req, res) => {
