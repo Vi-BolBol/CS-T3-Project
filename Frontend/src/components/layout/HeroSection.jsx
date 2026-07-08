@@ -1,4 +1,5 @@
-import Button from "../common/Button";
+import { Link } from "react-router-dom";
+import Button from "../ui/Button"; 
 
 export default function HeroSection() {
   return (

@@ -9,7 +9,7 @@ import ModernTemplate from '../../components/cv/templates/ModernTemplate.jsx';
 import ProfessionalTemplate from '../../components/cv/templates/ProfessionalTemplate.jsx';
 import Toast from '../../components/shared/Toast.jsx';
 import ConfirmDialog from '../../components/shared/ConfirmDialog.jsx';
-import { scoreCV } from '../../api/cvApi.js';
+import { scoreCV } from '../../services/cvService';
 import { generatePDF } from '../../utils/generatePDF.js';
 
 const COLOR_PALETTES = [

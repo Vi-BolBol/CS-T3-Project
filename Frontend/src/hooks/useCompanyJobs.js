@@ -1,18 +1,36 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { getPostedJobs, publishNewJob as publishNewJobService } from '../services/jobService';
 
-export default function useCompanyJobs() {
+/**
+ * Owns the "posted jobs" list plus the publish mutation, both backed by
+ * jobService. Pages just call refresh()/publishNewJob() and read state.
+ */
+export default function useCompanyJobs({ autoFetch = false } = {}) {
+  const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Core mutation logic to push a newly created internship posting to your data layer
+  const fetchJobs = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await getPostedJobs();
+      setJobs(data);
+      return data;
+    } catch (err) {
+      setError(err.message || "Failed to load posted jobs.");
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const publishNewJob = useCallback(async (jobPayload) => {
     setLoading(true);
     setError(null);
     try {
-      // Simulate API network handshake matching 2026 enterprise system architectures
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("Successfully securely injected job posting data structure:", jobPayload);
-      return { success: true, payload: jobPayload };
+      const result = await publishNewJobService(jobPayload);
+      return result;
     } catch (err) {
       setError(err.message || "Failed to broadcast your vacancy deployment.");
       return { success: false };
@@ -21,7 +39,13 @@ export default function useCompanyJobs() {
     }
   }, []);
 
+  useEffect(() => {
+    if (autoFetch) fetchJobs();
+  }, [autoFetch, fetchJobs]);
+
   return {
+    jobs,
+    fetchJobs,
     publishNewJob,
     loading,
     error

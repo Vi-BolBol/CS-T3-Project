@@ -1,28 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import Home from "../pages/Home";
-import About from "../pages/About";
-import Contact from "../pages/Contact";
 import NotFound from "../pages/NotFound";
-
-import Login from "../pages/auth/Login.auth";
-import Signup from "../pages/auth/signup.auth";
-
-import Company from "../pages/company/company";
-import CompanyDetail from "../pages/company/companyDetail";
-import CompanyHome from "../pages/company/CompanyHome";
-import CompanyDashboard from "../pages/company/CompanyDashboard";
-import CompanyProfile from "../pages/company/CompanyProfile";
-import CompanySetting from "../pages/company/CompanySetting";
-import CreateSetting from "../pages/company/CreateSetting";
-import CreateInternship from "../pages/company/CreateInternship";
-
-import UserHome from "../pages/user/UserHome";
-import UserProfile from "../pages/user/UserProfile";
-import UserSetting from "../pages/user/UserSetting";
-import UserApplication from "../pages/user/UserApplication";
-import Pipeline from "../pages/user/Pipeline";
-import ViewDetail from "../pages/user/ViewDetail";
+import ProtectedRoute from "./ProtectedRoute";
+import { publicRoutes, companyRoutes, studentRoutes } from "./routes.config";
 
 import StudentNavbar from "../components/layout/StudentNavbar";
 import StudentFooter from "../components/layout/StudentFooter";
@@ -59,30 +39,9 @@ export default function AppRoute() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
-
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-
-        <Route path="/company" element={<Company />} />
-        <Route path="/company/:id" element={<CompanyDetail />} />
-
-        <Route path="/company/home" element={<CompanyHome />} />
-        <Route path="/company/dashboard" element={<CompanyDashboard />} />
-        <Route path="/company/profile" element={<CompanyProfile />} />
-        <Route path="/company/settings" element={<CompanySetting />} />
-        <Route path="/company/create-wizard" element={<CreateSetting />} />
-        <Route path="/company/create-internship" element={<CreateInternship />} />
-
-        <Route path="/user/home" element={<UserHome />} />
-        <Route path="/user/profile" element={<UserProfile />} />
-        <Route path="/user/settings" element={<UserSetting />} />
-        <Route path="/user/applications" element={<UserApplication />} />
-        <Route path="/pipeline" element={<Pipeline />} />
-        <Route path="/view-detail" element={<ViewDetail />} />
+        {[...publicRoutes, ...companyRoutes, ...studentRoutes].map(({ path, element, role }) => (
+          <Route key={path} path={path} element={<ProtectedRoute role={role}>{element}</ProtectedRoute>} />
+        ))}
 
         <Route path="/cv/*" element={<CVBuilderRoutes />} />
 

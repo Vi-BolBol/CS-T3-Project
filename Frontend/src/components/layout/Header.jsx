@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import Button from "../common/Button";
+import Button from "../ui/Button";   // ← was "../common/Button"
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
