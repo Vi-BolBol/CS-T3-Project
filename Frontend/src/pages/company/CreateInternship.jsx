@@ -9,7 +9,7 @@ import Step1Essential from '../../components/company/JobWizardSteps/step1Essenti
 import Step2Detail from '../../components/company/JobWizardSteps/step2Detail';
 import Step3Compensation from '../../components/company/JobWizardSteps/step3Compensation';
 import Step4Review from '../../components/company/JobWizardSteps/step4Review';
-import Step5Checkout from '../../components/company/JobWizardSteps/step5Checkout';
+import Step5Publish from '../../components/company/JobWizardSteps/step5Publish';
 import WizardProgress from '../../components/company/JobWizardSteps/WizardProgress';
 
 const INITIAL_DATA = {
@@ -18,6 +18,7 @@ const INITIAL_DATA = {
   department: '',
   workEnvironment: 'Hybrid',
   description: '',
+  location: '',
   // Step 2 — Role Details (tags)
   skills: [],
   responsibilities: [],
@@ -26,13 +27,8 @@ const INITIAL_DATA = {
   payMax: '',
   durationValue: '',
   durationUnit: 'Months',
-  // Step 5 — Checkout
-  plan: 'featured',
-  cardName: '',
-  cardNumber: '',
-  expiryMonth: '',
-  expiryYear: '',
-  cvc: ''
+  // Step 5 — Plan
+  plan: 'featured'
 };
 
 export default function CreateInternship() {
@@ -54,6 +50,8 @@ export default function CreateInternship() {
     const result = await publishNewJob(formData);
     if (result.success) {
       navigate('/company/dashboard');
+    } else {
+      showToast(result.message || 'Failed to publish internship. Please try again.');
     }
   };
 
@@ -78,14 +76,13 @@ export default function CreateInternship() {
             <Step4Review data={formData} onNext={goNext} onBack={goBack} />
           )}
           {step === 5 && (
-            <Step5Checkout
+            <Step5Publish
               data={formData}
               onChange={updateField}
               onSubmit={handlePublish}
               onBack={goBack}
               loading={loading}
               error={error}
-              showToast={showToast}
             />
           )}
         </div>

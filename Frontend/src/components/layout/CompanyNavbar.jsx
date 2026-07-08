@@ -51,7 +51,7 @@ export default function CompanyNavbar() {
           <div className="flex items-center gap-4">
             {/* Design Call to Action matching the global '+ Create an Internship' design boundary */}
             <Link
-              to="/company/create-wizard"
+              to="/company/create-internship"
               className="hidden sm:inline-flex items-center justify-center px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-[#070B19] font-bold text-xs transition duration-150 shadow-md shadow-emerald-500/10"
             >
               + Create an Internship

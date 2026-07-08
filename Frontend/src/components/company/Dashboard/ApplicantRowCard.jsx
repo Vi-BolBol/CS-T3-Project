@@ -1,6 +1,18 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+
+function timeAgo(isoString) {
+  if (!isoString) return '';
+  const diffMs = Date.now() - new Date(isoString).getTime();
+  const hours = Math.max(1, Math.round(diffMs / (1000 * 60 * 60)));
+  if (hours < 24) return `Applied ${hours} hour${hours === 1 ? '' : 's'} ago`;
+  const days = Math.round(hours / 24);
+  return `Applied ${days} day${days === 1 ? '' : 's'} ago`;
+}
 
 export default function ApplicantRowCard({ applicant }) {
+  const navigate = useNavigate();
+
   return (
     <div className="group rounded-xl border border-white/5 bg-[#070B19]/40 p-4 transition-all duration-200 hover:border-white/10 hover:bg-[#070B19]/80 flex flex-col justify-between">
       <div>
@@ -17,20 +29,25 @@ export default function ApplicantRowCard({ applicant }) {
             </div>
           </div>
 
-          <span className="text-[10px] font-bold bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded">
-            {applicant.matchScore}
+          <span className="text-[10px] font-bold bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded whitespace-nowrap">
+            {applicant.matchScore}% Match
           </span>
         </div>
 
         <p className="text-xs text-gray-500 mt-3">School: {applicant.university}</p>
+        <p className="text-[11px] text-gray-600 mt-0.5">{timeAgo(applicant.appliedAt)}</p>
       </div>
 
       <div className="mt-4 pt-3 border-t border-white/5 flex items-center gap-2">
         <button className="flex-1 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-[#070B19] text-xs font-bold transition duration-150">
           Shortlist
         </button>
-        <button className="px-2.5 py-1.5 rounded-lg border border-white/10 bg-white/5 text-xs text-gray-400 hover:text-white hover:bg-white/10 transition">
-          Review
+        <button
+          type="button"
+          onClick={() => navigate(`/company/applicant/${applicant.id}/cv`)}
+          className="px-2.5 py-1.5 rounded-lg border border-white/10 bg-white/5 text-xs text-gray-400 hover:text-white hover:bg-white/10 transition"
+        >
+          Review CV
         </button>
       </div>
     </div>

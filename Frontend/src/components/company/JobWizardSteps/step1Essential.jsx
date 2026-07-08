@@ -13,6 +13,7 @@ function getErrors(data) {
   } else if (data.description.trim().length < 20) {
     errors.description = 'Description should be at least 20 characters.';
   }
+  if (isBlank(data.location)) errors.location = 'Location is required.';
   return errors;
 }
 
@@ -24,7 +25,7 @@ export default function Step1Essential({ data, onChange, onNext, onCancel }) {
   const markTouched = (field) => setTouched((t) => ({ ...t, [field]: true }));
 
   const handleNext = () => {
-    setTouched({ title: true, department: true, description: true });
+    setTouched({ title: true, department: true, description: true, location: true });
     if (isValid) onNext();
   };
 
@@ -87,6 +88,21 @@ export default function Step1Essential({ data, onChange, onNext, onCancel }) {
                 ))}
               </div>
             </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Location</label>
+            <input
+              type="text"
+              value={data.location}
+              onChange={(e) => onChange('location', e.target.value)}
+              onBlur={() => markTouched('location')}
+              placeholder="e.g. Phnom Penh, Cambodia"
+              className={`w-full px-4 py-3 rounded-xl border bg-[#070B19]/60 text-sm text-white placeholder-gray-600 focus:outline-none transition ${
+                touched.location && errors.location ? 'border-rose-500/40 focus:border-rose-500/40' : 'border-white/5 focus:border-emerald-500/40'
+              }`}
+            />
+            {touched.location && errors.location && <p className="text-[10px] text-rose-400 mt-1.5 font-medium">{errors.location}</p>}
           </div>
 
           <div>

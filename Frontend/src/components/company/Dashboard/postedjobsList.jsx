@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 export default function PostedJobsList({ jobs, selectedJobId, onSelectJob }) {
   const navigate = useNavigate();
+  const activeCount = jobs.filter((job) => job.status === 'open').length;
 
   return (
     <div className="rounded-2xl border border-white/5 bg-[#111B34]/40 p-4 shadow-xl backdrop-blur-sm">
@@ -11,7 +12,9 @@ export default function PostedJobsList({ jobs, selectedJobId, onSelectJob }) {
           <h2 className="text-sm font-bold uppercase tracking-wider text-emerald-400">Posted Internships</h2>
           <p className="text-xs text-gray-400 mt-0.5">{jobs.length} Positions Published</p>
         </div>
-        <span className="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-md font-medium">Manage</span>
+        <span className="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-md font-medium">
+          {activeCount} Active
+        </span>
       </div>
 
       <div className="space-y-2.5 max-h-[calc(100vh-22rem)] overflow-y-auto pr-1">
@@ -31,14 +34,20 @@ export default function PostedJobsList({ jobs, selectedJobId, onSelectJob }) {
             >
               <div className="flex items-start justify-between gap-2">
                 <h3 className="text-sm font-semibold tracking-tight text-white line-clamp-1">{job.title}</h3>
-                <span className={`text-[10px] uppercase tracking-wide font-bold px-1.5 py-0.5 rounded ${
-                  job.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'
-                }`}>
-                  {job.status}
+                <span
+                  className={`text-[10px] uppercase tracking-wide font-bold px-1.5 py-0.5 rounded ${
+                    job.status === 'open'
+                      ? 'bg-emerald-500/10 text-emerald-400'
+                      : job.status === 'draft'
+                      ? 'bg-white/10 text-gray-400'
+                      : 'bg-amber-500/10 text-amber-400'
+                  }`}
+                >
+                  {job.statusLabel}
                 </span>
               </div>
 
-              <p className="text-xs text-gray-400 mt-1">{job.location} - {job.type}</p>
+              <p className="text-xs text-gray-400 mt-1">{job.location} - {job.workEnvironment}</p>
 
               <div className="mt-3 pt-3 border-t border-white/5 flex items-center justify-between text-[11px] text-gray-400">
                 <span>{job.applicantsCount} Applicants</span>

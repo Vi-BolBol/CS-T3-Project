@@ -16,6 +16,7 @@ import CompanyProfile from "../pages/company/CompanyProfile";
 import CompanySetting from "../pages/company/CompanySetting";
 import CreateSetting from "../pages/company/CreateSetting";
 import CreateInternship from "../pages/company/CreateInternship";
+import ApplicantCVReview from "../pages/company/ApplicantCVReview";
 
 import UserHome from "../pages/user/UserHome";
 import UserProfile from "../pages/user/UserProfile";
@@ -76,6 +77,7 @@ export default function AppRoute() {
         <Route path="/company/settings" element={<CompanySetting />} />
         <Route path="/company/create-wizard" element={<CreateSetting />} />
         <Route path="/company/create-internship" element={<CreateInternship />} />
+        <Route path="/company/applicant/:applicantId/cv" element={<ApplicantCVReview />} />
 
         <Route path="/user/home" element={<UserHome />} />
         <Route path="/user/profile" element={<UserProfile />} />
