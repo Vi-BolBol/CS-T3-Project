@@ -3,38 +3,49 @@ import { Link, useNavigate } from "react-router-dom";
 import Input from "../../components/common/Input";
 import Button from "../../components/common/Button";
 import Header from "../../components/layout/Header";
-import { loginUser, registerUser } from "../../api/authApi";
+import { loginUser } from "../../api/authApi";
 
 export default function Login() {
-  const [credentials, setCredentials] = useState({ email: "", password: "" });
   const navigate = useNavigate();
+  const [credentials, setCredentials] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-const handleLogin = async (e) => {
-  e.preventDefault();
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+   
+    try {
+      const result = await loginUser({
+        email: credentials.email,
+        password: credentials.password,
+      });
 
-  const result = await loginUser({
-    email: credentials.email,
-    password: credentials.password,
-  });
+      if (result.success) {
+        localStorage.setItem("token", result.token);
+        localStorage.setItem("user", JSON.stringify(result.user));
 
-   if (result.success) {
-  localStorage.setItem("token", result.token);
-  localStorage.setItem("user", JSON.stringify(result.user));
+        if (result.user.role === "student") {
+          navigate("/user/home");
+        } else if (result.user.role === "company") {
+          navigate("/company/home");
+        } else {
+          setError("Unknown role configuration detected.");
+        }
+        return;
+      }
 
-  if (result.user.role === "student") {
-    // window.location.href = "http://localhost:3001/home";
-    navigate('/user/home')
-  } else if (result.user.role === "company") {
-    // window.location.href = "http://localhost:5174/home";
-    navigate('/company/home')
-  } else {
-    alert("Unknown role");
-  }
-}
-};
+      setError(result.message || "Login failed. Please verify credentials.");
+    } catch (err) {
+      setError("Unexpected error while connecting to infrastructure nodes.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-      <div className="min-h-screen bg-[#070B19] text-white flex flex-col justify-between selection:bg-emerald-500 selection:text-[#070B19] antialiased">
+    <div className="min-h-screen bg-[#070B19] text-white flex flex-col justify-between selection:bg-emerald-500 selection:text-[#070B19] antialiased">
       {/* Platform Level Global Shell Header Navigation */}
       <Header />
 
@@ -100,9 +111,16 @@ const handleLogin = async (e) => {
               />
             </div>
 
+            {/* Error Message Layout Display */}
+            {error && (
+              <div className="text-[11px] text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-2.5 font-medium transition duration-150">
+                ⚠️ {error}
+              </div>
+            )}
+
             <div className="pt-2">
-              <Button type="submit" variant="primary" className="w-full py-2.5">
-                Sign In to Platform
+              <Button type="submit" variant="primary" className="w-full py-2.5" disabled={loading}>
+                {loading ? "Signing in..." : "Sign In to Platform"}
               </Button>
             </div>
           </form>
@@ -124,14 +142,14 @@ const handleLogin = async (e) => {
               onClick={() => alert("OAuth handshake initializing via Google server nodes.")}
               className="flex items-center justify-center gap-2 rounded-xl border border-white/5 bg-[#070B19]/50 px-3 py-2 text-xs font-semibold text-gray-300 hover:bg-white/[0.02] hover:text-white hover:border-white/10 transition duration-150"
             >
-              <span><i class="bi bi-google"></i></span> Google
+              <span><i className="bi bi-google"></i></span> Google
             </button>
             <button
               type="button"
               onClick={() => alert("OAuth handshake initializing via GitHub repositories.")}
               className="flex items-center justify-center gap-2 rounded-xl border border-white/5 bg-[#070B19]/50 px-3 py-2 text-xs font-semibold text-gray-300 hover:bg-white/[0.02] hover:text-white hover:border-white/10 transition duration-150"
             >
-              <span><i class="bi bi-github"></i></span> GitHub
+              <span><i className="bi bi-github"></i></span> GitHub
             </button>
           </div>
 
