@@ -25,23 +25,17 @@ export default function Signup() {
       role: role,
     });
 
- if (result.success) {
-  localStorage.setItem("token", result.token);
-  localStorage.setItem("user", JSON.stringify(result.user));
-
-  if (result.user.role === "student") {
-    // window.location.href = "http://localhost:3001/home";
-    navigate('/user/home')
-  } else if (result.user.role === "company") {
-    // window.location.href = "http://localhost:5174/home";
-    navigate('/company/home')
-  } else {
-    alert("Unknown role");
-  }
-}
     if (result.success) {
-      alert("Register successful, please login");
-      navigate("/login");
+      localStorage.setItem("token", result.token);
+      localStorage.setItem("user", JSON.stringify(result.user));
+
+      if (result.user.role === "student") {
+        navigate('/user/home');
+      } else if (result.user.role === "company") {
+        navigate('/company/home');
+      } else {
+        alert("Unknown role");
+      }
     } else {
       alert(result.message || "Registration failed");
     }

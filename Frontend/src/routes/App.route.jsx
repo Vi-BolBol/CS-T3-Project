@@ -5,11 +5,11 @@ import About from "../pages/About";
 import Contact from "../pages/Contact";
 import NotFound from "../pages/NotFound";
 
-import Login from "../pages/auth/Login.auth";
-import Signup from "../pages/auth/signup.auth";
+import Login from "../pages/auth/Login";
+import Signup from "../pages/auth/Signup";
 
-import Company from "../pages/company/company";
-import CompanyDetail from "../pages/company/companyDetail";
+import BrowseCompanies from "../pages/company/BrowseCompanies";
+import CompanyDetailPublic from "../pages/company/CompanyDetailPublic";
 import CompanyHome from "../pages/company/CompanyHome";
 import CompanyDashboard from "../pages/company/CompanyDashboard";
 import CompanyProfile from "../pages/company/CompanyProfile";
@@ -28,14 +28,14 @@ import ViewDetail from "../pages/user/ViewDetail";
 import StudentNavbar from "../components/layout/StudentNavbar";
 import StudentFooter from "../components/layout/StudentFooter";
 import { CVBuilderProvider } from "../context/CVBuilderContext";
-import CVChoice from "../pages/cv/CVChoice";
-import CVUploadReview from "../pages/cv/CVUploadReview";
-import CVDashboard from "../pages/cv/CVDashboard";
-import CVStep1Photo from "../pages/cv/CVStep1Photo";
-import CVStep2Personal from "../pages/cv/CVStep2Personal";
-import CVStep3About from "../pages/cv/CVStep3About";
-import CVStep4Experience from "../pages/cv/CVStep4Experience";
-import CVStep5Preview from "../pages/cv/CVStep5Preview";
+import CVChoice from "../pages/CV/CVChoice";
+import CVUploadReview from "../pages/CV/CVUploadReview";
+import CVDashboard from "../pages/CV/CVDashboard";
+import CVStep1Photo from "../pages/CV/CVStep1Photo";
+import CVStep2Personal from "../pages/CV/CVStep2Personal";
+import CVStep3About from "../pages/CV/CVStep3About";
+import CVStep4Experience from "../pages/CV/CVStep4Experience";
+import CVStep5Preview from "../pages/CV/CVStep5Preview";
 
 function CVBuilderRoutes() {
   return (
@@ -68,8 +68,8 @@ export default function AppRoute() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
-        <Route path="/company" element={<Company />} />
-        <Route path="/company/:id" element={<CompanyDetail />} />
+        <Route path="/company" element={<BrowseCompanies />} />
+        <Route path="/company/:id" element={<CompanyDetailPublic />} />
 
         <Route path="/company/home" element={<CompanyHome />} />
         <Route path="/company/dashboard" element={<CompanyDashboard />} />

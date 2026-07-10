@@ -1,16 +1,21 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { Search, MapPin } from 'lucide-react';
 import Navbar from '../../components/layout/StudentNavbar';
 import Footer from '../../components/layout/StudentFooter';
-export default function Home() {
-  const [isOpen, setIsOpen] = useState(false);
-  const location = useLocation();
 
-  const navLinks = [
-    { label: 'Home', path: '/user/home' },
-    { label: 'CV', path: '/cv' },
-    { label: 'Applications', path: '/user/applications' },
-  ];
+export default function Home() {
+  const navigate = useNavigate();
+  const [role, setRole] = useState('');
+  const [location, setLocation] = useState('');
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    if (role.trim()) params.set('search', role.trim());
+    if (location.trim()) params.set('location', location.trim());
+    navigate(`/view-detail?${params.toString()}`);
+  };
 
   return (
     <div className="min-h-screen bg-[#070B19]">
@@ -26,11 +31,39 @@ export default function Home() {
           <p className="text-slate-400 text-sm lg:text-base max-w-xl mx-auto leading-relaxed">
             Connect your developer profile with leading technology environments looking for software engineering placement candidates.
           </p>
-          <div className="pt-4">
-            <button className="px-8 py-3.5 bg-[#10b981] hover:bg-emerald-600 transition-all font-semibold text-sm rounded-xl shadow-lg shadow-emerald-950/40 active:scale-95">
-              Explore Available Roles
+
+          {/* Search Bar — searches real internships from GET /api/internships */}
+          <form
+            onSubmit={handleSearch}
+            className="relative z-10 mx-auto flex max-w-2xl flex-col gap-3 pt-4 sm:flex-row sm:items-center"
+          >
+            <div className="flex flex-1 items-center gap-2 rounded-xl border border-slate-700/60 bg-[#0B132B]/60 px-4 py-3">
+              <Search className="h-4 w-4 shrink-0 text-slate-500" />
+              <input
+                type="text"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                placeholder="Role (e.g. UX Designer)"
+                className="w-full bg-transparent text-sm text-white placeholder-slate-500 focus:outline-none"
+              />
+            </div>
+            <div className="flex flex-1 items-center gap-2 rounded-xl border border-slate-700/60 bg-[#0B132B]/60 px-4 py-3">
+              <MapPin className="h-4 w-4 shrink-0 text-slate-500" />
+              <input
+                type="text"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="Location or Remote"
+                className="w-full bg-transparent text-sm text-white placeholder-slate-500 focus:outline-none"
+              />
+            </div>
+            <button
+              type="submit"
+              className="px-6 py-3 bg-[#10b981] hover:bg-emerald-600 transition-all font-semibold text-sm rounded-xl shadow-lg shadow-emerald-950/40 active:scale-95 whitespace-nowrap"
+            >
+              Search
             </button>
-          </div>
+          </form>
         </div>
 
         {/* Features Grid */}

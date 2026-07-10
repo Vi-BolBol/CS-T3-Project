@@ -4,7 +4,7 @@ import Footer from "../../components/layout/Footer";
 import Card from "../../components/common/Card";
 import Button from "../../components/common/Button";
 
-export default function CompanyDetail() {
+export default function CompanyDetailPublic() {
   // Mock listing dataset for the sidebar layout modeled from image_4b6637.png
   const availableInternships = [
     { id: 1, title: "Software Engineering Intern", company: "TechNova", location: "Phnom Penh", duration: "12 weeks", salary: "$6,500/mo", type: "Remote", initial: "T", color: "bg-purple-600/20 text-purple-400", applicants: 67, rating: "4.8", desc: "Help developers around the world build and deploy faster with TechNova. As a Software Engineering Intern, you will be engaging with our community, writing technical infrastructure, building deployment microservices, and helping shape the engineering efficiency of our core platform." },

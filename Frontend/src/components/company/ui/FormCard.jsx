@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Card({ children, className = '', glow = false, ...props }) {
+export default function FormCard({ children, className = '', glow = false, ...props }) {
   return (
     <div 
       className={`rounded-2xl border border-white/5 bg-[#111B34]/40 p-5 shadow-xl backdrop-blur-md relative overflow-hidden ${

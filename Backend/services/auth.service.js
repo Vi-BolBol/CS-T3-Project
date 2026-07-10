@@ -1,9 +1,9 @@
-import { createUser, findUserByEmail } from "../models/auth.model.js";
+import { createUserWithProfile, findUserByEmail } from "../models/auth.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 export const registerService = async (payload = {}) => {
-  const { email, password, role = "student" } = payload;
+  const { email, password, role = "student", name } = payload;
 
   if (!email || !password) {
     return {
@@ -23,15 +23,26 @@ export const registerService = async (payload = {}) => {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const user = await createUser({
+  const user = await createUserWithProfile({
     email,
     passwordHash: hashedPassword,
     role,
+    name,
   });
+
+  const token = jwt.sign(
+    {
+      id: user.id,
+      email: user.email,
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: "1d" }
+  );
 
   return {
     success: true,
     message: "Register successful",
+    token,
     user: {
       id: user.id,
       email: user.email,

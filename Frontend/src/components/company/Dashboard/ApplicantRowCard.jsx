@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function timeAgo(isoString) {
@@ -10,8 +10,27 @@ function timeAgo(isoString) {
   return `Applied ${days} day${days === 1 ? '' : 's'} ago`;
 }
 
-export default function ApplicantRowCard({ applicant }) {
+const STATUS_BADGE = {
+  accepted: 'bg-emerald-500/10 text-emerald-400',
+  rejected: 'bg-rose-500/10 text-rose-400',
+  reviewed: 'bg-sky-500/10 text-sky-400',
+  pending: 'bg-white/5 text-gray-400',
+};
+
+export default function ApplicantRowCard({ applicant, onStatusChange }) {
   const navigate = useNavigate();
+  const [busy, setBusy] = useState(false);
+  const isDecided = applicant.status === 'accepted' || applicant.status === 'rejected';
+
+  const handleDecision = async (status) => {
+    if (!onStatusChange || busy) return;
+    setBusy(true);
+    try {
+      await onStatusChange(applicant.id, status);
+    } finally {
+      setBusy(false);
+    }
+  };
 
   return (
     <div className="group rounded-xl border border-white/5 bg-[#070B19]/40 p-4 transition-all duration-200 hover:border-white/10 hover:bg-[#070B19]/80 flex flex-col justify-between">
@@ -29,26 +48,54 @@ export default function ApplicantRowCard({ applicant }) {
             </div>
           </div>
 
-          <span className="text-[10px] font-bold bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded whitespace-nowrap">
-            {applicant.matchScore}% Match
+          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded whitespace-nowrap capitalize ${STATUS_BADGE[applicant.status] || STATUS_BADGE.pending}`}>
+            {applicant.status}
           </span>
         </div>
 
         <p className="text-xs text-gray-500 mt-3">School: {applicant.university}</p>
-        <p className="text-[11px] text-gray-600 mt-0.5">{timeAgo(applicant.appliedAt)}</p>
+        <p className="text-[11px] text-gray-600 mt-0.5">
+          {applicant.matchScore != null ? `${applicant.matchScore}% match \u2022 ` : ''}
+          {timeAgo(applicant.appliedAt)}
+        </p>
       </div>
 
       <div className="mt-4 pt-3 border-t border-white/5 flex items-center gap-2">
-        <button className="flex-1 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-[#070B19] text-xs font-bold transition duration-150">
-          Shortlist
-        </button>
-        <button
-          type="button"
-          onClick={() => navigate(`/company/applicant/${applicant.id}/cv`)}
-          className="px-2.5 py-1.5 rounded-lg border border-white/10 bg-white/5 text-xs text-gray-400 hover:text-white hover:bg-white/10 transition"
-        >
-          Review CV
-        </button>
+        {isDecided ? (
+          <button
+            type="button"
+            onClick={() => navigate(`/company/applicant/${applicant.id}/cv`)}
+            className="flex-1 py-1.5 rounded-lg border border-white/10 bg-white/5 text-xs text-gray-300 hover:bg-white/10 transition"
+          >
+            View Details
+          </button>
+        ) : (
+          <>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => handleDecision('accepted')}
+              className="flex-1 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-[#070B19] text-xs font-bold transition duration-150 disabled:opacity-40"
+            >
+              Accept
+            </button>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => handleDecision('rejected')}
+              className="px-3 py-1.5 rounded-lg border border-rose-500/20 text-rose-400 bg-rose-500/5 hover:bg-rose-500/10 text-xs transition disabled:opacity-40"
+            >
+              Reject
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate(`/company/applicant/${applicant.id}/cv`)}
+              className="px-2.5 py-1.5 rounded-lg border border-white/10 bg-white/5 text-xs text-gray-400 hover:text-white hover:bg-white/10 transition"
+            >
+              Review CV
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

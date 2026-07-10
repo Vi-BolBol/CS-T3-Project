@@ -33,14 +33,24 @@ export const findInternshipById = async (id) => {
   });
 };
 
-export const findPublicInternships = async ({ status = "open" } = {}) => {
+export const findPublicInternships = async ({ status = "open", search, location } = {}) => {
+  const where = {};
+  if (status) where.status = status;
+  if (search) {
+    where.title = { contains: search, mode: "insensitive" };
+  }
+  if (location) {
+    where.location = { contains: location, mode: "insensitive" };
+  }
+
   return prisma.internship.findMany({
-    where: status ? { status } : undefined,
+    where,
     orderBy: { createdAt: "desc" },
     include: {
       company: {
         select: { id: true, companyName: true, logoUrl: true, industry: true },
       },
+      _count: { select: { applications: true } },
     },
   });
 };

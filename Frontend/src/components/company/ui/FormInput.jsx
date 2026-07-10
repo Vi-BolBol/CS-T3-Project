@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Input({ label, error, className = '', ...props }) {
+export default function FormInput({ label, error, className = '', ...props }) {
   return (
     <div className="w-full">
       {label && (

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import CompanyNavbar from '../../components/layout/CompanyNavbar';
 import CompanyFooter from '../../components/layout/CompanyFooter';
-import PostedJobsList from '../../components/company/Dashboard/postedjobsList';
+import PostedJobsList from '../../components/company/Dashboard/PostedJobsList';
 import SelectedJobView from '../../components/company/Dashboard/SelectedJobView';
 import useCompanyJobs from '../../hooks/useCompanyJobs';
 import { toDisplayJobList } from '../../utils/internshipMapper';

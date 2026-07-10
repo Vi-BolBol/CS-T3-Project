@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Button({ children, variant = 'primary', className = '', ...props }) {
+export default function FormButton({ children, variant = 'primary', className = '', ...props }) {
   const baseStyles = 'px-4 py-2 text-xs font-bold rounded-xl transition-all duration-150 flex items-center justify-center gap-1.5 focus:outline-none';
   
   const variants = {

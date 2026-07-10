@@ -118,3 +118,58 @@ export function toUpdatePayload(formData) {
     location: formData.location,
   };
 }
+
+// --- Student-facing (public) mapping -------------------------------------
+// Turns a real Internship row (from GET /api/internships or GET /:id) into
+// the shape UserHome's search results and ViewDetail's master-detail view
+// render. This replaces the hardcoded `availableInternships` mock array
+// that both pages used to ship with.
+
+const AVATAR_PALETTE = [
+  'bg-purple-600/20 text-purple-400',
+  'bg-emerald-600/20 text-emerald-400',
+  'bg-sky-600/20 text-sky-400',
+  'bg-amber-600/20 text-amber-400',
+  'bg-rose-600/20 text-rose-400',
+];
+
+function initialFromCompanyName(name) {
+  return name?.trim()?.[0]?.toUpperCase() || '?';
+}
+
+function colorForId(id) {
+  return AVATAR_PALETTE[id % AVATAR_PALETTE.length];
+}
+
+function formatDuration(value, unit) {
+  if (!value) return 'Not specified';
+  return `${value} ${unit || 'Months'}`;
+}
+
+export function toPublicListing(internship) {
+  if (!internship) return null;
+
+  return {
+    id: internship.id,
+    title: internship.title,
+    company: internship.company?.companyName || 'Unknown Company',
+    location: internship.location || 'Not specified',
+    duration: formatDuration(internship.durationValue, internship.durationUnit),
+    salary: formatSalaryRange(internship.salaryMin, internship.salaryMax),
+    type: formatWorkEnvironment(internship.workEnvironment),
+    initial: initialFromCompanyName(internship.company?.companyName),
+    color: colorForId(internship.id),
+    applicants: internship._count?.applications ?? 0,
+    desc: internship.jobDescription || 'No description provided for this listing yet.',
+    skills: internship.skills ? internship.skills.split(',').map((s) => s.trim()).filter(Boolean) : [],
+    requirements: internship.requirements
+      ? internship.requirements.split('\n').map((r) => r.trim()).filter(Boolean)
+      : [],
+    postedDate: formatPostedDate(internship.createdAt),
+    raw: internship,
+  };
+}
+
+export function toPublicListingList(internships = []) {
+  return internships.map(toPublicListing);
+}
