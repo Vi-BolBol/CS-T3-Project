@@ -1,5 +1,5 @@
 import express from "express";
-import { verifyToken } from "../middleware/auth.middleware.js";
+import { protect } from "../middleware/auth.middleware.js";
 import {
   publishInternship,
   getMyInternships,
@@ -15,10 +15,10 @@ const router = express.Router();
 router.get("/", getPublicInternships);
 
 // Company-only routes — must come before "/:id" so "mine" isn't parsed as an id
-router.get("/mine", verifyToken, getMyInternships);
-router.post("/", verifyToken, publishInternship);
-router.put("/:id", verifyToken, updateInternshipController);
-router.delete("/:id", verifyToken, deleteInternshipController);
+router.get("/mine", protect, getMyInternships);
+router.post("/", protect, publishInternship);
+router.put("/:id", protect, updateInternshipController);
+router.delete("/:id", protect, deleteInternshipController);
 
 router.get("/:id", getInternship);
 

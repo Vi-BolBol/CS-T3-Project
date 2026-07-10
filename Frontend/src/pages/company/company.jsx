@@ -6,7 +6,7 @@ import Card from "../../components/common/Card";
 import Button from "../../components/common/Button";
 import Input from "../../components/common/Input";
 
-export default function BrowseCompanies() {
+export default function Company() {
   // Enhanced dataset to support interactive filtering features
   const initialCompanies = [
     { name: "TechNova", jobs: 12, location: "Phnom Penh", industry: "Frontend Development", type: "Hybrid", initial: "T", color: "bg-purple-600/20 text-purple-400" },

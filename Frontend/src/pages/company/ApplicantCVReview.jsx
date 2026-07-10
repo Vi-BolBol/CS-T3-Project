@@ -38,11 +38,9 @@ export default function ApplicantCVReview() {
   }, [applicantId]);
 
   const handleStatusChange = async (targetStatus) => {
-    const result = await dispatchApplicationStatus(applicantId, targetStatus);
-    if (result.success) {
+    const success = await dispatchApplicationStatus(applicantId, targetStatus);
+    if (success) {
       setApplicant((prev) => (prev ? { ...prev, status: targetStatus } : prev));
-    } else {
-      alert(result.message || 'Failed to update status.');
     }
   };
 
@@ -91,7 +89,7 @@ export default function ApplicantCVReview() {
                   </div>
                   <div className="flex justify-between">
                     <span>Match Score</span>
-                    <span className="text-emerald-400 font-bold">{applicant.matchScore != null ? `${applicant.matchScore}%` : 'Not scored'}</span>
+                    <span className="text-emerald-400 font-bold">{applicant.matchScore}%</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Status</span>
@@ -130,17 +128,11 @@ export default function ApplicantCVReview() {
 
             {/* CV render */}
             <div className="lg:col-span-8">
-              {applicant.cvData ? (
-                <div className="rounded-2xl border border-white/10 bg-[#111B34]/60 p-4 sm:p-6 shadow-2xl overflow-x-auto">
-                  <div className="mx-auto w-fit shadow-2xl">
-                    <TemplateComponent cvData={applicant.cvData} palette={applicant.palette} />
-                  </div>
+              <div className="rounded-2xl border border-white/10 bg-[#111B34]/60 p-4 sm:p-6 shadow-2xl overflow-x-auto">
+                <div className="mx-auto w-fit shadow-2xl">
+                  <TemplateComponent cvData={applicant.cvData} palette={applicant.palette} />
                 </div>
-              ) : (
-                <div className="rounded-2xl border border-white/5 bg-[#111B34]/40 p-12 text-center text-sm text-gray-400">
-                  This applicant hasn't submitted a CV through the platform yet.
-                </div>
-              )}
+              </div>
             </div>
           </div>
         )}

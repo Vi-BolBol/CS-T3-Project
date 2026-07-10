@@ -125,11 +125,7 @@ export const listCompanyInternshipsService = async (userId) => {
 };
 
 export const listPublicInternshipsService = async (query = {}) => {
-  const internships = await findPublicInternships({
-    status: query.status || "open",
-    search: query.search,
-    location: query.location,
-  });
+  const internships = await findPublicInternships({ status: query.status || "open" });
   return { success: true, internships };
 };
 

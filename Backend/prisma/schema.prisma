@@ -58,6 +58,7 @@ model User {
   cvs             Cv[]
   applications    Application[]
   savedInternships SavedInternship[]
+  followedCompanies FollowedCompany[]
   auditLogs       AuditLog[]
 
   @@map("users")
@@ -93,6 +94,7 @@ model CompanyProfile {
 
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   internships  Internship[]
+  followedBy   FollowedCompany[]
 
   @@map("company_profiles")
 }
@@ -170,6 +172,18 @@ model SavedInternship {
 
   @@id([userId, internshipId])
   @@map("saved_internships")
+}
+
+model FollowedCompany {
+  userId    Int
+  companyId Int
+  createdAt DateTime @default(now())
+
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company CompanyProfile @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@id([userId, companyId])
+  @@map("followed_companies")
 }
 
 model AuditLog {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import FormInput from '../../ui/FormInput';
+import Input from '../../ui/Input';
 import TagInput from '../../ui/TagInput';
 import EditableListInput from '../../ui/EditableListInput';
 import useCompanyJobs from '../../../../hooks/useCompanyJobs';
@@ -29,7 +29,7 @@ export default function EditTab({ job, onSaved }) {
 
   return (
     <div className="space-y-5">
-      <FormInput label="Job Title" value={formData.title} onChange={(e) => updateField('title', e.target.value)} />
+      <Input label="Job Title" value={formData.title} onChange={(e) => updateField('title', e.target.value)} />
 
       <div>
         <label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-1.5">Department</label>
@@ -65,7 +65,7 @@ export default function EditTab({ job, onSaved }) {
         </div>
       </div>
 
-      <FormInput label="Location" value={formData.location} onChange={(e) => updateField('location', e.target.value)} placeholder="e.g. San Francisco, CA" />
+      <Input label="Location" value={formData.location} onChange={(e) => updateField('location', e.target.value)} placeholder="e.g. San Francisco, CA" />
 
       <div>
         <label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-1.5">Description</label>
@@ -88,12 +88,12 @@ export default function EditTab({ job, onSaved }) {
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <FormInput label="Min Pay ($/mo)" type="number" value={formData.payMin} onChange={(e) => updateField('payMin', e.target.value)} />
-        <FormInput label="Max Pay ($/mo)" type="number" value={formData.payMax} onChange={(e) => updateField('payMax', e.target.value)} />
+        <Input label="Min Pay ($/mo)" type="number" value={formData.payMin} onChange={(e) => updateField('payMin', e.target.value)} />
+        <Input label="Max Pay ($/mo)" type="number" value={formData.payMax} onChange={(e) => updateField('payMax', e.target.value)} />
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <FormInput label="Duration" type="number" value={formData.durationValue} onChange={(e) => updateField('durationValue', e.target.value)} />
+        <Input label="Duration" type="number" value={formData.durationValue} onChange={(e) => updateField('durationValue', e.target.value)} />
         <div>
           <label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-1.5">Duration Unit</label>
           <select

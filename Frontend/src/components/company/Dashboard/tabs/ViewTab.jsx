@@ -3,7 +3,7 @@ import ApplicantRowCard from '../ApplicantRowCard';
 import useApplications from '../../../../hooks/useApplications';
 
 export default function ViewTab({ job }) {
-  const { fetchApplicants, dispatchApplicationStatus, loading } = useApplications();
+  const { fetchApplicants, loading } = useApplications();
   const [applicants, setApplicants] = useState([]);
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState('top');
@@ -20,24 +20,13 @@ export default function ViewTab({ job }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [job.id]);
 
-  const handleStatusChange = async (applicantId, targetStatus) => {
-    const result = await dispatchApplicationStatus(applicantId, targetStatus);
-    if (result.success) {
-      setApplicants((prev) =>
-        prev.map((a) => (a.id === applicantId ? { ...a, status: targetStatus } : a))
-      );
-    } else {
-      alert(result.message || 'Failed to update applicant status.');
-    }
-  };
-
   const visibleApplicants = useMemo(() => {
     let list = applicants.filter((a) =>
       a.name.toLowerCase().includes(search.toLowerCase()) ||
       a.university.toLowerCase().includes(search.toLowerCase())
     );
     if (sort === 'top') {
-      list = [...list].sort((a, b) => (b.matchScore ?? -1) - (a.matchScore ?? -1));
+      list = [...list].sort((a, b) => b.matchScore - a.matchScore);
     } else {
       list = [...list].sort((a, b) => new Date(b.appliedAt) - new Date(a.appliedAt));
     }
@@ -78,7 +67,7 @@ export default function ViewTab({ job }) {
       ) : visibleApplicants.length > 0 ? (
         <div className="grid gap-3 sm:grid-cols-2">
           {visibleApplicants.map((applicant) => (
-            <ApplicantRowCard key={applicant.id} applicant={applicant} onStatusChange={handleStatusChange} />
+            <ApplicantRowCard key={applicant.id} applicant={applicant} />
           ))}
         </div>
       ) : (

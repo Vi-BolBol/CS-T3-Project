@@ -1,32 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../../components/layout/StudentNavbar';
+import Pipeline from './Pipeline';
 import Footer from '../../components/layout/StudentFooter';
-import useApplications from '../../hooks/useApplications';
 
 export default function Application() {
-  const { fetchMyApplications, loading } = useApplications();
-  const [pipeline, setPipeline] = useState([]);
-  const [loadError, setLoadError] = useState('');
+  const [pipeline] = useState([
+    { role: 'Software Engineering Intern', company: 'Tesla Inc.', date: 'Jun 12, 2026', status: 'Selected' },
+    { role: 'Data Analytics Associate', company: 'Google Cloud Team', date: 'Jun 19, 2026', status: 'Pending' },
+    { role: 'Cloud Architect Intern', company: 'Amazon Web Services', date: 'Jun 24, 2026', status: 'Disqualified' }
+  ]);
 
-  useEffect(() => {
-    let cancelled = false;
-    fetchMyApplications().then((result) => {
-      if (cancelled) return;
-      if (result.success) {
-        setPipeline(result.applications);
-      } else {
-        setLoadError(result.message || 'Failed to load your applications.');
-      }
-    });
-    return () => {
-      cancelled = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Placeholder recommendations — there's no match-scoring engine against
-  // internships yet, so this section stays illustrative for now.
   const [topChoices] = useState([
     { role: 'UI Developer Intern', company: 'Vercel Operations', date: 'Active Selection Round', matchScore: '96%' },
     { role: 'AI Data Design Intern', company: 'OpenAI Studio Workspace', date: 'In Review Queue', matchScore: '91%' }
@@ -52,52 +36,35 @@ export default function Application() {
               <p className="text-xs text-slate-400">Track and monitor your active internship selection rounds.</p>
             </div>
 
-            {loading ? (
-              <div className="text-center py-12 border border-dashed border-white/5 rounded-2xl bg-white/[0.01]">
-                <p className="text-xs text-gray-400">Loading your applications…</p>
-              </div>
-            ) : loadError ? (
-              <div className="text-center py-12 border border-dashed border-rose-500/20 rounded-2xl bg-rose-500/[0.02]">
-                <p className="text-xs text-rose-400">{loadError}</p>
-              </div>
-            ) : pipeline.length === 0 ? (
-              <div className="text-center py-12 border border-dashed border-white/5 rounded-2xl bg-white/[0.01]">
-                <p className="text-xs text-gray-400">You haven't applied to any internships yet.</p>
-                <Link to="/user/home" className="text-xs text-[#10b981] font-bold hover:text-emerald-400 transition-colors mt-2 inline-block">
-                  Browse internships ›
-                </Link>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {pipeline.map((app) => (
-                  <div
-                    key={app.id}
-                    className="bg-[#0d1527] border border-white/5 rounded-2xl p-5 flex flex-col justify-between space-y-4 hover:border-emerald-500/30 transition-all duration-200 text-left group shadow-md"
-                  >
-                    <div className="space-y-3">
-                      <div className="flex">
-                        <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider ${statusBadges[app.status]}`}>
-                          {app.status}
-                        </span>
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-sm text-white group-hover:text-[#10b981] transition-colors line-clamp-1">
-                          {app.role}
-                        </h3>
-                        <p className="text-xs text-slate-400 mt-0.5">{app.company}</p>
-                      </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {pipeline.map((app, index) => (
+                <div 
+                  key={index} 
+                  className="bg-[#0d1527] border border-white/5 rounded-2xl p-5 flex flex-col justify-between space-y-4 hover:border-emerald-500/30 transition-all duration-200 text-left group shadow-md"
+                >
+                  <div className="space-y-3">
+                    <div className="flex">
+                      <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider ${statusBadges[app.status]}`}>
+                        {app.status}
+                      </span>
                     </div>
-
-                    <div className="flex justify-between items-center pt-3 border-t border-white/5 text-[11px] text-slate-500 font-medium">
-                      <span>Filed: {app.date}</span>
-                       <Link to="/pipeline" className="text-[#10b981] hover:text-emerald-400 transition-colors font-bold">
-                         View Pipeline ›
-                       </Link>
+                    <div>
+                      <h3 className="font-bold text-sm text-white group-hover:text-[#10b981] transition-colors line-clamp-1">
+                        {app.role}
+                      </h3>
+                      <p className="text-xs text-slate-400 mt-0.5">{app.company}</p>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
+                  
+                  <div className="flex justify-between items-center pt-3 border-t border-white/5 text-[11px] text-slate-500 font-medium">
+                    <span>Filed: {app.date}</span>
+                     <Link to="/pipeline" className="text-[#10b981] hover:text-emerald-400 transition-colors font-bold">
+                       View Pipeline ›
+                     </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
           </section>
 
           {/* Priority Target Grid Row */}

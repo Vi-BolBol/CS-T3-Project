@@ -5,11 +5,11 @@ import CompanyFooter from '../../components/layout/CompanyFooter';
 import useCompanyJobs from '../../hooks/useCompanyJobs';
 import useToast from '../../hooks/useToast';
 import Toast from '../../components/shared/Toast';
-import Step1Essential from '../../components/company/JobWizardSteps/Step1Essential';
-import Step2Detail from '../../components/company/JobWizardSteps/Step2Detail';
-import Step3Compensation from '../../components/company/JobWizardSteps/Step3Compensation';
-import Step4Review from '../../components/company/JobWizardSteps/Step4Review';
-import Step5Publish from '../../components/company/JobWizardSteps/Step5Publish';
+import Step1Essential from '../../components/company/JobWizardSteps/step1Essential';
+import Step2Detail from '../../components/company/JobWizardSteps/step2Detail';
+import Step3Compensation from '../../components/company/JobWizardSteps/step3Compensation';
+import Step4Review from '../../components/company/JobWizardSteps/step4Review';
+import Step5Checkout from '../../components/company/JobWizardSteps/step5Checkout';
 import WizardProgress from '../../components/company/JobWizardSteps/WizardProgress';
 
 const INITIAL_DATA = {
@@ -27,8 +27,13 @@ const INITIAL_DATA = {
   payMax: '',
   durationValue: '',
   durationUnit: 'Months',
-  // Step 5 — Plan
-  plan: 'featured'
+  // Step 5 — Checkout
+  plan: 'featured',
+  cardName: '',
+  cardNumber: '',
+  expiryMonth: '',
+  expiryYear: '',
+  cvc: ''
 };
 
 export default function CreateInternship() {
@@ -76,13 +81,14 @@ export default function CreateInternship() {
             <Step4Review data={formData} onNext={goNext} onBack={goBack} />
           )}
           {step === 5 && (
-            <Step5Publish
+            <Step5Checkout
               data={formData}
               onChange={updateField}
               onSubmit={handlePublish}
               onBack={goBack}
               loading={loading}
               error={error}
+              showToast={showToast}
             />
           )}
         </div>

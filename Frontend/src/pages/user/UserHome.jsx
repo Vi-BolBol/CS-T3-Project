@@ -1,27 +1,65 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Search, MapPin } from 'lucide-react';
+import { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../../components/layout/StudentNavbar';
 import Footer from '../../components/layout/StudentFooter';
+import JobCard from '../../components/ui/JobCard';
+import CompanyCard from '../../components/ui/CompanyCard';
+import useSavedInternships from '../../hooks/useSavedInternships';
+import useFollowedCompanies from '../../hooks/useFollowedCompanies';
+import useRecommendedInternships from '../../hooks/useRecommendedInternships';
+
+function formatSalary(job) {
+  if (job.salaryMin && job.salaryMax) return `$${job.salaryMin}-$${job.salaryMax}/mo`;
+  if (job.salary) return `$${job.salary}/mo`;
+  return 'Not disclosed';
+}
+
+function SectionHeader({ title, actionLabel, actionTo }) {
+  return (
+    <div className="flex items-center justify-between mb-4">
+      <h2 className="text-lg font-bold text-white">{title}</h2>
+      {actionLabel && actionTo && (
+        <Link to={actionTo} className="text-xs text-[#10b981] hover:underline">
+          {actionLabel}
+        </Link>
+      )}
+    </div>
+  );
+}
+
+function EmptyState({ message, actionLabel, actionTo }) {
+  return (
+    <div className="text-center py-10 rounded-2xl border border-dashed border-slate-800">
+      <p className="text-sm text-slate-400">{message}</p>
+      {actionLabel && actionTo && (
+        <Link
+          to={actionTo}
+          className="inline-block mt-3 text-xs font-semibold text-[#10b981] hover:underline"
+        >
+          {actionLabel}
+        </Link>
+      )}
+    </div>
+  );
+}
 
 export default function Home() {
   const navigate = useNavigate();
-  const [role, setRole] = useState('');
-  const [location, setLocation] = useState('');
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    const params = new URLSearchParams();
-    if (role.trim()) params.set('search', role.trim());
-    if (location.trim()) params.set('location', location.trim());
-    navigate(`/view-detail?${params.toString()}`);
-  };
+  const { savedInternships, loading: savedLoading, fetchSaved } = useSavedInternships();
+  const { followedCompanies, loading: followedLoading, fetchFollowed } = useFollowedCompanies();
+  const { recommended, loading: recommendedLoading, fetchRecommended } = useRecommendedInternships();
+
+  useEffect(() => {
+    fetchSaved();
+    fetchFollowed();
+    fetchRecommended();
+  }, [fetchSaved, fetchFollowed, fetchRecommended]);
 
   return (
     <div className="min-h-screen bg-[#070B19]">
       <Navbar />
-      {/* Main Content */}
-      <div className="max-w-5xl mx-auto space-y-12">
+      <div className="max-w-5xl mx-auto space-y-12 pb-16">
         {/* Hero Section */}
         <div className="relative bg-gradient-to-b from-[#070B19] mt-[60px] to-[#11182c] border border-slate-800/80 rounded-3xl p-10 lg:p-14 text-center space-y-6 overflow-hidden shadow-2xl">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-[#10b981]/5 rounded-full blur-3xl pointer-events-none"></div>
@@ -31,57 +69,93 @@ export default function Home() {
           <p className="text-slate-400 text-sm lg:text-base max-w-xl mx-auto leading-relaxed">
             Connect your developer profile with leading technology environments looking for software engineering placement candidates.
           </p>
-
-          {/* Search Bar — searches real internships from GET /api/internships */}
-          <form
-            onSubmit={handleSearch}
-            className="relative z-10 mx-auto flex max-w-2xl flex-col gap-3 pt-4 sm:flex-row sm:items-center"
-          >
-            <div className="flex flex-1 items-center gap-2 rounded-xl border border-slate-700/60 bg-[#0B132B]/60 px-4 py-3">
-              <Search className="h-4 w-4 shrink-0 text-slate-500" />
-              <input
-                type="text"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                placeholder="Role (e.g. UX Designer)"
-                className="w-full bg-transparent text-sm text-white placeholder-slate-500 focus:outline-none"
-              />
-            </div>
-            <div className="flex flex-1 items-center gap-2 rounded-xl border border-slate-700/60 bg-[#0B132B]/60 px-4 py-3">
-              <MapPin className="h-4 w-4 shrink-0 text-slate-500" />
-              <input
-                type="text"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="Location or Remote"
-                className="w-full bg-transparent text-sm text-white placeholder-slate-500 focus:outline-none"
-              />
-            </div>
+          <div className="pt-4">
             <button
-              type="submit"
-              className="px-6 py-3 bg-[#10b981] hover:bg-emerald-600 transition-all font-semibold text-sm rounded-xl shadow-lg shadow-emerald-950/40 active:scale-95 whitespace-nowrap"
+              onClick={() => navigate('/user/browse')}
+              className="px-8 py-3.5 bg-[#10b981] hover:bg-emerald-600 transition-all font-semibold text-sm rounded-xl shadow-lg shadow-emerald-950/40 active:scale-95"
             >
-              Search
+              Explore Available Roles
             </button>
-          </form>
+          </div>
         </div>
 
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-[#131c35] border border-slate-800/50 p-8 rounded-2xl space-y-3">
-            <div className="text-2xl">💼</div>
-            <h3 className="font-bold text-base text-white">Curated Technical Matches</h3>
-            <p className="text-sm text-slate-400 leading-relaxed">
-              System filters align automatically with your language preferences and runtime expertise.
-            </p>
-          </div>
-          <div className="bg-[#131c35] border border-slate-800/50 p-8 rounded-2xl space-y-3">
-            <div className="text-2xl">🚀</div>
-            <h3 className="font-bold text-base text-white">Direct Application Piping</h3>
-            <p className="text-sm text-slate-400 leading-relaxed">
-              Bypass long recruitment loops by feeding parsed JSON templates straight into engineering teams.
-            </p>
-          </div>
+        {/* Companies You Follow */}
+        <div>
+          <SectionHeader title="Companies You Follow" actionLabel="Browse Companies" actionTo="/company" />
+          {followedLoading && <p className="text-sm text-slate-400">Loading…</p>}
+          {!followedLoading && followedCompanies.length === 0 && (
+            <EmptyState
+              message="You're not following any companies yet."
+              actionLabel="Discover companies to follow"
+              actionTo="/company"
+            />
+          )}
+          {!followedLoading && followedCompanies.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {followedCompanies.map((company) => (
+                <Link key={company.id} to={`/company/${company.id}`}>
+                  <CompanyCard
+                    name={company.companyName}
+                    industry={company.industry}
+                    location={company.location}
+                    jobs={company.openInternshipsCount}
+                  />
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Saved Internships */}
+        <div>
+          <SectionHeader title="Saved Internships" actionLabel="Find more internships" actionTo="/user/browse" />
+          {savedLoading && <p className="text-sm text-slate-400">Loading…</p>}
+          {!savedLoading && savedInternships.length === 0 && (
+            <EmptyState
+              message="You haven't saved any internships yet."
+              actionLabel="Browse internships"
+              actionTo="/user/browse"
+            />
+          )}
+          {!savedLoading && savedInternships.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {savedInternships.map((job) => (
+                <Link key={job.id} to={`/company/${job.companyId}`}>
+                  <JobCard
+                    title={job.title}
+                    company={job.company?.companyName}
+                    location={job.location}
+                    type={job.workEnvironment}
+                    salary={formatSalary(job)}
+                  />
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Recommended For You */}
+        <div>
+          <SectionHeader title="Recommended For You" actionLabel="See all internships" actionTo="/user/browse" />
+          {recommendedLoading && <p className="text-sm text-slate-400">Loading…</p>}
+          {!recommendedLoading && recommended.length === 0 && (
+            <EmptyState message="No recommendations yet — check back soon." />
+          )}
+          {!recommendedLoading && recommended.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {recommended.map((job) => (
+                <Link key={job.id} to={`/company/${job.companyId}`}>
+                  <JobCard
+                    title={job.title}
+                    company={job.company?.companyName}
+                    location={job.location}
+                    type={job.workEnvironment}
+                    salary={formatSalary(job)}
+                  />
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </div>
       <Footer />
