@@ -86,3 +86,6 @@ prisma/dev.db-journal
 
 # Misc
 .nyc_output
+
+# Unnecessary .md file
+SessionsSummarize.md
