@@ -197,4 +197,4 @@ These are tracked so the team (and any AI assistant helping out) doesn't redisco
 
 ## 8. Team
 
-Chhon Chhaychanvibol - Lov Kimtech - Rith Sereyrathanak - Hem Rothapanharith - Bol
+Chhon Chhaychanvibol - Lov Kimtech - Rith Sereyrathanak
