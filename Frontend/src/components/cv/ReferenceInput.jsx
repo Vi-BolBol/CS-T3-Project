@@ -54,11 +54,11 @@ function ReferenceInput({ entries, onChange }) {
 
       {/* Form / button — on top */}
       {isAdding ? (
-        <div className="bg-slate-800 border border-slate-600 rounded-lg p-4 flex flex-col gap-3">
+        <div className="bg-raised border border-line rounded-lg p-4 flex flex-col gap-3">
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs text-slate-400 mb-1">
+              <label className="block text-xs text-subtle mb-1">
                 Full Name <span className="text-red-400">*</span>
               </label>
               <input
@@ -66,11 +66,11 @@ function ReferenceInput({ entries, onChange }) {
                 value={form.fullName}
                 onChange={(e) => handleChange('fullName', e.target.value)}
                 placeholder="e.g. Dara Heng"
-                className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-400"
+                className="w-full bg-muted border border-line rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent"
               />
             </div>
             <div>
-              <label className="block text-xs text-slate-400 mb-1">
+              <label className="block text-xs text-subtle mb-1">
                 Company <span className="text-red-400">*</span>
               </label>
               <input
@@ -78,50 +78,50 @@ function ReferenceInput({ entries, onChange }) {
                 value={form.company}
                 onChange={(e) => handleChange('company', e.target.value)}
                 placeholder="e.g. TechCo Cambodia"
-                className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-400"
+                className="w-full bg-muted border border-line rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs text-slate-400 mb-1">
+            <label className="block text-xs text-subtle mb-1">
               Job Title
-              <span className="text-slate-500 ml-1">(optional)</span>
+              <span className="text-faint ml-1">(optional)</span>
             </label>
             <input
               type="text"
               value={form.jobTitle}
               onChange={(e) => handleChange('jobTitle', e.target.value)}
               placeholder="e.g. HR Manager"
-              className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-400"
+              className="w-full bg-muted border border-line rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs text-slate-400 mb-1">
+              <label className="block text-xs text-subtle mb-1">
                 Email
-                <span className="text-slate-500 ml-1">(optional)</span>
+                <span className="text-faint ml-1">(optional)</span>
               </label>
               <input
                 type="email"
                 value={form.email}
                 onChange={(e) => handleChange('email', e.target.value)}
                 placeholder="e.g. dara@techco.com"
-                className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-400"
+                className="w-full bg-muted border border-line rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent"
               />
             </div>
             <div>
-              <label className="block text-xs text-slate-400 mb-1">
+              <label className="block text-xs text-subtle mb-1">
                 Phone
-                <span className="text-slate-500 ml-1">(optional)</span>
+                <span className="text-faint ml-1">(optional)</span>
               </label>
               <input
                 type="tel"
                 value={form.phone}
                 onChange={(e) => handleChange('phone', e.target.value)}
                 placeholder="e.g. +855 12 345 678"
-                className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-400"
+                className="w-full bg-muted border border-line rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent"
               />
             </div>
           </div>
@@ -130,7 +130,7 @@ function ReferenceInput({ entries, onChange }) {
             <button
               type="button"
               onClick={handleCancel}
-              className="px-4 py-2 text-sm text-slate-400 hover:text-white transition"
+              className="px-4 py-2 text-sm text-subtle hover:text-content transition"
             >
               Cancel
             </button>
@@ -138,7 +138,7 @@ function ReferenceInput({ entries, onChange }) {
               type="button"
               onClick={handleAdd}
               disabled={form.fullName.trim() === '' || form.company.trim() === ''}
-              className="px-4 py-2 bg-emerald-400 text-slate-900 text-sm font-semibold rounded-lg hover:bg-emerald-300 transition disabled:bg-slate-600 disabled:text-slate-400 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-accent text-accent-ink text-sm font-semibold rounded-lg hover:bg-accent transition disabled:bg-muted disabled:text-subtle disabled:cursor-not-allowed"
             >
               {editingIndex !== null ? 'Update Entry' : 'Save Entry'}
             </button>
@@ -148,7 +148,7 @@ function ReferenceInput({ entries, onChange }) {
         <button
           type="button"
           onClick={() => setIsAdding(true)}
-          className="w-full py-2 border border-dashed border-slate-600 rounded-lg text-sm text-slate-400 hover:border-emerald-400 hover:text-emerald-400 transition"
+          className="w-full py-2 border border-dashed border-line rounded-lg text-sm text-subtle hover:border-accent hover:text-accent transition"
         >
           + Add Reference
         </button>
@@ -160,33 +160,33 @@ function ReferenceInput({ entries, onChange }) {
           {entries.map((entry, index) => (
             <div
               key={index}
-              className="bg-slate-800 border border-slate-600 rounded-lg px-4 py-3 flex justify-between items-start gap-3"
+              className="bg-raised border border-line rounded-lg px-4 py-3 flex justify-between items-start gap-3"
             >
               <div className="flex flex-col gap-0.5">
-                <span className="text-sm font-semibold text-white">{entry.fullName}</span>
+                <span className="text-sm font-semibold text-content">{entry.fullName}</span>
                 {entry.jobTitle && (
-                  <span className="text-xs text-emerald-400">{entry.jobTitle}</span>
+                  <span className="text-xs text-accent">{entry.jobTitle}</span>
                 )}
-                <span className="text-xs text-slate-400">{entry.company}</span>
+                <span className="text-xs text-subtle">{entry.company}</span>
                 {entry.email && (
-                  <span className="text-xs text-slate-400">✉ {entry.email}</span>
+                  <span className="text-xs text-subtle">✉ {entry.email}</span>
                 )}
                 {entry.phone && (
-                  <span className="text-xs text-slate-400">📞 {entry.phone}</span>
+                  <span className="text-xs text-subtle">📞 {entry.phone}</span>
                 )}
               </div>
               <div className="flex items-center gap-3 shrink-0">
                 <button
                   type="button"
                   onClick={() => handleEdit(index)}
-                  className="text-slate-400 hover:text-emerald-400 transition text-xs font-semibold"
+                  className="text-subtle hover:text-accent transition text-xs font-semibold"
                 >
                   Edit
                 </button>
                 <button
                   type="button"
                   onClick={() => handleRemove(index)}
-                  className="text-slate-400 hover:text-red-400 transition text-sm"
+                  className="text-subtle hover:text-red-400 transition text-sm"
                 >
                   ×
                 </button>

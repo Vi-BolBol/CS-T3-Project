@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import Home from "../pages/Home";
 import About from "../pages/About";
@@ -14,9 +14,15 @@ import CompanyHome from "../pages/company/CompanyHome";
 import CompanyDashboard from "../pages/company/CompanyDashboard";
 import CompanyProfile from "../pages/company/CompanyProfile";
 import CompanySetting from "../pages/company/CompanySetting";
+import CompanyInternships from "../pages/company/CompanyInternships";
+import CompanySearch from "../pages/company/CompanySearch";
 import CreateSetting from "../pages/company/CreateSetting";
 import CreateInternship from "../pages/company/CreateInternship";
 import ApplicantCVReview from "../pages/company/ApplicantCVReview";
+
+import AdminDashboard from "../pages/admin/AdminDashboard";
+import AdminUsers from "../pages/admin/AdminUsers";
+import AdminAuditLogs from "../pages/admin/AdminAuditLogs";
 
 import UserHome from "../pages/user/UserHome";
 import BrowseInternships from "../pages/user/BrowseInternships";
@@ -76,17 +82,26 @@ export default function AppRoute() {
         <Route path="/company/dashboard" element={<CompanyDashboard />} />
         <Route path="/company/profile" element={<CompanyProfile />} />
         <Route path="/company/settings" element={<CompanySetting />} />
+        <Route path="/company/internships" element={<CompanyInternships />} />
+        <Route path="/company/search" element={<CompanySearch />} />
         <Route path="/company/create-wizard" element={<CreateSetting />} />
         <Route path="/company/create-internship" element={<CreateInternship />} />
         <Route path="/company/applicant/:applicantId/cv" element={<ApplicantCVReview />} />
 
         <Route path="/user/home" element={<UserHome />} />
-        <Route path="/user/browse" element={<BrowseInternships />} />
+        <Route path="/user/internships" element={<BrowseInternships />} />
+        <Route path="/user/browse" element={<Navigate to="/user/internships" replace />} />
         <Route path="/user/profile" element={<UserProfile />} />
+        <Route path="/user/profile/:id" element={<UserProfile />} />
         <Route path="/user/settings" element={<UserSetting />} />
         <Route path="/user/applications" element={<UserApplication />} />
         <Route path="/pipeline" element={<Pipeline />} />
         <Route path="/view-detail" element={<ViewDetail />} />
+
+        {/* Admin — AdminLayout redirects non-admins; the server enforces the real boundary */}
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin/users" element={<AdminUsers />} />
+        <Route path="/admin/audit" element={<AdminAuditLogs />} />
 
         <Route path="/cv/*" element={<CVBuilderRoutes />} />
 

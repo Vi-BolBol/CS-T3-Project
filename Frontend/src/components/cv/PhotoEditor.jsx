@@ -3,7 +3,7 @@ import Cropper from 'react-easy-crop'
 function PhotoEditor({ photo, crop, zoom, onCropChange, onZoomChange, onCropComplete }){
     return(
         <div
-        className='relative w-64 h-64 bg-slate-800 rounded-lg overflow-hidden'>
+        className='relative w-64 h-64 bg-raised rounded-lg overflow-hidden'>
             <Cropper
             image={photo}
             crop={crop}

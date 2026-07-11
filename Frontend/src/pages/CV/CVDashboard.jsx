@@ -126,13 +126,13 @@ function CVDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white flex">
+    <div className="min-h-[calc(100vh-4rem)] bg-surface text-content flex">
 
       {/* Sidebar */}
-      <aside className="w-64 shrink-0 bg-slate-950/60 border-r border-slate-800 min-h-screen flex flex-col py-6 px-4">
+      <aside className="w-64 shrink-0 bg-surface/60 border-r border-line min-h-screen flex flex-col py-6 px-4">
         <div className="px-2 mb-8">
           <h1 className="text-lg font-bold">My CV</h1>
-          <p className="text-xs text-slate-500 font-mono mt-0.5">Manage your profile</p>
+          <p className="text-xs text-faint font-mono mt-0.5">Manage your profile</p>
         </div>
 
         <nav className="flex flex-col gap-1">
@@ -144,8 +144,8 @@ function CVDashboard() {
                 onClick={() => setActiveTab(item.id)}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left transition-colors border-l-2 ${
                   isActive
-                    ? 'bg-emerald-400/10 text-emerald-300 border-emerald-400'
-                    : 'text-slate-400 border-transparent hover:text-white hover:bg-slate-800/60'
+                    ? 'bg-accent/10 text-accent border-accent'
+                    : 'text-subtle border-transparent hover:text-content hover:bg-raised/60'
                 }`}
               >
                 {item.icon({ className: 'w-4 h-4 shrink-0' })}
@@ -160,25 +160,25 @@ function CVDashboard() {
       <main className="flex-1 p-8 min-w-0">
 
         {/* Header card */}
-        <div className="bg-slate-800/60 border border-slate-700/80 rounded-2xl shadow-xl shadow-black/20 px-6 py-5 flex items-center justify-between mb-6">
+        <div className="bg-raised/60 border border-line/80 rounded-2xl shadow-xl shadow-black/20 px-6 py-5 flex items-center justify-between mb-6">
           <div>
             <h2 className="text-xl font-bold">
               {cvData.personal?.fullName ? `${cvData.personal.fullName}'s CV` : 'Your CV'}
             </h2>
-            <p className="text-sm text-slate-400 mt-0.5">
+            <p className="text-sm text-subtle mt-0.5">
               {completedSteps?.size >= 4 ? 'All sections complete' : 'Some sections still need attention'}
             </p>
           </div>
           <div className="flex gap-2">
             <button
               onClick={() => setConfirmAction('upload')}
-              className="px-4 py-2 border border-slate-600 text-slate-200 text-sm font-semibold rounded-lg hover:bg-slate-700/60 transition"
+              className="px-4 py-2 border border-line text-content text-sm font-semibold rounded-lg hover:bg-muted/60 transition"
             >
               Upload a CV instead
             </button>
             <button
               onClick={() => setConfirmAction('create')}
-              className="px-4 py-2 bg-emerald-400 text-slate-900 text-sm font-bold rounded-lg hover:bg-emerald-300 transition shadow-md shadow-emerald-400/20"
+              className="px-4 py-2 bg-accent text-accent-ink text-sm font-bold rounded-lg hover:bg-accent transition shadow-md shadow-accent/20"
             >
               + Create New CV
             </button>
@@ -189,7 +189,7 @@ function CVDashboard() {
 
         {activeTab === 'preview' && (
           <div
-            className="flex-1 bg-slate-800/60 border border-slate-700/80 rounded-2xl shadow-xl shadow-black/20 p-4 min-w-0"
+            className="flex-1 bg-raised/60 border border-line/80 rounded-2xl shadow-xl shadow-black/20 p-4 min-w-0"
             style={{ maxHeight: 'calc(100vh - 220px)', overflowX: 'auto', overflowY: 'auto' }}
           >
             <div className="w-fit">
@@ -200,19 +200,19 @@ function CVDashboard() {
 
         {/* Edit Content tab */}
         {activeTab === 'edit' && (
-          <div className="bg-slate-800/60 border border-slate-700/80 rounded-2xl shadow-xl shadow-black/20 p-6 flex flex-col gap-3">
+          <div className="bg-raised/60 border border-line/80 rounded-2xl shadow-xl shadow-black/20 p-6 flex flex-col gap-3">
             {EDIT_SECTIONS.map((section) => {
               const isDone = completedSteps?.has(section.step);
               return (
                 <div
                   key={section.id}
-                  className="flex items-center justify-between bg-slate-900/60 border border-slate-700 rounded-xl px-5 py-4"
+                  className="flex items-center justify-between bg-surface/60 border border-line rounded-xl px-5 py-4"
                 >
                   <div className="flex items-center gap-3">
-                    <span className={`w-2 h-2 rounded-full ${isDone ? 'bg-emerald-400' : 'bg-slate-600'}`} />
+                    <span className={`w-2 h-2 rounded-full ${isDone ? 'bg-accent' : 'bg-muted'}`} />
                     <div>
                       <p className="font-semibold text-sm">{section.label}</p>
-                      <p className="text-xs text-slate-400">{section.hint}</p>
+                      <p className="text-xs text-subtle">{section.hint}</p>
                     </div>
                   </div>
                   <button
@@ -220,7 +220,7 @@ function CVDashboard() {
                       clearActiveSuggestion();
                       navigate(`/cv/step${section.step}`);
                     }}
-                    className="px-4 py-1.5 bg-slate-700 hover:bg-slate-600 text-white text-sm font-semibold rounded-lg transition"
+                    className="px-4 py-1.5 bg-muted hover:bg-muted text-content text-sm font-semibold rounded-lg transition"
                   >
                     Edit
                   </button>
@@ -235,18 +235,18 @@ function CVDashboard() {
           <div className="flex flex-col gap-6">
 
             {isScoring && (
-              <div className="bg-slate-800/60 border border-slate-700/80 rounded-2xl shadow-xl shadow-black/20 p-8 flex flex-col items-center gap-3 text-center">
-                <div className="w-8 h-8 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin" />
-                <p className="text-sm text-slate-400">Analyzing your CV with AI — this takes a few seconds...</p>
+              <div className="bg-raised/60 border border-line/80 rounded-2xl shadow-xl shadow-black/20 p-8 flex flex-col items-center gap-3 text-center">
+                <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+                <p className="text-sm text-subtle">Analyzing your CV with AI — this takes a few seconds...</p>
               </div>
             )}
 
             {!isScoring && scoreError && (
-              <div className="bg-slate-800/60 border border-red-500/40 rounded-2xl shadow-xl shadow-black/20 p-6 flex flex-col items-center gap-3 text-center">
+              <div className="bg-raised/60 border border-red-500/40 rounded-2xl shadow-xl shadow-black/20 p-6 flex flex-col items-center gap-3 text-center">
                 <p className="text-sm text-red-300">{scoreError}</p>
                 <button
                   onClick={handleRunScoring}
-                  className="px-4 py-2 bg-emerald-400 text-slate-900 text-sm font-bold rounded-lg hover:bg-emerald-300 transition"
+                  className="px-4 py-2 bg-accent text-accent-ink text-sm font-bold rounded-lg hover:bg-accent transition"
                 >
                   Try again
                 </button>
@@ -255,24 +255,24 @@ function CVDashboard() {
 
             {!isScoring && !scoreError && scoreData && (
               <>
-                <div className="bg-slate-800/60 border border-slate-700/80 rounded-2xl shadow-xl shadow-black/20 p-6 flex items-center gap-6">
-                  <div className="w-20 h-20 rounded-full border-4 border-emerald-400/70 flex items-center justify-center shrink-0">
-                    <span className="text-2xl font-bold text-emerald-300">{scoreData.score}</span>
+                <div className="bg-raised/60 border border-line/80 rounded-2xl shadow-xl shadow-black/20 p-6 flex items-center gap-6">
+                  <div className="w-20 h-20 rounded-full border-4 border-accent/70 flex items-center justify-center shrink-0">
+                    <span className="text-2xl font-bold text-accent">{scoreData.score}</span>
                   </div>
                   <div>
                     <h3 className="font-bold text-lg">CV Score</h3>
-                    <p className="text-sm text-slate-400 mt-1">
+                    <p className="text-sm text-subtle mt-1">
                       {scoreData.summary || 'A rough read on how complete and recruiter-friendly your CV looks right now.'}
                     </p>
                   </div>
                 </div>
 
-                <div className="bg-slate-800/60 border border-slate-700/80 rounded-2xl shadow-xl shadow-black/20 p-6 flex flex-col gap-4">
+                <div className="bg-raised/60 border border-line/80 rounded-2xl shadow-xl shadow-black/20 p-6 flex flex-col gap-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-bold text-sm text-slate-300">Suggestions</h3>
+                    <h3 className="font-bold text-sm text-subtle">Suggestions</h3>
                     <button
                       onClick={handleRunScoring}
-                      className="text-xs text-slate-400 hover:text-emerald-300 transition"
+                      className="text-xs text-subtle hover:text-accent transition"
                     >
                       Re-run scoring
                     </button>
@@ -280,22 +280,22 @@ function CVDashboard() {
                   {scoreData.suggestions.map((s, i) => (
                     <div
                       key={i}
-                      className="flex items-start justify-between gap-4 bg-slate-900/60 border border-slate-700 rounded-xl px-5 py-4"
+                      className="flex items-start justify-between gap-4 bg-surface/60 border border-line rounded-xl px-5 py-4"
                     >
                       <div>
-                        <p className="text-xs font-semibold text-emerald-300 uppercase tracking-wide">{s.section}</p>
-                        <p className="text-sm text-slate-300 mt-1">{s.note}</p>
+                        <p className="text-xs font-semibold text-accent uppercase tracking-wide">{s.section}</p>
+                        <p className="text-sm text-subtle mt-1">{s.note}</p>
                       </div>
                       <div className="flex gap-2 shrink-0">
                         <button
                           onClick={() => handleIgnoreSuggestion(i)}
-                          className="px-3 py-1.5 border border-slate-600 text-slate-300 text-xs font-semibold rounded-lg hover:bg-slate-700/60 transition"
+                          className="px-3 py-1.5 border border-line text-subtle text-xs font-semibold rounded-lg hover:bg-muted/60 transition"
                         >
                           Ignore
                         </button>
                         <button
                           onClick={() => handleImproveSuggestion(s)}
-                          className="px-3 py-1.5 bg-emerald-400 text-slate-900 text-xs font-bold rounded-lg hover:bg-emerald-300 transition"
+                          className="px-3 py-1.5 bg-accent text-accent-ink text-xs font-bold rounded-lg hover:bg-accent transition"
                         >
                           Improve
                         </button>
@@ -307,11 +307,11 @@ function CVDashboard() {
             )}
 
             {!isScoring && !scoreError && !scoreData && completedSteps?.size >= 4 && (
-              <div className="bg-slate-800/60 border border-slate-700/80 rounded-2xl shadow-xl shadow-black/20 p-8 flex flex-col items-center gap-3 text-center">
-                <p className="text-sm text-slate-400">Get an AI-powered score and suggestions for your CV.</p>
+              <div className="bg-raised/60 border border-line/80 rounded-2xl shadow-xl shadow-black/20 p-8 flex flex-col items-center gap-3 text-center">
+                <p className="text-sm text-subtle">Get an AI-powered score and suggestions for your CV.</p>
                 <button
                   onClick={handleRunScoring}
-                  className="px-4 py-2 bg-emerald-400 text-slate-900 text-sm font-bold rounded-lg hover:bg-emerald-300 transition"
+                  className="px-4 py-2 bg-accent text-accent-ink text-sm font-bold rounded-lg hover:bg-accent transition"
                 >
                   Get CV Score & Suggestions
                 </button>
@@ -319,13 +319,13 @@ function CVDashboard() {
             )}
 
             {!isScoring && !scoreError && !scoreData && completedSteps?.size < 4 && (
-              <div className="bg-slate-800/60 border border-slate-700/80 rounded-2xl shadow-xl shadow-black/20 p-8 flex flex-col items-center gap-3 text-center">
-                <p className="text-sm text-slate-400">
+              <div className="bg-raised/60 border border-line/80 rounded-2xl shadow-xl shadow-black/20 p-8 flex flex-col items-center gap-3 text-center">
+                <p className="text-sm text-subtle">
                   Finish all 4 sections of your CV before running AI scoring.
                 </p>
                 <button
                   onClick={() => setActiveTab('edit')}
-                  className="px-4 py-2 border border-slate-600 text-slate-200 text-sm font-semibold rounded-lg hover:bg-slate-700/60 transition"
+                  className="px-4 py-2 border border-line text-content text-sm font-semibold rounded-lg hover:bg-muted/60 transition"
                 >
                   Go to Edit Content
                 </button>
@@ -337,13 +337,13 @@ function CVDashboard() {
         {/* Download tab */}
         {activeTab === 'download' && (
           <div className="flex flex-col lg:flex-row gap-6">
-            <div className="w-full lg:w-72 shrink-0 bg-slate-800/60 border border-slate-700/80 rounded-2xl shadow-xl shadow-black/20 p-5 flex flex-col gap-5 h-fit">
+            <div className="w-full lg:w-72 shrink-0 bg-raised/60 border border-line/80 rounded-2xl shadow-xl shadow-black/20 p-5 flex flex-col gap-5 h-fit">
               <div>
-                <p className="text-sm font-medium text-slate-300 mb-2">Template</p>
+                <p className="text-sm font-medium text-subtle mb-2">Template</p>
                 <TemplatePicker templates={TEMPLATES} activeTemplate={activeTemplate} onChange={setActiveTemplate} />
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-300 mb-2">Color Palette</p>
+                <p className="text-sm font-medium text-subtle mb-2">Color Palette</p>
                 <PalettePicker palettes={COLOR_PALETTES} activePalette={activePalette} onChange={setActivePalette} />
               </div>
               <button
@@ -351,8 +351,8 @@ function CVDashboard() {
                 disabled={isGenerating}
                 className={`w-full py-2.5 font-semibold rounded-lg text-sm transition ${
                   isGenerating
-                    ? 'bg-slate-700 text-slate-400 cursor-not-allowed'
-                    : 'bg-emerald-400 text-slate-900 hover:bg-emerald-300 shadow-md shadow-emerald-400/20'
+                    ? 'bg-muted text-subtle cursor-not-allowed'
+                    : 'bg-accent text-accent-ink hover:bg-accent shadow-md shadow-accent/20'
                 }`}
               >
                 {isGenerating ? 'Generating PDF...' : 'Download PDF'}
@@ -360,7 +360,7 @@ function CVDashboard() {
             </div>
 
             <div
-              className="flex-1 bg-slate-800/60 border border-slate-700/80 rounded-2xl shadow-xl shadow-black/20 p-4 min-w-0"
+              className="flex-1 bg-raised/60 border border-line/80 rounded-2xl shadow-xl shadow-black/20 p-4 min-w-0"
               style={{ maxHeight: 'calc(100vh - 220px)', overflowX: 'auto', overflowY: 'auto' }}
             >
               <div className="w-fit">

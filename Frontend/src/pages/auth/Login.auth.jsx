@@ -22,11 +22,14 @@ export default function Login() {
         password: credentials.password,
       });
 
-      if (result.success) {
+      // Only proceed if the server really returned a session.
+      if (result.success && result.token && result.user) {
         localStorage.setItem("token", result.token);
         localStorage.setItem("user", JSON.stringify(result.user));
 
-        if (result.user.role === "student") {
+        if (result.user.role === "admin") {
+          navigate("/admin");
+        } else if (result.user.role === "student") {
           navigate("/user/home");
         } else if (result.user.role === "company") {
           navigate("/company/home");

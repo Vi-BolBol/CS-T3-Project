@@ -7,14 +7,14 @@ import Button from '../../components/company/ui/Button';
 
 export default function CreateSetting() {
   return (
-    <div className="min-h-screen bg-[#070B19] text-white flex flex-col justify-between">
+    <div className="min-h-screen bg-surface text-content flex flex-col justify-between">
       <CompanyNavbar />
 
       <main className="flex-1 mx-auto w-full max-w-xl px-4 py-16 flex flex-col justify-center">
         <Card glow className="border border-white/10">
           <div className="text-center pb-4 border-b border-white/5 mb-6">
-            <h2 className="text-xl font-black tracking-tight text-white">Initialize Corporate Workspace</h2>
-            <p className="text-xs text-gray-400 mt-1">Configure your foundational configuration matrix to unlock onboarding candidate searches.</p>
+            <h2 className="text-xl font-black tracking-tight text-content">Initialize Corporate Workspace</h2>
+            <p className="text-xs text-subtle mt-1">Configure your foundational configuration matrix to unlock onboarding candidate searches.</p>
           </div>
 
           <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); alert("Workspace settings generated successfully!"); }}>

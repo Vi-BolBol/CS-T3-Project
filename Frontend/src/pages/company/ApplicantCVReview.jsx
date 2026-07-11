@@ -47,24 +47,24 @@ export default function ApplicantCVReview() {
   const TemplateComponent = applicant ? TEMPLATE_COMPONENTS[applicant.template] || ClassicTemplate : null;
 
   return (
-    <div className="min-h-screen bg-[#070B19] text-white flex flex-col justify-between selection:bg-emerald-500 selection:text-[#070B19]">
+    <div className="min-h-screen bg-surface text-content flex flex-col justify-between selection:bg-accent selection:text-[#070B19]">
       <CompanyNavbar />
 
       <main className="flex-1 mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="text-xs text-gray-400 hover:text-white transition mb-6 inline-flex items-center gap-1"
+          className="text-xs text-subtle hover:text-content transition mb-6 inline-flex items-center gap-1"
         >
           &larr; Back to Dashboard
         </button>
 
         {notFound ? (
-          <div className="rounded-2xl border border-white/5 bg-[#111B34]/40 p-12 text-center text-sm text-gray-400">
+          <div className="rounded-2xl border border-white/5 bg-[#111B34]/40 p-12 text-center text-sm text-subtle">
             Applicant not found.
           </div>
         ) : !applicant ? (
-          <div className="rounded-2xl border border-white/5 bg-[#111B34]/40 p-12 text-center text-sm text-gray-400">
+          <div className="rounded-2xl border border-white/5 bg-[#111B34]/40 p-12 text-center text-sm text-subtle">
             Loading CV…
           </div>
         ) : (
@@ -73,27 +73,27 @@ export default function ApplicantCVReview() {
             <div className="lg:col-span-4 space-y-4">
               <div className="rounded-2xl border border-white/5 bg-[#111B34]/40 p-5">
                 <div className="flex items-center gap-3">
-                  <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/20 flex items-center justify-center font-black text-sm text-emerald-400">
+                  <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-accent/20 to-teal-500/20 border border-accent/20 flex items-center justify-center font-black text-sm text-accent">
                     {applicant.avatar}
                   </div>
                   <div>
-                    <h1 className="text-base font-bold text-white">{applicant.name}</h1>
-                    <p className="text-xs text-gray-400">{applicant.role}</p>
+                    <h1 className="text-base font-bold text-content">{applicant.name}</h1>
+                    <p className="text-xs text-subtle">{applicant.role}</p>
                   </div>
                 </div>
 
-                <div className="mt-4 pt-4 border-t border-white/5 space-y-2 text-xs text-gray-400">
+                <div className="mt-4 pt-4 border-t border-white/5 space-y-2 text-xs text-subtle">
                   <div className="flex justify-between">
                     <span>School</span>
-                    <span className="text-gray-200">{applicant.university}</span>
+                    <span className="text-content">{applicant.university}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Match Score</span>
-                    <span className="text-emerald-400 font-bold">{applicant.matchScore}%</span>
+                    <span className="text-accent font-bold">{applicant.matchScore}%</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Status</span>
-                    <span className="text-gray-200 capitalize">{applicant.status}</span>
+                    <span className="text-content capitalize">{applicant.status}</span>
                   </div>
                 </div>
               </div>
@@ -103,7 +103,7 @@ export default function ApplicantCVReview() {
                   type="button"
                   disabled={isProcessing}
                   onClick={() => handleStatusChange('accepted')}
-                  className="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-[#070B19] text-xs font-bold transition disabled:opacity-40"
+                  className="w-full py-2.5 rounded-xl bg-accent hover:bg-accent text-[#070B19] text-xs font-bold transition disabled:opacity-40"
                 >
                   Shortlist Candidate
                 </button>
@@ -111,7 +111,7 @@ export default function ApplicantCVReview() {
                   type="button"
                   disabled={isProcessing}
                   onClick={() => handleStatusChange('reviewed')}
-                  className="w-full py-2.5 rounded-xl border border-white/10 bg-white/5 text-xs text-gray-300 hover:bg-white/10 transition disabled:opacity-40"
+                  className="w-full py-2.5 rounded-xl border border-white/10 bg-raised/5 text-xs text-subtle hover:bg-raised/10 transition disabled:opacity-40"
                 >
                   Mark as Reviewed
                 </button>

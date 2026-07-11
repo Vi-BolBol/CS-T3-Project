@@ -1,5 +1,6 @@
 import express from "express";
 import { protect } from "../middleware/auth.middleware.js";
+import { authorize } from "../middleware/role.middleware.js";
 import {
   saveInternship,
   unsaveInternship,
@@ -12,8 +13,8 @@ import {
 
 const router = express.Router();
 
-// All student home-page routes require a logged-in user
-router.use(protect);
+// All student routes require a logged-in user with the student role
+router.use(protect, authorize("student"));
 
 router.get("/saved-internships", getSavedInternships);
 router.post("/saved-internships/:internshipId", saveInternship);

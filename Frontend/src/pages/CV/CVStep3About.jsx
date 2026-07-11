@@ -58,19 +58,19 @@ function CVStep3About() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white flex flex-col items-center py-6 px-4">
+    <div className="min-h-[calc(100vh-4rem)] bg-surface text-content flex flex-col items-center py-6 px-4">
       <StepProgressBar currentStep={3} />
       <SuggestionBanner />
 
-      <div className="w-full max-w-2xl bg-slate-800/60 border border-slate-700/80 rounded-2xl shadow-xl shadow-black/20 p-6 sm:p-8 mt-6 flex flex-col gap-6">
+      <div className="w-full max-w-2xl bg-raised/60 border border-line/80 rounded-2xl shadow-xl shadow-black/20 p-6 sm:p-8 mt-6 flex flex-col gap-6">
 
         <div>
           <h2 className="text-lg font-bold">About You</h2>
-          <p className="text-sm text-slate-400 mt-1">What you're good at, and how you spend your time.</p>
+          <p className="text-sm text-subtle mt-1">What you're good at, and how you spend your time.</p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1.5">About Me
+          <label className="block text-sm font-medium text-subtle mb-1.5">About Me
             <span className="text-red-400 ml-1">*</span>
           </label>
           <textarea
@@ -78,24 +78,24 @@ function CVStep3About() {
           onChange={(e) => { if(e.target.value.length <= ABOUT_MAX) setAboutMe(e.target.value) }}
           placeholder="Write a short summary about yourself"
           rows={4}
-          className={`w-full bg-slate-900/60 border rounded-lg px-3 py-2.5 text-sm resize-none transition-colors focus:outline-none focus:ring-1 ${
+          className={`w-full bg-surface/60 border rounded-lg px-3 py-2.5 text-sm resize-none transition-colors focus:outline-none focus:ring-1 ${
             submitted && !isAboutValid
               ? 'border-red-400 ring-1 ring-red-400/40'
-              : 'border-slate-700 focus:border-emerald-400 focus:ring-emerald-400/40'
+              : 'border-line focus:border-accent focus:ring-accent/40'
           }`}
           />
           <div className="flex justify-between mt-1.5">
-            <span className={`text-xs ${submitted && aboutMe.trim().length < 1 ? 'text-red-400' : 'text-slate-500'}`}>
+            <span className={`text-xs ${submitted && aboutMe.trim().length < 1 ? 'text-red-400' : 'text-faint'}`}>
               {submitted && aboutMe.trim().length < 1 ? 'Please write a short summary' : 'Brief summary of who you are'}
             </span>
-            <span className={`text-xs ${aboutMe.length >= ABOUT_MAX ? 'text-red-400' : 'text-slate-500'}`}>
+            <span className={`text-xs ${aboutMe.length >= ABOUT_MAX ? 'text-red-400' : 'text-faint'}`}>
               {aboutMe.length} / {ABOUT_MAX}
             </span>
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1.5">Skills
+          <label className="block text-sm font-medium text-subtle mb-1.5">Skills
             <span className="text-red-400 ml-1">*</span>
           </label>
           <div className={submitted && skills.length === 0 ? 'rounded-lg ring-1 ring-red-400/50' : ''}>
@@ -108,13 +108,13 @@ function CVStep3About() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1.5">Hobbies</label>
+          <label className="block text-sm font-medium text-subtle mb-1.5">Hobbies</label>
           <SearchableTagInput tags={hobbies} onChange={setHobbies}
             suggestions={suggestedHobbies} placeholder="Search or add a custom hobby..." />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1.5">Languages
+          <label className="block text-sm font-medium text-subtle mb-1.5">Languages
             <span className="text-red-400 ml-1">*</span>
           </label>
           <div className={submitted && languages.length === 0 ? 'rounded-lg ring-1 ring-red-400/50' : ''}>
@@ -126,19 +126,19 @@ function CVStep3About() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1.5">Links
-            <span className="text-slate-500 font-normal ml-1">(optional, max 5)</span>
+          <label className="block text-sm font-medium text-subtle mb-1.5">Links
+            <span className="text-faint font-normal ml-1">(optional, max 5)</span>
           </label>
           <LinkInput links={links} onChange={setLinks} />
         </div>
 
-        <div className="flex justify-between items-center border-t border-slate-700/80 pt-5 mt-1">
+        <div className="flex justify-between items-center border-t border-line/80 pt-5 mt-1">
           <button onClick={() => navigate('/cv/step2')}
-            className="px-6 py-2 bg-slate-700 text-white font-semibold rounded-lg hover:bg-slate-600 transition">
+            className="px-6 py-2 bg-muted text-content font-semibold rounded-lg hover:bg-muted transition">
             ← Back
           </button>
           <button onClick={handleNext}
-            className="px-6 py-2 bg-emerald-400 text-slate-900 font-semibold rounded-lg hover:bg-emerald-300 transition">
+            className="px-6 py-2 bg-accent text-accent-ink font-semibold rounded-lg hover:bg-accent transition">
             Next →
           </button>
         </div>

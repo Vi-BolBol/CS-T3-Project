@@ -8,16 +8,16 @@ function TemplatePicker({ templates, activeTemplate, onChange }) {
           onClick={() => onChange(template.id)}
           className={`flex items-center gap-3 p-2 rounded-lg border transition ${
             activeTemplate === template.id
-              ? 'border-emerald-400 bg-emerald-400/10'
-              : 'border-slate-600 hover:border-slate-400'
+              ? 'border-accent bg-accent/10'
+              : 'border-line hover:border-line'
           }`}
         >
           {/* Template thumbnail placeholder */}
           <div
             className={`w-12 h-16 rounded flex-shrink-0 flex items-center justify-center text-xs ${
               activeTemplate === template.id
-                ? 'bg-emerald-400/20 text-emerald-400'
-                : 'bg-slate-700 text-slate-500'
+                ? 'bg-accent/20 text-accent'
+                : 'bg-muted text-faint'
             }`}
           >
             {template.id === 'classic' && (
@@ -59,11 +59,11 @@ function TemplatePicker({ templates, activeTemplate, onChange }) {
           {/* Template info */}
           <div className="flex flex-col items-start gap-0.5">
             <span className={`text-sm font-medium ${
-              activeTemplate === template.id ? 'text-emerald-400' : 'text-slate-300'
+              activeTemplate === template.id ? 'text-accent' : 'text-subtle'
             }`}>
               {template.name}
             </span>
-            <span className="text-xs text-slate-500">
+            <span className="text-xs text-faint">
               {template.id === 'classic' && 'Sidebar layout with photo'}
               {template.id === 'modern' && 'Clean single column'}
               {template.id === 'professional' && 'Structured two columns'}
@@ -72,7 +72,7 @@ function TemplatePicker({ templates, activeTemplate, onChange }) {
 
           {/* Active indicator */}
           {activeTemplate === template.id && (
-            <span className="ml-auto text-emerald-400 text-sm">✓</span>
+            <span className="ml-auto text-accent text-sm">✓</span>
           )}
         </button>
       ))}

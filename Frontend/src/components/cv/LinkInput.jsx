@@ -60,10 +60,10 @@ function LinkInput({ links, onChange }) {
               onClick={() => handleSuggestionClick(suggestion)}
               className={`px-3 py-1 text-xs rounded-full border transition ${
                 selectedSuggestion?.label === suggestion.label
-                  ? 'bg-emerald-400/20 text-emerald-300 border-emerald-400/30'
+                  ? 'bg-accent/20 text-accent border-accent/30'
                   : alreadyAdded || links.length >= MAX_LINKS
-                  ? 'text-slate-600 border-slate-700 cursor-not-allowed'
-                  : 'text-slate-400 border-slate-600 hover:border-emerald-400 hover:text-emerald-400'
+                  ? 'text-faint border-line cursor-not-allowed'
+                  : 'text-subtle border-line hover:border-accent hover:text-accent'
               }`}
             >
               {suggestion.label}
@@ -84,7 +84,7 @@ function LinkInput({ links, onChange }) {
             }}
             onKeyDown={handleKeyDown}
             placeholder="Label (e.g. Portfolio, GitHub...)"
-            className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-400"
+            className="w-full bg-raised border border-line rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent"
           />
           <div className="flex gap-2">
             <input
@@ -97,13 +97,13 @@ function LinkInput({ links, onChange }) {
                   ? selectedSuggestion.placeholder
                   : 'https://...'
               }
-              className="flex-1 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-400"
+              className="flex-1 bg-raised border border-line rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent"
             />
             <button
               type="button"
               onClick={handleAdd}
               disabled={labelInput.trim() === '' || urlInput.trim() === ''}
-              className="px-4 py-2 bg-emerald-400 text-slate-900 text-sm font-semibold rounded-lg hover:bg-emerald-300 transition disabled:bg-slate-600 disabled:text-slate-400 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-accent text-accent-ink text-sm font-semibold rounded-lg hover:bg-accent transition disabled:bg-muted disabled:text-subtle disabled:cursor-not-allowed"
             >
               Add
             </button>
@@ -124,16 +124,16 @@ function LinkInput({ links, onChange }) {
           {links.map((link, index) => (
             <div
               key={index}
-              className="flex items-center justify-between bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 gap-3"
+              className="flex items-center justify-between bg-raised border border-line rounded-lg px-3 py-2 gap-3"
             >
               <div className="flex items-center gap-3 min-w-0">
-                <span className="text-xs text-emerald-400 font-medium bg-emerald-400/10 border border-emerald-400/20 px-2 py-0.5 rounded-full whitespace-nowrap">
+                <span className="text-xs text-accent font-medium bg-accent/10 border border-accent/20 px-2 py-0.5 rounded-full whitespace-nowrap">
                   {link.label}
                 </span>
                 <a                  href={link.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-sm text-slate-300 hover:text-emerald-400 truncate transition"
+                  className="text-sm text-subtle hover:text-accent truncate transition"
                 >
                   {link.url}
                 </a>
@@ -141,7 +141,7 @@ function LinkInput({ links, onChange }) {
               <button
                 type="button"
                 onClick={() => handleRemove(index)}
-                className="text-slate-400 hover:text-red-400 transition text-sm shrink-0"
+                className="text-subtle hover:text-red-400 transition text-sm shrink-0"
               >
                 ×
               </button>

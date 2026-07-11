@@ -2,60 +2,64 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Design tokens. "R G B" triplets so Tailwind opacity modifiers work (bg-surface/50).
+   Light is default; .dark on <html> flips the whole app. Never hardcode hex in JSX. */
+:root {
+  --c-surface: 246 248 251;
+  --c-raised: 255 255 255;
+  --c-muted: 238 242 247;
+  --c-line: 226 232 240;
+  --c-text: 15 23 42;
+  --c-text-2: 71 85 105;
+  --c-text-3: 148 163 184;
+  --c-accent: 16 185 129;
+  --c-accent-ink: 4 35 26;
+  --c-accent-soft: 236 253 245;
+  --c-warn: 245 158 11;
+  --c-danger: 239 68 68;
+  color-scheme: light;
+}
+
+.dark {
+  --c-surface: 11 18 32;
+  --c-raised: 17 26 46;
+  --c-muted: 22 34 58;
+  --c-line: 31 44 70;
+  --c-text: 230 237 247;
+  --c-text-2: 148 163 184;
+  --c-text-3: 100 116 139;
+  --c-accent: 52 211 153;
+  --c-accent-ink: 4 35 26;
+  --c-accent-soft: 12 42 34;
+  --c-warn: 251 191 36;
+  --c-danger: 248 113 113;
+  color-scheme: dark;
+}
+
 body {
   margin: 0;
-  background-color: #070B19;
-  color: white;
-  font-family: Arial, sans-serif;
+  background-color: rgb(var(--c-surface));
+  color: rgb(var(--c-text));
+  font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  transition: background-color .2s ease, color .2s ease;
 }
 
-/* Custom scrollbar used by CustomSelect, SearchableTagInput, LanguageInput */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #475569;
-  border-radius: 9999px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
-}
-.custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: #475569 transparent;
-}
+.custom-scrollbar::-webkit-scrollbar { width: 6px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: rgb(var(--c-text-3)); border-radius: 9999px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgb(var(--c-text-2)); }
+.custom-scrollbar { scrollbar-width: thin; scrollbar-color: rgb(var(--c-text-3)) transparent; }
 
-/* Dark-theme override for react-phone-number-input (used in CVStep2Personal) */
 .phone-input-custom.PhoneInput {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: #1e293b;
-  border: 1px solid #475569;
-  border-radius: 0.5rem;
-  padding: 0.5rem 0.75rem;
+  display: flex; align-items: center; gap: .5rem;
+  background: rgb(var(--c-muted));
+  border: 1px solid rgb(var(--c-line));
+  border-radius: .5rem; padding: .5rem .75rem;
 }
-.phone-input-custom.PhoneInput--focus {
-  border-color: #10b981;
-}
+.phone-input-custom.PhoneInput--focus { border-color: rgb(var(--c-accent)); }
 .phone-input-custom .PhoneInputInput {
-  background: transparent;
-  color: white;
-  border: none;
-  outline: none;
-  font-size: 0.875rem;
+  background: transparent; color: rgb(var(--c-text));
+  border: none; outline: none; font-size: .875rem;
 }
-.phone-input-custom .PhoneInputCountry {
-  margin-right: 0.25rem;
-}
-.phone-input-custom .PhoneInputCountrySelect {
-  background: #1e293b;
-  color: white;
-}
-.phone-input-custom .PhoneInputCountrySelectArrow {
-  color: #94a3b8;
-  opacity: 0.8;
-}
+.phone-input-custom .PhoneInputCountrySelect { background: rgb(var(--c-raised)); color: rgb(var(--c-text)); }
+.phone-input-custom .PhoneInputCountrySelectArrow { color: rgb(var(--c-text-3)); opacity: .8; }

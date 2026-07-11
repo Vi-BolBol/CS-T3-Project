@@ -18,7 +18,7 @@ export default function SelectedJobView({ job, onJobUpdated }) {
 
   if (!job) {
     return (
-      <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.01] p-12 text-center text-sm text-gray-400">
+      <div className="rounded-2xl border border-dashed border-white/10 bg-raised/[0.01] p-12 text-center text-sm text-subtle">
         Select a job from the list to view its details.
       </div>
     );
@@ -37,24 +37,24 @@ export default function SelectedJobView({ job, onJobUpdated }) {
           <div>
             <div className="flex items-center gap-2">
               {job.category && (
-                <span className="text-[10px] uppercase font-bold tracking-widest text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
+                <span className="text-[10px] uppercase font-bold tracking-widest text-accent bg-accent/10 px-2 py-0.5 rounded">
                   {job.category}
                 </span>
               )}
-              <span className="text-[10px] font-mono text-gray-500">ID: {job.code}</span>
+              <span className="text-[10px] font-mono text-subtle">ID: {job.code}</span>
             </div>
-            <h1 className="text-2xl font-black tracking-tight text-white mt-2 sm:text-3xl">{job.title}</h1>
-            <p className="text-sm text-gray-400 mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+            <h1 className="text-2xl font-black tracking-tight text-content mt-2 sm:text-3xl">{job.title}</h1>
+            <p className="text-sm text-subtle mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
               <span>{job.location}</span>
-              <span className="h-1 w-1 rounded-full bg-white/20" />
+              <span className="h-1 w-1 rounded-full bg-raised/20" />
               <span>{job.workEnvironment}</span>
-              <span className="h-1 w-1 rounded-full bg-white/20" />
-              <span className="text-emerald-400 font-semibold">{job.salaryRange}</span>
+              <span className="h-1 w-1 rounded-full bg-raised/20" />
+              <span className="text-accent font-semibold">{job.salaryRange}</span>
             </p>
           </div>
 
           <div className="flex items-center gap-2 self-start sm:self-auto">
-            <button className="px-3 py-1.5 border border-white/10 rounded-lg bg-white/5 text-xs text-gray-300 hover:bg-white/10 transition">
+            <button className="px-3 py-1.5 border border-white/10 rounded-lg bg-raised/5 text-xs text-subtle hover:bg-raised/10 transition">
               Share
             </button>
             <button
@@ -64,7 +64,7 @@ export default function SelectedJobView({ job, onJobUpdated }) {
               className={`px-3 py-1.5 border rounded-lg text-xs transition disabled:opacity-40 ${
                 job.status === 'open'
                   ? 'border-amber-500/20 text-amber-400 bg-amber-500/5 hover:bg-amber-500/10'
-                  : 'border-emerald-500/20 text-emerald-400 bg-emerald-500/5 hover:bg-emerald-500/10'
+                  : 'border-accent/20 text-accent bg-accent/5 hover:bg-accent/10'
               }`}
             >
               {togglingStatus ? 'Updating…' : job.status === 'open' ? 'Freeze Listing' : 'Resume Listing'}
@@ -72,13 +72,13 @@ export default function SelectedJobView({ job, onJobUpdated }) {
           </div>
         </div>
 
-        <p className="mt-4 text-xs sm:text-sm leading-relaxed text-gray-400 max-w-3xl">
+        <p className="mt-4 text-xs sm:text-sm leading-relaxed text-subtle max-w-3xl">
           {job.description}
         </p>
 
-        <div className="mt-4 flex flex-wrap gap-4 text-xs text-gray-400">
-          <div>Posted: <span className="text-gray-200">{job.postedDate}</span></div>
-          <div>Volume: <span className="text-emerald-400 font-bold">{job.applicantsCount} total tracking profiles</span></div>
+        <div className="mt-4 flex flex-wrap gap-4 text-xs text-subtle">
+          <div>Posted: <span className="text-content">{job.postedDate}</span></div>
+          <div>Volume: <span className="text-accent font-bold">{job.applicantsCount} total tracking profiles</span></div>
         </div>
 
         <div className="mt-6 flex items-center gap-1 border-b border-white/5 -mb-px">
@@ -89,8 +89,8 @@ export default function SelectedJobView({ job, onJobUpdated }) {
               onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-2.5 text-xs font-semibold border-b-2 transition ${
                 activeTab === tab.id
-                  ? 'border-emerald-400 text-emerald-400'
-                  : 'border-transparent text-gray-400 hover:text-white'
+                  ? 'border-accent text-accent'
+                  : 'border-transparent text-subtle hover:text-content'
               }`}
             >
               {tab.label}

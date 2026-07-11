@@ -72,26 +72,34 @@ function CVStep2Personal() {
   }
 
   const inputClass = (isValid) =>
-    `w-full bg-slate-900/60 border rounded-lg px-3 py-2.5 text-sm transition-colors focus:outline-none focus:ring-1 ${
+    `w-full bg-surface/60 border rounded-lg px-3 py-2.5 text-sm transition-colors focus:outline-none focus:ring-1 ${
       submitted && !isValid
         ? 'border-red-400 ring-1 ring-red-400/40'
-        : 'border-slate-700 focus:border-emerald-400 focus:ring-emerald-400/40'
+        : 'border-line focus:border-accent focus:ring-accent/40'
     }`
 
+  // Bridge the existing day/month/year state to a single yyyy-mm-dd value.
+  const pad = (n) => String(n).padStart(2, '0');
+  const isoBirthDate =
+    birthYear && birthMonth && birthDay
+      ? `${birthYear}-${pad(birthMonth)}-${pad(birthDay)}`
+      : '';
+  const todayISO = new Date().toISOString().split('T')[0];
+
   return (
-    <div className="min-h-screen bg-slate-900 text-white flex flex-col items-center py-6 px-4">
+    <div className="min-h-[calc(100vh-4rem)] bg-surface text-content flex flex-col items-center py-6 px-4">
       <StepProgressBar currentStep={2} />
       <SuggestionBanner />
 
-      <div className="w-full max-w-2xl bg-slate-800/60 border border-slate-700/80 rounded-2xl shadow-xl shadow-black/20 p-6 sm:p-8 mt-6 flex flex-col gap-6">
+      <div className="w-full max-w-2xl bg-raised/60 border border-line/80 rounded-2xl shadow-xl shadow-black/20 p-6 sm:p-8 mt-6 flex flex-col gap-6">
 
         <div>
           <h2 className="text-lg font-bold">Personal Information</h2>
-          <p className="text-sm text-slate-400 mt-1">Basic details companies will use to reach you.</p>
+          <p className="text-sm text-subtle mt-1">Basic details companies will use to reach you.</p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1.5">Full Name</label>
+          <label className="block text-sm font-medium text-subtle mb-1.5">Full Name</label>
           <input
           type="text"
           value={fullName}
@@ -110,26 +118,33 @@ function CVStep2Personal() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1.5">Date of Birth</label>
-          <div className='flex gap-2'>
-            <CustomSelect value={birthDay} onChange={setBirthDay}
-              options={days.map((day) => ({ value: day, label: String(day) }))} placeholder="Day" />
-            <CustomSelect value={birthMonth} onChange={(newMonth) => {
-                setBirthMonth(newMonth)
-                const newDaysInMonth = getDaysinMonth(Number(newMonth), Number(birthYear))
-                if(birthDay && Number(birthDay) > newDaysInMonth) setBirthDay('');
-              }}
-              options={months.map((month, index) => ({ value: index + 1, label: month}))} placeholder='Month' />
-            <CustomSelect value={birthYear} onChange={(newYear) => {
-                setBirthYear(newYear)
-                const newDaysInMonth = getDaysinMonth(Number(birthMonth), Number(newYear))
-                if(birthDay && Number(birthDay) > newDaysInMonth) setBirthDay('');
-              }}
-              options={Array.from({ length: 100 }, (_, i) => {
-                const y = new Date().getFullYear() - i;
-                return { value: y, label: String(y) };
-              })} placeholder="Year" />
-          </div>
+          <label className="block text-sm font-medium text-subtle mb-1.5">Date of Birth</label>
+          {/* Single date field — a real date picker beats three dropdowns, and it
+              can't produce an impossible date like 31 Feb. The underlying
+              day/month/year state is kept so validation + templates still work. */}
+          <input
+            type="date"
+            value={isoBirthDate}
+            max={todayISO}
+            min="1950-01-01"
+            onChange={(e) => {
+              const v = e.target.value; // yyyy-mm-dd
+              if (!v) { setBirthDay(''); setBirthMonth(''); setBirthYear(''); return; }
+              const [y, m, d] = v.split('-');
+              setBirthYear(String(Number(y)));
+              setBirthMonth(String(Number(m)));
+              setBirthDay(String(Number(d)));
+            }}
+            className="w-full bg-muted border border-line rounded-lg px-3 py-2.5 text-sm text-content
+                       focus:border-accent focus:outline-none [color-scheme:light] dark:[color-scheme:dark]"
+          />
+          {isoBirthDate && (
+            <p className="text-xs text-faint mt-1.5">
+              {new Date(isoBirthDate).toLocaleDateString(undefined, {
+                day: 'numeric', month: 'long', year: 'numeric',
+              })}
+            </p>
+          )}
           {isBirthDateUnchanged && (
             <p className="text-xs text-yellow-400 mt-1.5">
               This is today's date — please confirm or update your actual date of birth.
@@ -138,7 +153,7 @@ function CVStep2Personal() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1.5">Current Location</label>
+          <label className="block text-sm font-medium text-subtle mb-1.5">Current Location</label>
           <div className={`inline-block rounded-lg ${submitted && !isLocationValid ? 'ring-1 ring-red-400/40' : ''}`}>
             <CustomSelect value={location} onChange={setLocation}
               options={cambodianProvinces.map((province) => ({ value: province, label: province}))}
@@ -150,7 +165,7 @@ function CVStep2Personal() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1.5">Gender</label>
+          <label className="block text-sm font-medium text-subtle mb-1.5">Gender</label>
           <div className='inline-block'>
             <ToggleButtonGroup
             options={[
@@ -165,7 +180,7 @@ function CVStep2Personal() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1.5">Phone Number</label>
+          <label className="block text-sm font-medium text-subtle mb-1.5">Phone Number</label>
           <div className={`phone-input-wrapper rounded-lg ${submitted && !isPhoneValid ? 'ring-1 ring-red-400/50' : ''}`}>
             <PhoneInput international defaultCountry='KH' value={phoneNumber}
               onChange={setPhoneNumber}
@@ -180,7 +195,7 @@ function CVStep2Personal() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1.5">Email</label>
+          <label className="block text-sm font-medium text-subtle mb-1.5">Email</label>
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
             placeholder='e.g. SopheaChan123@gmail.com' className={inputClass(isEmailValid)} />
           {email.length > 0 && !isEmailValid && (
@@ -191,13 +206,13 @@ function CVStep2Personal() {
           )}
         </div>
 
-        <div className="flex justify-between items-center border-t border-slate-700/80 pt-5 mt-1">
+        <div className="flex justify-between items-center border-t border-line/80 pt-5 mt-1">
           <button onClick={() => navigate('/cv/step1')}
-            className="px-6 py-2 bg-slate-700 text-white font-semibold rounded-lg hover:bg-slate-600 transition">
+            className="px-6 py-2 bg-muted text-content font-semibold rounded-lg hover:bg-muted transition">
             ← Back
           </button>
           <button onClick={handleNext}
-            className="px-6 py-2 bg-emerald-400 text-slate-900 font-semibold rounded-lg hover:bg-emerald-300 transition">
+            className="px-6 py-2 bg-accent text-accent-ink font-semibold rounded-lg hover:bg-accent transition">
             Next →
           </button>
         </div>

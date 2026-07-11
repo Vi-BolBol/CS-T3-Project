@@ -16,13 +16,13 @@ function Toast({ message, onClose, duration = 5000 }) {
   return (
     <div
       style={{ zIndex: 9999 }}
-      className="fixed bottom-5 right-5 flex items-start gap-3 bg-slate-600 text-white px-4 py-3 rounded-xl shadow-2xl max-w-sm border border-red-400 animate-in"
+      className="fixed bottom-5 right-5 flex items-start gap-3 bg-muted text-content px-4 py-3 rounded-xl shadow-2xl max-w-sm border border-danger animate-in"
     >
       <span className="text-lg leading-none mt-0.5">⚠</span>
       <p className="text-sm font-medium leading-snug flex-1">{message}</p>
       <button
         onClick={() => { setHidden(true); onClose?.(); }}
-        className="text-white/70 hover:text-white text-lg leading-none ml-1 mt-0.5"
+        className="text-content/70 hover:text-content text-lg leading-none ml-1 mt-0.5"
         aria-label="Dismiss"
       >
         ×

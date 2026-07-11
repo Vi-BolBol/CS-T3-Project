@@ -23,11 +23,19 @@ export default function Signup() {
     setLoading(true);
 
     try {
+      if (formData.password.length < 8) {
+        setError("Password must be at least 8 characters.");
+        setLoading(false);
+        return;
+      }
+
       const res = await registerUser({
-        name: formData.name,
         email: formData.email,
         password: formData.password,
         role: formData.role,
+        ...(formData.role === "company"
+        ? { companyName: formData.name }
+        : { fullName: formData.name }),
       });
 
       if (res.success) {

@@ -81,17 +81,17 @@ function CVStep1Photo() {
   }
 
   return (
-    <div className="h-screen overflow-hidden bg-slate-900 text-white flex flex-col items-center py-4 px-4">
+    <div className="h-screen overflow-hidden bg-surface text-content flex flex-col items-center py-4 px-4">
       <StepProgressBar currentStep={1} />
       <SuggestionBanner />
 
-      <div className={`w-full max-w-4xl bg-slate-800/60 border rounded-2xl shadow-xl shadow-black/20 p-6 mt-4 flex gap-6 transition-colors ${photoError ? 'border-red-400/70' : 'border-slate-700/80'}`}>
+      <div className={`w-full max-w-4xl bg-raised/60 border rounded-2xl shadow-xl shadow-black/20 p-6 mt-4 flex gap-6 transition-colors ${photoError ? 'border-red-400/70' : 'border-line/80'}`}>
         <div className="flex-1 flex flex-col gap-2 items-center justify-center">
           {!originalPhoto ? (
             <div className="w-full flex flex-col items-center">
               <div className="text-center mb-6">
                 <h2 className="text-lg font-bold">Add Your Photo</h2>
-                <p className="text-sm text-slate-400 mt-1">A clear headshot helps your CV stand out.</p>
+                <p className="text-sm text-subtle mt-1">A clear headshot helps your CV stand out.</p>
               </div>
               <PhotoSourceButtons onPhotoSelected={(photo) => { setOriginalPhoto(photo); setPhotoError(false); }} onError={(msg) => setToastMessage(msg)} />
             </div>
@@ -105,11 +105,11 @@ function CVStep1Photo() {
               onZoomChange={setZoom}
               onCropComplete={handleCropComplete}
               />
-              <p className='text-xs text-slate-400 text-center max-w-[16rem]'>
+              <p className='text-xs text-subtle text-center max-w-[16rem]'>
                 Drag to reposition the photo
               </p>
               <div className="flex items-center gap-3 w-64">
-                <span className="text-xs text-slate-400">−</span>
+                <span className="text-xs text-subtle">−</span>
                 <input
                   type="range"
                   min={1}
@@ -117,9 +117,9 @@ function CVStep1Photo() {
                   step={0.01}
                   value={zoom}
                   onChange={(e) => setZoom(Number(e.target.value))}
-                  className="flex-1 accent-emerald-400"
+                  className="flex-1 accent-[rgb(var(--c-accent))]"
                 />
-                <span className="text-xs text-slate-400">+</span>
+                <span className="text-xs text-subtle">+</span>
               </div>
 
               <GenerateButton status={generationStatus} onGenerate={handleGenerate} />
@@ -137,19 +137,19 @@ function CVStep1Photo() {
 
               <button
               onClick={handleRetake}
-              className="text-sm text-slate-300 hover:text-emerald-400 underline transition">
+              className="text-sm text-subtle hover:text-accent underline transition">
                 Choose a different photo
               </button>
             </div>
           )}
         </div>
 
-        <div className="w-px bg-slate-700" />
+        <div className="w-px bg-muted" />
           <div className="flex flex-col items-center justify-center gap-3 self-center">
             <div className={`rounded-full transition-shadow ${photoError ? 'ring-2 ring-red-400/70' : ''}`}>
               <PhotoPreview photo={croppedPreview}/>
             </div>
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-subtle">
               What will it look like on your CV
             </p>
             {photoError && (
@@ -158,7 +158,7 @@ function CVStep1Photo() {
 
             <button
             onClick={handleNext}
-            className='mt-2 px-6 py-2 bg-emerald-400 text-slate-900 font-semibold rounded-lg hover:bg-emerald-300 transition'
+            className='mt-2 px-6 py-2 bg-accent text-accent-ink font-semibold rounded-lg hover:bg-accent transition'
             >
               Next →
             </button>

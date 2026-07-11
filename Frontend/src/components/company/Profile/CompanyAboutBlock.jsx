@@ -7,7 +7,7 @@ export default function CompanyAboutBlock({ biography, tagline, website, locatio
 
       <div className="relative z-10">
         <div className="flex items-center justify-between pb-3 border-b border-white/5 mb-4">
-          <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+          <h3 className="text-xs font-bold text-subtle uppercase tracking-widest flex items-center gap-2">
             About Corporate Infrastructure
           </h3>
           {website && (
@@ -15,7 +15,7 @@ export default function CompanyAboutBlock({ biography, tagline, website, locatio
               href={website}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[11px] text-emerald-400 hover:underline flex items-center gap-1"
+              className="text-[11px] text-accent hover:underline flex items-center gap-1"
             >
               Visit Website
             </a>
@@ -23,19 +23,19 @@ export default function CompanyAboutBlock({ biography, tagline, website, locatio
         </div>
 
         {tagline && (
-          <p className="text-xs font-bold text-white mb-2 italic">
+          <p className="text-xs font-bold text-content mb-2 italic">
             &quot;{tagline}&quot;
           </p>
         )}
 
-        <p className="text-xs sm:text-sm leading-relaxed text-gray-300 whitespace-pre-line">
+        <p className="text-xs sm:text-sm leading-relaxed text-subtle whitespace-pre-line">
           {biography || 'No organizational briefing provided yet.'}
         </p>
 
         {location && (
-          <div className="mt-4 pt-4 border-t border-white/5 flex items-center gap-2 text-[11px] text-gray-400">
+          <div className="mt-4 pt-4 border-t border-white/5 flex items-center gap-2 text-[11px] text-subtle">
             <span>Base Operations:</span>
-            <span className="text-gray-200 font-medium">{location}</span>
+            <span className="text-content font-medium">{location}</span>
           </div>
         )}
       </div>

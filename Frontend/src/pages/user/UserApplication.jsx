@@ -1,120 +1,183 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useSearchParams, Link } from 'react-router-dom';
 import Navbar from '../../components/layout/StudentNavbar';
-import Pipeline from './Pipeline';
 import Footer from '../../components/layout/StudentFooter';
+import InternshipCard from '../../components/ui/InternshipCard';
+import Toast from '../../components/shared/Toast';
+import ConfirmDialog from '../../components/shared/ConfirmDialog';
+import useMyApplications from '../../hooks/useMyApplications';
+import useSavedInternships from '../../hooks/useSavedInternships';
+import useApplicationAlerts from '../../hooks/useApplicationAlerts';
+import useToast from '../../hooks/useToast';
 
-export default function Application() {
-  const [pipeline] = useState([
-    { role: 'Software Engineering Intern', company: 'Tesla Inc.', date: 'Jun 12, 2026', status: 'Selected' },
-    { role: 'Data Analytics Associate', company: 'Google Cloud Team', date: 'Jun 19, 2026', status: 'Pending' },
-    { role: 'Cloud Architect Intern', company: 'Amazon Web Services', date: 'Jun 24, 2026', status: 'Disqualified' }
-  ]);
+const STATUS = {
+  pending:  { label: 'Pending',       icon: 'bi-hourglass-split', cls: 'bg-muted text-subtle' },
+  reviewed: { label: 'Under review',  icon: 'bi-eye',             cls: 'bg-muted text-subtle' },
+  accepted: { label: 'Accepted',      icon: 'bi-check-circle-fill', cls: 'bg-accent-soft text-accent' },
+  rejected: { label: 'Not selected',  icon: 'bi-x-circle-fill',   cls: 'bg-danger/10 text-danger' },
+};
 
-  const [topChoices] = useState([
-    { role: 'UI Developer Intern', company: 'Vercel Operations', date: 'Active Selection Round', matchScore: '96%' },
-    { role: 'AI Data Design Intern', company: 'OpenAI Studio Workspace', date: 'In Review Queue', matchScore: '91%' }
-  ]);
+function StatusPill({ status }) {
+  const s = STATUS[status] || STATUS.pending;
+  return (
+    <span className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-semibold ${s.cls}`}>
+      <i className={`bi ${s.icon}`} /> {s.label}
+    </span>
+  );
+}
 
-  const statusBadges = {
-    Selected: 'bg-emerald-500/10 text-[#10b981] border border-emerald-500/20',
-    Pending: 'bg-amber-500/10 text-amber-400 border border-amber-500/20',
-    Disqualified: 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+export default function UserApplication() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tab = searchParams.get('tab') === 'saved' ? 'saved' : 'applied';
+
+  const { applications, withdraw, loading, error } = useMyApplications();
+  const { savedInternships, fetchSaved, unsaveInternship } = useSavedInternships();
+  const { clear: clearAlerts } = useApplicationAlerts();
+  const { message: toastMessage, showToast, clearToast } = useToast();
+  const [confirm, setConfirm] = useState(null);
+
+  const apps = Array.isArray(applications) ? applications : [];
+  const savedList = Array.isArray(savedInternships) ? savedInternships : [];
+
+  useEffect(() => { fetchSaved(); }, [fetchSaved]);
+
+  // Opening this page marks accept/reject news as seen -> clears the nav badge.
+  useEffect(() => { clearAlerts(); }, [clearAlerts]);
+
+  const setTab = (t) => setSearchParams(t === 'saved' ? { tab: 'saved' } : {});
+
+  const doWithdraw = async () => {
+    if (!confirm) return;
+    await withdraw(confirm.id);
+    showToast('Application withdrawn.');
+    setConfirm(null);
   };
 
+  const tabCls = (active) =>
+    `rounded-lg px-4 py-2 text-sm font-semibold transition-all ${
+      active ? 'bg-accent-soft text-accent' : 'text-subtle hover:bg-muted hover:text-content'
+    }`;
+
   return (
-    <div className="min-h-screen bg-[#070B19] text-white flex flex-col justify-between">
-      <div>
-        <Navbar />
-        
-        <main className="max-w-7xl mx-auto px-6 lg:px-12 py-12 space-y-10">
-          
-          {/* Core Status Block List */}
-          <section className="bg-[#0b1224]/40 border border-white/5 rounded-3xl p-6 lg:p-8 shadow-xl space-y-6">
-            <div className="text-left space-y-0.5">
-              <h2 className="text-lg font-bold tracking-tight">Application Status</h2>
-              <p className="text-xs text-slate-400">Track and monitor your active internship selection rounds.</p>
-            </div>
+    <div className="flex min-h-screen flex-col bg-surface">
+      <Navbar />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {pipeline.map((app, index) => (
-                <div 
-                  key={index} 
-                  className="bg-[#0d1527] border border-white/5 rounded-2xl p-5 flex flex-col justify-between space-y-4 hover:border-emerald-500/30 transition-all duration-200 text-left group shadow-md"
-                >
-                  <div className="space-y-3">
-                    <div className="flex">
-                      <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider ${statusBadges[app.status]}`}>
-                        {app.status}
-                      </span>
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-sm text-white group-hover:text-[#10b981] transition-colors line-clamp-1">
-                        {app.role}
-                      </h3>
-                      <p className="text-xs text-slate-400 mt-0.5">{app.company}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex justify-between items-center pt-3 border-t border-white/5 text-[11px] text-slate-500 font-medium">
-                    <span>Filed: {app.date}</span>
-                     <Link to="/pipeline" className="text-[#10b981] hover:text-emerald-400 transition-colors font-bold">
-                       View Pipeline ›
-                     </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
+        <header className="mb-6">
+          <h1 className="text-2xl font-black tracking-tight text-content">Applications</h1>
+          <p className="mt-1 text-sm text-subtle">Track what you've applied to and revisit what you saved.</p>
+        </header>
 
-          {/* Priority Target Grid Row */}
-          <section className="bg-[#0b1224]/40 border border-white/5 rounded-3xl p-6 lg:p-8 shadow-xl space-y-6 text-left">
-            <div className="flex justify-between items-end">
-              <div className="space-y-0.5">
-                <h2 className="text-lg font-bold tracking-tight">Top Selection Choices</h2>
-                <p className="text-xs text-slate-400">High-match positions tailored exactly to your runtime experience inventory.</p>
-              </div>
-              <Link to="/user/home" className="text-xs text-[#10b981] font-bold hover:text-emerald-400 transition-colors">
-                Explore More Roles ›
+        <div className="mb-6 flex gap-1 rounded-xl border border-line bg-raised p-1">
+          <button onClick={() => setTab('applied')} className={tabCls(tab === 'applied')}>
+            Applied ({apps.length})
+          </button>
+          <button onClick={() => setTab('saved')} className={tabCls(tab === 'saved')}>
+            Saved ({savedList.length})
+          </button>
+        </div>
+
+        {error && (
+          <div className="mb-4 rounded-xl border border-danger/30 bg-danger/10 p-4 text-sm text-danger">
+            {error}
+          </div>
+        )}
+
+        {/* Applied */}
+        {tab === 'applied' && (
+          apps.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-line bg-raised py-16 text-center">
+              <i className="bi bi-send text-3xl text-faint" />
+              <p className="mt-3 text-sm font-semibold text-content">You haven't applied to anything yet</p>
+              <p className="mt-1 text-xs text-subtle">When you apply, you'll be able to track the outcome here.</p>
+              <Link to="/user/internships" className="mt-4 inline-block rounded-lg bg-accent px-4 py-2 text-xs font-bold text-accent-ink">
+                Browse internships
               </Link>
             </div>
-
-            <div className="space-y-3">
-              {topChoices.map((choice, i) => (
-                <div 
-                  key={i} 
-                  className="bg-[#0d1527] border border-white/5 p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-slate-700 transition-colors shadow-md"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-[#070B19] border border-white/5 flex items-center justify-center font-bold text-[#10b981] text-sm shadow-inner">
-                      ⚡
-                    </div>
-                    <div className="space-y-0.5">
-                      <h4 className="font-bold text-sm text-white">{choice.role}</h4>
-                      <p className="text-xs text-slate-400">
-                        {choice.company} <span className="text-slate-700 mx-1.5">•</span> <span className="text-emerald-500/80 font-medium">{choice.date}</span>
+          ) : (
+            <ul className="space-y-3">
+              {apps.map((a) => (
+                <li key={a.id} className="rounded-xl border border-line bg-raised p-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="min-w-0">
+                      <h3 className="truncate text-sm font-bold text-content">{a.title}</h3>
+                      <p className="truncate text-xs text-subtle">
+                        {a.companyName} · {a.location}
+                      </p>
+                      <p className="mt-1 text-[11px] text-faint">
+                        Applied {new Date(a.appliedAt).toLocaleDateString()}
                       </p>
                     </div>
+
+                    <div className="flex flex-shrink-0 items-center gap-2">
+                      <StatusPill status={a.status} />
+                      <button
+                        onClick={() => setConfirm(a)}
+                        className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-subtle transition hover:text-danger"
+                      >
+                        Withdraw
+                      </button>
+                    </div>
                   </div>
 
-                  <div className="flex items-center justify-between sm:justify-end gap-6 border-t sm:border-t-0 border-white/5 pt-3 sm:pt-0">
-                    <div className="text-left sm:text-right">
-                      <span className="text-[10px] text-slate-500 block uppercase font-bold tracking-wide">Match Rating</span>
-                      <span className="text-sm font-black text-[#10b981]">{choice.matchScore}</span>
+                  {(a.status === 'accepted' || a.status === 'rejected') && (
+                    <div className={`mt-3 rounded-lg px-3 py-2 text-xs ${
+                      a.status === 'accepted' ? 'bg-accent-soft text-accent' : 'bg-danger/10 text-danger'
+                    }`}>
+                      {a.status === 'accepted'
+                        ? 'Congratulations! The company accepted your application — expect them to reach out by email or Telegram.'
+                        : 'The company decided not to move forward this time. Keep applying — more listings are added often.'}
                     </div>
-                    <button type="button" className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/5 text-xs font-bold rounded-xl transition-all">
-                      Review Matrix
-                    </button>
-                  </div>
-                </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )
+        )}
+
+        {/* Saved */}
+        {tab === 'saved' && (
+          savedList.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-line bg-raised py-16 text-center">
+              <i className="bi bi-bookmark text-3xl text-faint" />
+              <p className="mt-3 text-sm font-semibold text-content">Nothing saved yet</p>
+              <p className="mt-1 text-xs text-subtle">Tap the bookmark icon on any internship to keep it here.</p>
+              <Link to="/user/internships" className="mt-4 inline-block rounded-lg bg-accent px-4 py-2 text-xs font-bold text-accent-ink">
+                Browse internships
+              </Link>
+            </div>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {savedList.map((job) => (
+                <InternshipCard
+                  key={job.id}
+                  job={job}
+                  saved
+                  onToggleSave={async (id) => {
+                    await unsaveInternship(id);
+                    await fetchSaved();
+                    showToast('Removed from saved.');
+                  }}
+                  onApply={() => showToast('Open the internship to apply.')}
+                  compact
+                />
               ))}
             </div>
-          </section>
-
-        </main>
-      </div>
+          )
+        )}
+      </main>
 
       <Footer />
+      <Toast message={toastMessage} onClose={clearToast} />
+
+      <ConfirmDialog
+        open={Boolean(confirm)}
+        title="Withdraw application?"
+        message={confirm ? `This will withdraw your application to "${confirm.title}". You can apply again later.` : ''}
+        confirmLabel="Withdraw"
+        onConfirm={doWithdraw}
+        onCancel={() => setConfirm(null)}
+      />
     </div>
   );
 }

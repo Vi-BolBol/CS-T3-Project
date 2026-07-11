@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 const CVBuilderContext = createContext(null)
 
@@ -28,11 +28,49 @@ const initialCvData = {
     },
 }
 
+// The provider only wraps /cv/* routes, so it unmounts the moment the person
+// navigates to Home/Profile/etc. Without persistence the whole CV was lost and
+// the builder fell back to the "upload or create" choice screen. Persist to
+// localStorage so a CV survives navigation and refreshes.
+// TODO(backend): replace with POST/GET /api/cv once the Cv model is wired up.
+const CV_KEY = 'if-cv-data'
+const STEPS_KEY = 'if-cv-steps'
+
+function loadCvData(){
+    try {
+        const raw = localStorage.getItem(CV_KEY)
+        if (!raw) return initialCvData
+        const parsed = JSON.parse(raw)
+        // Merge so newly-added fields aren't missing on older saved CVs.
+        return {
+            ...initialCvData,
+            ...parsed,
+            personal: { ...initialCvData.personal, ...(parsed.personal || {}) },
+            about: { ...initialCvData.about, ...(parsed.about || {}) },
+            experience: { ...initialCvData.experience, ...(parsed.experience || {}) },
+        }
+    } catch { return initialCvData }
+}
+
+function loadSteps(){
+    try { return new Set(JSON.parse(localStorage.getItem(STEPS_KEY) || '[]')) }
+    catch { return new Set() }
+}
+
 export function CVBuilderProvider({ children }){
-    const [cvData, setCvData] = useState(initialCvData)
+    const [cvData, setCvData] = useState(loadCvData)
 
     // Track which steps have been fully completed (clicked Next successfully)
-    const [completedSteps, setCompletedSteps] = useState(new Set())
+    const [completedSteps, setCompletedSteps] = useState(loadSteps)
+
+    // Persist on every change so nothing is lost when the provider unmounts.
+    useEffect(() => {
+        try { localStorage.setItem(CV_KEY, JSON.stringify(cvData)) } catch { /* quota */ }
+    }, [cvData])
+
+    useEffect(() => {
+        try { localStorage.setItem(STEPS_KEY, JSON.stringify([...completedSteps])) } catch { /* quota */ }
+    }, [completedSteps])
 
     // Holds the suggestion the user clicked "Improve" on, so the target
     // step page can read it and show a hint banner. Cleared once the user
@@ -52,6 +90,12 @@ export function CVBuilderProvider({ children }){
     const resetCV = () => {
         setCvData(initialCvData)
         setCompletedSteps(new Set())
+        try {
+            localStorage.removeItem(CV_KEY)
+            localStorage.removeItem(STEPS_KEY)
+            localStorage.removeItem('if-cv-status')
+            window.dispatchEvent(new Event('if-cv-changed'))
+        } catch { /* ignore */ }
     }
 
     const updatePhoto = (photoData) => {

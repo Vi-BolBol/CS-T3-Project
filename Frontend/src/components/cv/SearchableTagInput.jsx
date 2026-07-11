@@ -58,18 +58,18 @@ function SearchableTagInput({ tags, onChange, suggestions, placeholder = 'Search
                 onFocus={() => setIsOpen(true)}
                 onKeyDown={handleKeyDown}
                 placeholder={placeholder}
-                className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-400"
+                className="w-full bg-raised border border-line rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent"
                 />
                 {isOpen && inputValue.length > 0 && (
                     <div
-                    className="absolute z-10 mt-1 w-full max-h-48 overflow-y-auto bg-slate-800 border border-slate-600 rounded-lg shadow-lg custom-scrollbar">
+                    className="absolute z-10 mt-1 w-full max-h-48 overflow-y-auto bg-raised border border-line rounded-lg shadow-lg custom-scrollbar">
                         {filtered.length > 0 ? (
                             filtered.map((suggestion) => (
                                 <button
                                 key={suggestion}
                                 type="button"
                                 onClick={() => addTag(suggestion)}
-                                className="w-full text-left px-3 py-2 text-sm text-slate-200 hover:bg-slate-700 transition"
+                                className="w-full text-left px-3 py-2 text-sm text-content hover:bg-muted transition"
                                 >
                                     {suggestion}
                                 </button>
@@ -78,7 +78,7 @@ function SearchableTagInput({ tags, onChange, suggestions, placeholder = 'Search
                             <button
                             type="button"
                             onClick={() => addTag(inputValue)}
-                            className="w-full teext-left px-3 py-2 text-sm text-emerald-400 hover:bg-slate-700 transition"
+                            className="w-full teext-left px-3 py-2 text-sm text-accent hover:bg-muted transition"
                             >
                                 + Add "{inputValue}" as custom
                             </button>
@@ -94,12 +94,12 @@ function SearchableTagInput({ tags, onChange, suggestions, placeholder = 'Search
                     {tags.map((tag) => (
                         <span
                         key={tag}
-                        className="flex items-center gap-1 bg-emerald-400/20 text-emerald-300 text-sm px-3 py-2 rounded-full border border-emerald-400/30">
+                        className="flex items-center gap-1 bg-accent/20 text-accent text-sm px-3 py-2 rounded-full border border-accent/30">
                             {tag}
                             <button
                             type="button"
                             onClick={() => handleRemove(tag)}
-                            className="text-emerald-400 hover:text-red-400 transition ml-1"
+                            className="text-accent hover:text-red-400 transition ml-1"
                             >
                                 ×
                             </button>

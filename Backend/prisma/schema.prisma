@@ -54,7 +54,7 @@ model User {
   updatedAt    DateTime @updatedAt
 
   studentProfile  StudentProfile?
-  companyProfile  CompanyProfile[]
+  companyProfile  CompanyProfile?
   cvs             Cv[]
   applications    Application[]
   savedInternships SavedInternship[]
@@ -82,7 +82,7 @@ model StudentProfile {
 
 model CompanyProfile {
   id          Int      @id @default(autoincrement())
-  userId      Int
+  userId      Int      @unique
   companyName String?  @db.VarChar(200)
   industry    String?  @db.VarChar(100)
   description String?
@@ -90,6 +90,9 @@ model CompanyProfile {
   contact     String?  @db.VarChar(50)
   telegramLink String? @db.VarChar(255)
   logoUrl     String?  @db.VarChar(500)
+  coverUrl    String?  @db.VarChar(500)
+  location      String? @db.VarChar(150)
+  employeeCount Int?
   createdAt   DateTime @default(now())
 
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)

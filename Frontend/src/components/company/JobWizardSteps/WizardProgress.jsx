@@ -23,18 +23,18 @@ export default function WizardProgress({ currentStep }) {
                 <div
                   className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all ${
                     isActiveOrDone
-                      ? 'bg-emerald-400 border-emerald-400 text-[#070B19]'
-                      : 'bg-transparent border-white/10 text-gray-500'
+                      ? 'bg-accent border-accent text-[#070B19]'
+                      : 'bg-transparent border-white/10 text-subtle'
                   }`}
                 >
                   {isPast ? '✓' : step.n}
                 </div>
-                <span className={`text-[11px] font-medium whitespace-nowrap ${isActiveOrDone ? 'text-emerald-400' : 'text-gray-500'}`}>
+                <span className={`text-[11px] font-medium whitespace-nowrap ${isActiveOrDone ? 'text-accent' : 'text-subtle'}`}>
                   {step.label}
                 </span>
               </div>
               {index < STEPS.length - 1 && (
-                <div className={`h-0.5 w-10 sm:w-20 mx-2 mb-6 transition-all ${isPast ? 'bg-emerald-400' : 'bg-white/10'}`} />
+                <div className={`h-0.5 w-10 sm:w-20 mx-2 mb-6 transition-all ${isPast ? 'bg-accent' : 'bg-raised/10'}`} />
               )}
             </div>
           );

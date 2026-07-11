@@ -1,178 +1,226 @@
-import { useState } from "react";
-import Navbar from "../../components/layout/StudentNavbar";
-import Footer from "../../components/layout/StudentFooter";
-import Card from "../../components/common/Card";
-import Button from "../../components/common/Button";
+import { useState, useEffect, useMemo } from 'react';
+import { useSearchParams, useNavigate, Link } from 'react-router-dom';
+import Navbar from '../../components/layout/StudentNavbar';
+import Footer from '../../components/layout/StudentFooter';
+import Toast from '../../components/shared/Toast';
+import useInternships from '../../hooks/useInternships';
+import useSavedInternships from '../../hooks/useSavedInternships';
+import useMyApplications from '../../hooks/useMyApplications';
+import useToast from '../../hooks/useToast';
+import { payRange } from '../../components/ui/InternshipCard';
+
+const ENV_LABEL = { remote: 'Remote', onsite: 'On-site', hybrid: 'Hybrid' };
+
+function Stat({ label, value }) {
+  return (
+    <div className="rounded-xl border border-line bg-muted p-4">
+      <p className="text-[11px] font-bold uppercase tracking-wide text-faint">{label}</p>
+      <p className="mt-1 text-sm font-bold text-content">{value}</p>
+    </div>
+  );
+}
 
 export default function ViewDetail() {
-  // Mock listing dataset for the sidebar layout modeled from image_4b6637.png
-  const availableInternships = [
-    { id: 1, title: "Software Engineering Intern", company: "TechNova", location: "Phnom Penh", duration: "12 weeks", salary: "$6,500/mo", type: "Remote", initial: "T", color: "bg-purple-600/20 text-purple-400", applicants: 67, rating: "4.8", desc: "Help developers around the world build and deploy faster with TechNova. As a Software Engineering Intern, you will be engaging with our community, writing technical infrastructure, building deployment microservices, and helping shape the engineering efficiency of our core platform." },
-    { id: 2, title: "DevRel Intern", company: "TechNova", location: "Remote", duration: "12 weeks", salary: "$5,500/mo", type: "Remote", initial: "T", color: "bg-purple-600/20 text-purple-400", applicants: 34, rating: "4.6", desc: "Bridge the gap between developers and our engineering pipelines. In this role, you will create specialized developer tutorials, interact with open-source contributors, and advocate for optimization adjustments across our ecosystem components." },
-    { id: 3, title: "Data Science Intern", company: "TechNova", location: "Phnom Penh", duration: "10 weeks", salary: "$6,800/mo", type: "Hybrid", initial: "T", color: "bg-purple-600/20 text-purple-400", applicants: 42, rating: "4.9", desc: "Work closely with our metrics team to build machine learning models, run deep data analytics operations, and formulate data-driven predictions that shape upcoming product releases." },
-    { id: 4, title: "Product Design Intern", company: "TechNova", location: "Phnom Penh", duration: "16 weeks", salary: "$7,200/mo", type: "On-site", initial: "T", color: "bg-purple-600/20 text-purple-400", applicants: 81, rating: "4.7", desc: "Design elegant, high-fidelity dashboard structures and user-flows. You will collaborate directly with cross-functional software engineers and project management stakeholders to craft clean, components-based UI interfaces." },
-  ];
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const jobId = Number(searchParams.get('id'));
 
-  // Active interaction selection state 
-  const [selectedJob, setSelectedJob] = useState(availableInternships[0]);
+  const { internships, fetchInternships, loading } = useInternships();
+  const { savedInternships, fetchSaved, saveInternship, unsaveInternship } = useSavedInternships();
+  const { apply, hasApplied } = useMyApplications();
+  const { message: toastMessage, showToast, clearToast } = useToast();
+
+  const [savedIds, setSavedIds] = useState(new Set());
+
+  useEffect(() => {
+    fetchInternships();
+    fetchSaved();
+  }, [fetchInternships, fetchSaved]);
+
+  useEffect(() => {
+    setSavedIds(new Set((savedInternships || []).map((j) => j.id)));
+  }, [savedInternships]);
+
+  const list = Array.isArray(internships) ? internships : [];
+  const job = useMemo(() => list.find((j) => j.id === jobId), [list, jobId]);
+
+  // Other openings from the same company.
+  const siblings = useMemo(
+    () => (job ? list.filter((j) => j.company?.id === job.company?.id && j.id !== job.id) : []),
+    [list, job]
+  );
+
+  const toggleSave = async (id) => {
+    const next = new Set(savedIds);
+    if (next.has(id)) { next.delete(id); setSavedIds(next); await unsaveInternship(id); }
+    else { next.add(id); setSavedIds(next); await saveInternship(id); }
+  };
+
+  const handleApply = async () => {
+    const res = await apply(job);
+    if (res.success) showToast(`Applied to ${job.title}.`);
+    else if (res.needsCv) {
+      showToast(res.message || 'You need a CV before applying.');
+      navigate(`/cv?redirect=${encodeURIComponent(`/view-detail?id=${job.id}`)}&reason=apply`);
+    } else showToast(res.message || 'Could not apply.');
+  };
+
+  const skills = (job?.skills || '').split(',').map((s) => s.trim()).filter(Boolean);
+  const applied = job ? hasApplied(job.id) : false;
 
   return (
-    <div className="min-h-screen bg-[#070B19] text-white flex flex-col justify-between selection:bg-greenMain selection:text-darkBlue">
-      <div>
-        <Navbar />
+    <div className="flex min-h-screen flex-col bg-surface">
+      <Navbar />
 
-        {/* Global Page Header Block */}
-        <div className="border-b border-white/5 bg-[#0B132B]/40 py-8 backdrop-blur-sm">
-          <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center gap-5">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-purple-600/20 text-2xl font-bold text-purple-400 border border-purple-500/10 shadow-lg shadow-purple-950/20">
-              {selectedJob.initial}
-            </div>
-            <div className="text-center md:text-left">
-              <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">TechNova Enterprise</h1>
-              <p className="mt-1 text-sm text-gray-400 max-w-2xl">
-                A premier global technology hub focused on cutting-edge software development, cloud orchestration, and digital transformation solutions.
-              </p>
-            </div>
-          </main>
-        </div>
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
+        {loading && <div className="h-64 animate-pulse rounded-2xl border border-line bg-muted" />}
 
-        {/* Master-Detail Interactive Content Hub */}
-        <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            
-            {/* LEFT COLUMN: Open Positions Sidebar List (Takes 4 columns) */}
-            <section className="lg:col-span-4 space-y-3 max-h-[calc(100vh-12rem)] overflow-y-auto pr-1">
-              <div className="pb-2">
-                <h2 className="text-xs font-bold uppercase tracking-wider text-greenMain">Open Opportunities</h2>
-                <p className="text-[11px] text-gray-500 mt-0.5">{availableInternships.length} roles currently active</p>
+        {!loading && !job && (
+          <div className="rounded-2xl border border-dashed border-line bg-raised py-20 text-center">
+            <i className="bi bi-exclamation-circle text-3xl text-faint" />
+            <p className="mt-3 text-sm font-semibold text-content">Internship not found</p>
+            <p className="mt-1 text-xs text-subtle">It may have been closed or removed.</p>
+            <Link to="/user/internships" className="mt-4 inline-block rounded-lg bg-accent px-4 py-2 text-xs font-bold text-accent-ink">
+              Browse internships
+            </Link>
+          </div>
+        )}
+
+        {!loading && job && (
+          <>
+            <Link to="/user/internships" className="mb-4 inline-flex items-center gap-1.5 text-xs font-semibold text-subtle hover:text-accent">
+              <i className="bi bi-arrow-left" /> Back to internships
+            </Link>
+
+            <div className="flex flex-col gap-6 lg:flex-row">
+              {/* Main */}
+              <div className="min-w-0 flex-1">
+                <section className="rounded-2xl border border-line bg-raised p-6">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="flex items-start gap-4">
+                      {job.company?.logoUrl ? (
+                        <img src={job.company.logoUrl} alt="" className="h-14 w-14 rounded-xl border border-line object-cover" />
+                      ) : (
+                        <span className="grid h-14 w-14 flex-shrink-0 place-items-center rounded-xl bg-accent-soft text-xl font-black text-accent">
+                          {(job.company?.companyName || '?').charAt(0).toUpperCase()}
+                        </span>
+                      )}
+                      <div className="min-w-0">
+                        <h1 className="text-2xl font-black tracking-tight text-content">{job.title}</h1>
+                        <Link
+                          to={job.company?.id ? `/company/${job.company.id}` : '#'}
+                          className="text-sm text-subtle hover:text-accent"
+                        >
+                          {job.company?.companyName || 'Unknown company'}
+                        </Link>
+                        <p className="mt-1 text-xs text-faint">
+                          <i className="bi bi-geo-alt mr-1" />{job.location || 'Not specified'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-shrink-0 gap-2">
+                      <button
+                        onClick={() => toggleSave(job.id)}
+                        className={`grid h-9 w-9 place-items-center rounded-lg border transition-colors ${
+                          savedIds.has(job.id)
+                            ? 'border-accent bg-accent-soft text-accent'
+                            : 'border-line text-faint hover:text-content'
+                        }`}
+                        aria-label={savedIds.has(job.id) ? 'Remove from saved' : 'Save internship'}
+                      >
+                        <i className={`bi ${savedIds.has(job.id) ? 'bi-bookmark-fill' : 'bi-bookmark'}`} />
+                      </button>
+                      <button
+                        onClick={handleApply}
+                        disabled={applied}
+                        className={`rounded-lg px-5 py-2 text-sm font-bold transition-all ${
+                          applied ? 'cursor-default bg-muted text-faint' : 'bg-accent text-accent-ink hover:opacity-90'
+                        }`}
+                      >
+                        {applied ? 'Applied' : 'Apply now'}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                    <Stat label="Type" value={ENV_LABEL[job.workEnvironment] || job.workEnvironment || '—'} />
+                    <Stat
+                      label="Duration"
+                      value={job.durationValue ? `${job.durationValue} ${job.durationUnit || ''}`.trim() : '—'}
+                    />
+                    <Stat label="Salary" value={payRange(job)} />
+                    <Stat label="Category" value={job.internshipCategory || '—'} />
+                  </div>
+                </section>
+
+                <section className="mt-6 rounded-2xl border border-line bg-raised p-6">
+                  <h2 className="text-xs font-bold uppercase tracking-wide text-faint">About the role</h2>
+                  <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-subtle">
+                    {job.jobDescription || 'No description provided.'}
+                  </p>
+
+                  {skills.length > 0 && (
+                    <>
+                      <h2 className="mt-6 text-xs font-bold uppercase tracking-wide text-faint">Skills</h2>
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {skills.map((s) => (
+                          <span key={s} className="rounded-md border border-line px-2 py-0.5 text-xs text-subtle">{s}</span>
+                        ))}
+                      </div>
+                    </>
+                  )}
+
+                  {job.deadline && (
+                    <p className="mt-6 text-xs text-subtle">
+                      <i className="bi bi-calendar-event mr-1.5" />
+                      Apply before {new Date(job.deadline).toLocaleDateString()}
+                    </p>
+                  )}
+                </section>
               </div>
 
-              {availableInternships.map((job) => {
-                const isSelected = selectedJob.id === job.id;
-                return (
-                  <div
-                    key={job.id}
-                    onClick={() => setSelectedJob(job)}
-                    className={`group relative cursor-pointer rounded-2xl border p-4 transition-all duration-200 ${
-                      isSelected
-                        ? "border-greenMain/40 bg-[#111B34] shadow-lg shadow-black/30"
-                        : "border-white/5 bg-[#111B34]/40 hover:border-white/10 hover:bg-[#111B34]/80"
-                    }`}
-                  >
-                    {/* Bookmark Indicator Match with image_4b6637.png */}
-                    <span className="absolute top-4 right-4 text-xs text-gray-500 hover:text-greenMain transition">🔖</span>
-
-                    <div className="flex items-start gap-3">
-                      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-bold ${job.color}`}>
-                        {job.initial}
-                      </div>
-                      <div className="pr-4">
-                        <h3 className="text-sm font-semibold tracking-tight text-white group-hover:text-greenMain transition line-clamp-1">
-                          {job.title}
-                        </h3>
-                        <p className="text-[11px] text-gray-400 mt-0.5">{job.company}</p>
-                      </div>
-                    </div>
-
-                    <div className="mt-4 flex flex-col gap-1 text-[11px] text-gray-400">
-                      <div className="flex items-center gap-1">
-                        <span>📍</span> {job.location} <span className="text-white/10 mx-1">|</span> <span>🕒</span> {job.duration}
-                      </div>
-                    </div>
-
-                    <div className="mt-3 pt-3 border-t border-white/5 flex items-center justify-between">
-                      <span className="text-xs font-bold text-greenMain">{job.salary}</span>
-                      <span className="rounded-md bg-white/5 px-2 py-0.5 text-[9px] font-semibold text-gray-400 uppercase tracking-wide">
-                        {job.type}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </section>
-
-            {/* RIGHT COLUMN: Selected Role Detail View (Takes 8 columns) */}
-            <section className="lg:col-span-8">
-              <Card className="border border-white/10 bg-[#111B34]/60 p-6 sm:p-8 rounded-[2rem] shadow-2xl shadow-black/40">
-                
-                {/* Meta Job Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/5 pb-6">
-                  <div className="flex items-center gap-4">
-                    <div className={`flex h-14 w-14 items-center justify-center rounded-2xl text-xl font-bold ${selectedJob.color} border border-white/5`}>
-                      {selectedJob.initial}
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-bold tracking-tight text-white sm:text-2xl">{selectedJob.title}</h2>
-                      <p className="text-sm text-gray-400 flex items-center gap-2 mt-0.5">
-                        {selectedJob.company} <span className="h-1 w-1 rounded-full bg-white/20"></span> {selectedJob.location}
-                      </p>
-                      <p className="text-xs text-yellow-500 mt-1 flex items-center gap-1">
-                        ⭐ <span className="font-semibold text-gray-300">{selectedJob.rating} rating</span>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Info Metric Grid System Blocks */}
-                <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-                  <div className="rounded-2xl border border-white/5 bg-[#070B19]/50 p-4">
-                    <p className="text-[11px] font-medium uppercase tracking-wider text-gray-400">Type</p>
-                    <p className="mt-1 text-sm font-bold text-greenMain">{selectedJob.type}</p>
-                  </div>
-                  <div className="rounded-2xl border border-white/5 bg-[#070B19]/50 p-4">
-                    <p className="text-[11px] font-medium uppercase tracking-wider text-gray-400">Duration</p>
-                    <p className="mt-1 text-sm font-bold text-white">{selectedJob.duration}</p>
-                  </div>
-                  <div className="rounded-2xl border border-white/5 bg-[#070B19]/50 p-4">
-                    <p className="text-[11px] font-medium uppercase tracking-wider text-gray-400">Salary</p>
-                    <p className="mt-1 text-sm font-bold text-white">{selectedJob.salary}</p>
-                  </div>
-                  <div className="rounded-2xl border border-white/5 bg-[#070B19]/50 p-4">
-                    <p className="text-[11px] font-medium uppercase tracking-wider text-gray-400">Applicants</p>
-                    <p className="mt-1 text-sm font-bold text-white">{selectedJob.applicants} applied</p>
-                  </div>
-                </div>
-
-                {/* About the Role Text Area */}
-                <div className="mt-8">
-                  <h3 className="text-sm font-bold uppercase tracking-wider text-gray-300">About the Role</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-gray-400 font-normal">
-                    {selectedJob.desc}
+              {/* Sidebar — other roles at this company */}
+              <aside className="lg:w-80 lg:flex-shrink-0">
+                <div className="sticky top-24 rounded-2xl border border-line bg-raised p-4">
+                  <h2 className="text-xs font-bold uppercase tracking-wide text-faint">
+                    More at {job.company?.companyName || 'this company'}
+                  </h2>
+                  <p className="mt-0.5 text-xs text-subtle">
+                    {siblings.length} other {siblings.length === 1 ? 'role' : 'roles'}
                   </p>
+
+                  {siblings.length === 0 ? (
+                    <p className="mt-4 rounded-lg border border-dashed border-line py-6 text-center text-xs text-faint">
+                      No other openings right now.
+                    </p>
+                  ) : (
+                    <ul className="mt-3 space-y-2">
+                      {siblings.slice(0, 5).map((s) => (
+                        <li key={s.id}>
+                          <Link
+                            to={`/view-detail?id=${s.id}`}
+                            className="block rounded-lg border border-line p-3 transition-colors hover:border-accent/60"
+                          >
+                            <p className="truncate text-sm font-bold text-content">{s.title}</p>
+                            <p className="truncate text-xs text-subtle">
+                              {s.location || 'Not specified'} · {ENV_LABEL[s.workEnvironment] || s.workEnvironment || ''}
+                            </p>
+                            <p className="mt-1 text-xs font-semibold text-accent">{payRange(s)}</p>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
-
-                {/* Dynamic Core Requirements Bullet Sets */}
-                <div className="mt-6 pt-6 border-t border-white/5">
-                  <h3 className="text-sm font-bold uppercase tracking-wider text-gray-300">Minimum Requirements</h3>
-                  <ul className="mt-3 space-y-2 text-xs text-gray-400 list-disc list-inside">
-                    <li>Basic familiarity with Modern Framework architecture (React / NextJS ecosystem).</li>
-                    <li>Understanding of responsive design principles using styling configurations like TailwindCSS.</li>
-                    <li>Solid communication skills and readiness to collaborate in multi-stage code analysis reviews.</li>
-                  </ul>
-                </div>
-
-                {/* Primary Interactive CTA Actions Panel */}
-                <div className="mt-8 pt-6 border-t border-white/5 flex items-center gap-3">
-                  <Button className="flex-1 py-3.5 text-sm font-semibold tracking-wide bg-greenMain text-darkBlue hover:bg-greenMain/90 rounded-xl transition shadow-lg shadow-greenMain/10">
-                    Apply Now
-                  </Button>
-                  <button 
-                    type="button" 
-                    className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white transition"
-                    title="Bookmark this position"
-                  >
-                    🔖
-                  </button>
-                </div>
-
-              </Card>
-            </section>
-
-          </div>
-        </main>
-      </div>
+              </aside>
+            </div>
+          </>
+        )}
+      </main>
 
       <Footer />
+      <Toast message={toastMessage} onClose={clearToast} />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 function ToggleButtonGroup({ options, active, onChange }){
     return(
         <div
-        className="flex gap-2 bg-slate-800 p-1 rounded-lg">
+        className="flex gap-2 bg-raised p-1 rounded-lg">
             {options.map((option) => (
                 <button
                 key={option.value}
@@ -10,8 +10,8 @@ function ToggleButtonGroup({ options, active, onChange }){
                 px-4 py-1.5 text-sm font-medium rounded-md transition
                 ${
                 active === option.value
-                ? 'bg-emerald-400 text-slate-900'
-                : 'text-slate-300 hover:text-whtie'
+                ? 'bg-accent text-accent-ink'
+                : 'text-subtle hover:text-whtie'
                 }
                 `}>
                     {option.label}

@@ -27,7 +27,7 @@ function TagInput({ tags, onChange, placeholder = 'Type and press Enter...' }) {
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
-            className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-400"  
+            className="w-full bg-raised border border-line rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent"  
             />
             {tags.length > 0 && (
                 <div
@@ -35,13 +35,13 @@ function TagInput({ tags, onChange, placeholder = 'Type and press Enter...' }) {
                     {tags.map((tag) => (
                         <span
                         key={tag}
-                        className="flex items-center gap-1 bg-slate-700 text-slate-200 text-xs px-3 py-1 rounded-full"
+                        className="flex items-center gap-1 bg-muted text-content text-xs px-3 py-1 rounded-full"
                         >
                             {tag}
                             <button
                             type="button"
                             onClick={() => handleRemove(tag)}
-                            className="text-slate-400 hover:text-red-400 transition ml-1"
+                            className="text-subtle hover:text-red-400 transition ml-1"
                             >
                                 ×
                             </button>

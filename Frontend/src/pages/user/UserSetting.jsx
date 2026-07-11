@@ -1,132 +1,216 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Navbar from '../../components/layout/StudentNavbar';
+import Footer from '../../components/layout/StudentFooter';
+import ThemeToggle from '../../components/shared/ThemeToggle';
+import Toast from '../../components/shared/Toast';
+import ConfirmDialog from '../../components/shared/ConfirmDialog';
+import useToast from '../../hooks/useToast';
 
-export default function Setting() {
+const SECTIONS = [
+  { id: 'appearance', label: 'Appearance', icon: 'bi-palette' },
+  { id: 'account',    label: 'Account',    icon: 'bi-person-gear' },
+  { id: 'security',   label: 'Security',   icon: 'bi-shield-lock' },
+  { id: 'memory',     label: 'Memory',     icon: 'bi-hdd' },
+];
+
+const inputCls =
+  'w-full rounded-lg border border-line bg-muted px-3 py-2 text-sm text-content placeholder:text-faint focus:border-accent focus:outline-none';
+
+function Panel({ title, description, children }) {
+  return (
+    <section className="rounded-xl border border-line bg-raised p-5">
+      <h2 className="text-sm font-bold text-content">{title}</h2>
+      {description && <p className="mt-0.5 text-xs text-subtle">{description}</p>}
+      <div className="mt-4 space-y-4">{children}</div>
+    </section>
+  );
+}
+
+export default function UserSetting() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('Personal Data');
-  
-  const settingTabs = [
-    { name: 'Personal Data', icon: '' },
-    { name: 'Account Options', icon: '' },
-    { name: 'Security Keys', icon: '' },
-    { name: 'Linked Platforms', icon: '' }
-  ];
+  const [searchParams, setSearchParams] = useSearchParams();
+  const active = SECTIONS.some((s) => s.id === searchParams.get('s'))
+    ? searchParams.get('s')
+    : 'appearance';
 
-  // Clears the session and sends the user back to the general (public) home page
-  const handleSignOut = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/");
+  const { message: toastMessage, showToast, clearToast } = useToast();
+  const [pw, setPw] = useState({ current: '', next: '', confirm: '' });
+  const [account, setAccount] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('user') || '{}'); } catch { return {}; }
+  });
+  const [confirmDialog, setConfirmDialog] = useState(null); // 'logout' | 'clear'
+
+  const changePassword = (e) => {
+    e.preventDefault();
+    if (!pw.current || !pw.next) return showToast('Fill in both password fields.');
+    if (pw.next.length < 8) return showToast('New password must be at least 8 characters.');
+    if (pw.next !== pw.confirm) return showToast('New passwords do not match.');
+    // TODO(backend): POST /api/auth/change-password — endpoint doesn't exist yet.
+    showToast('Password change isn’t wired to the backend yet.');
   };
 
+  const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/login');
+  };
+
+  // Everything this app stores on-device (CV, profile, applications, theme).
+  const clearMemory = () => {
+    ['if-cv-data', 'if-cv-steps', 'if-cv-status', 'if-student-profile',
+     'if-applications', 'if-app-seen'].forEach((k) => localStorage.removeItem(k));
+    window.dispatchEvent(new Event('if-cv-changed'));
+    window.dispatchEvent(new Event('if-applications-changed'));
+    setConfirmDialog(null);
+    showToast('Local data cleared.');
+  };
+
+  const storedKeys = [
+    { key: 'if-cv-data', label: 'CV draft' },
+    { key: 'if-student-profile', label: 'Profile details' },
+    { key: 'if-applications', label: 'Applications' },
+    { key: 'if-theme', label: 'Theme preference' },
+  ];
+
   return (
-    <div className="min-h-screen bg-[#070B19] text-white">
+    <div className="flex min-h-screen flex-col bg-surface">
       <Navbar />
-      <main className="max-w-7xl mx-auto px-6 lg:px-12 py-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
-          {/* Sub-Navigation Panel Wrapper */}
-          <nav className="lg:col-span-3 bg-[#131c35] border border-slate-800/60 rounded-2xl p-4 flex flex-col gap-1 shadow-xl">
-            {settingTabs.map((tab) => (
-              <button
-                key={tab.name}
-                type="button"
-                onClick={() => setActiveTab(tab.name)}
-                className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all text-left ${
-                  activeTab === tab.name
-                    ? 'bg-[#10b981] text-white shadow-lg shadow-emerald-950/20'
-                    : 'text-slate-400 hover:bg-[#0b1224]/60 hover:text-slate-200'
-                }`}
-              >
-                <span className="text-sm">{tab.icon}</span>
-                {tab.name}
-              </button>
-            ))}
 
-            {/* Visual Divider Line */}
-            <div className="h-px bg-slate-800/60 my-2" />
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
+        <header className="mb-6">
+          <h1 className="text-2xl font-black tracking-tight text-content">Settings</h1>
+          <p className="mt-1 text-sm text-subtle">Manage your appearance, account, and data.</p>
+        </header>
 
-            {/* Danger Zone Action: Sign Out */}
-            <button
-              type="button"
-              onClick={handleSignOut}
-              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider text-rose-400 hover:bg-rose-500/10 active:scale-98 transition-all text-left border border-transparent hover:border-rose-500/20"
-            > 
-              <span className="text-sm"> </span>
-              Sign Out
-            </button>
-          </nav>
-
-          {/* Core Configuration Sheet Context */}
-          <div className="lg:col-span-9 bg-[#131c35] border border-slate-800/60 rounded-3xl p-8 lg:p-10 shadow-2xl space-y-8">
-            <div className="border-b border-slate-800/60 pb-5 space-y-1 text-left">
-              <h2 className="text-xl font-bold tracking-tight text-white">{activeTab}</h2>
-              <p className="text-xs text-slate-400">Manage database parameters used to fill structural application models dynamically.</p>
-            </div>
-
-            {/* Profile Picture Identity Component */}
-            <div className="flex items-center gap-5 bg-[#0b1224]/40 border border-slate-800/50 rounded-2xl p-5 text-left">
-              <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-[#10b981] bg-slate-700 shadow-md">
-                <img 
-                  src="https://p7.hiclipart.com/preview/782/114/405/5bbc3519d674c.jpg" 
-                  alt="Identity Avatar View" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Avatar Frame</p>
-                <div className="flex gap-2">
-                  <button type="button" className="px-3 py-1.5 bg-[#10b981] hover:bg-emerald-600 transition-colors text-[11px] font-bold rounded-lg text-white">Upload New</button>
-                  <button type="button" className="px-3 py-1.5 bg-transparent border border-slate-700 text-[11px] font-semibold rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-all">Remove</button>
-                </div>
-              </div>
-            </div>
-
-            {/* Data Inputs Array Form Block */}
-            <form className="space-y-6 text-left" onSubmit={(e) => e.preventDefault()}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider">First Name</label>
-                  <input type="text" defaultValue="Kimtech" className="w-full bg-[#0b1224] border border-slate-700/60 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#10b981] transition-all" />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider">Last Name</label>
-                  <input type="text" defaultValue="Lov" className="w-full bg-[#0b1224] border border-slate-700/60 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#10b981] transition-all" />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider">Headline Descriptor</label>
-                <input type="text" defaultValue="Full Stack Developer Candidate" className="w-full bg-[#0b1224] border border-slate-700/60 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#10b981] transition-all" />
-              </div>
-
-              {/* Connected Handles Blocks */}
-              <div className="space-y-3">
-                <h4 className="block text-xs font-bold text-slate-400 uppercase tracking-wider">Social Handles</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-center gap-3 bg-[#0b1224] border border-slate-800 rounded-xl px-4 py-3">
-                    <span className="text-slate-500 text-sm">🔗</span>
-                    <input type="text" placeholder="github.com/profile" className="w-full bg-transparent text-sm focus:outline-none" />
-                  </div>
-                  <div className="flex items-center gap-3 bg-[#0b1224] border border-slate-800 rounded-xl px-4 py-3">
-                    <span className="text-slate-500 text-sm">💼</span>
-                    <input type="text" placeholder="linkedin.com/in/user" className="w-full bg-transparent text-sm focus:outline-none" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Interactive Submit Panel */}
-              <div className="flex items-center justify-end pt-4 border-t border-slate-800/60">
-                <button type="submit" className="px-6 py-3 bg-[#10b981] hover:bg-emerald-600 active:scale-95 transition-all rounded-xl text-white font-bold text-sm shadow-lg shadow-emerald-950/20">
-                  Save Changes
+        <div className="flex flex-col gap-6 md:flex-row">
+          {/* Left sidebar */}
+          <aside className="md:w-56 md:flex-shrink-0">
+            <nav className="flex gap-1 overflow-x-auto rounded-xl border border-line bg-raised p-1.5 md:sticky md:top-24 md:flex-col md:overflow-visible">
+              {SECTIONS.map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => setSearchParams({ s: s.id })}
+                  aria-current={active === s.id ? 'page' : undefined}
+                  className={`flex flex-shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-semibold transition-colors ${
+                    active === s.id
+                      ? 'bg-accent-soft text-accent'
+                      : 'text-subtle hover:bg-muted hover:text-content'
+                  }`}
+                >
+                  <i className={`bi ${s.icon}`} /> {s.label}
                 </button>
-              </div>
-            </form>
-          </div>
+              ))}
 
+              <div className="my-1 hidden h-px bg-line md:block" />
+
+              <button
+                onClick={() => setConfirmDialog('logout')}
+                className="flex flex-shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-semibold text-subtle transition-colors hover:bg-muted hover:text-danger"
+              >
+                <i className="bi bi-box-arrow-right" /> Log out
+              </button>
+            </nav>
+          </aside>
+
+          {/* Right panel */}
+          <div className="min-w-0 flex-1">
+            {active === 'appearance' && (
+              <Panel title="Appearance" description="Choose how Internship Finder looks to you.">
+                <ThemeToggle />
+              </Panel>
+            )}
+
+            {active === 'account' && (
+              <Panel title="Account" description="Your sign-in details.">
+                <div>
+                  <label className="mb-1 block text-xs font-semibold text-subtle">Email</label>
+                  <input value={account.email || ''} disabled className={`${inputCls} cursor-not-allowed opacity-70`} />
+                  <p className="mt-1 text-xs text-faint">Email can't be changed yet.</p>
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-semibold text-subtle">Role</label>
+                  <input value={account.role || 'student'} disabled className={`${inputCls} cursor-not-allowed opacity-70`} />
+                </div>
+              </Panel>
+            )}
+
+            {active === 'security' && (
+              <Panel title="Security" description="Keep your account protected.">
+                <form onSubmit={changePassword} className="space-y-3">
+                  <div>
+                    <label className="mb-1 block text-xs font-semibold text-subtle">Current password</label>
+                    <input type="password" value={pw.current} onChange={(e) => setPw({ ...pw, current: e.target.value })} className={inputCls} placeholder="••••••••" />
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold text-subtle">New password</label>
+                      <input type="password" value={pw.next} onChange={(e) => setPw({ ...pw, next: e.target.value })} className={inputCls} placeholder="At least 8 characters" />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold text-subtle">Confirm new password</label>
+                      <input type="password" value={pw.confirm} onChange={(e) => setPw({ ...pw, confirm: e.target.value })} className={inputCls} placeholder="Repeat new password" />
+                    </div>
+                  </div>
+                  <button type="submit" className="rounded-lg bg-accent px-4 py-2 text-xs font-bold text-accent-ink transition hover:opacity-90">
+                    Update password
+                  </button>
+                </form>
+              </Panel>
+            )}
+
+            {active === 'memory' && (
+              <Panel title="Memory" description="Data this app stores on this device.">
+                <ul className="divide-y divide-line rounded-lg border border-line">
+                  {storedKeys.map((k) => {
+                    const present = Boolean(localStorage.getItem(k.key));
+                    return (
+                      <li key={k.key} className="flex items-center justify-between px-3 py-2.5">
+                        <span className="text-sm text-content">{k.label}</span>
+                        <span className={`text-xs font-semibold ${present ? 'text-accent' : 'text-faint'}`}>
+                          {present ? 'Stored' : 'Empty'}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+
+                <p className="text-xs text-subtle">
+                  Your CV, profile, and applications currently live in this browser (the backend
+                  endpoints for them don't exist yet). Clearing this removes them from this device.
+                </p>
+
+                <button
+                  onClick={() => setConfirmDialog('clear')}
+                  className="rounded-lg border border-line px-4 py-2 text-xs font-semibold text-subtle transition hover:text-danger"
+                >
+                  <i className="bi bi-trash mr-1.5" /> Clear local data
+                </button>
+              </Panel>
+            )}
+          </div>
         </div>
       </main>
+
+      <Footer />
+      <Toast message={toastMessage} onClose={clearToast} />
+
+      <ConfirmDialog
+        open={confirmDialog === 'logout'}
+        title="Log out?"
+        message="You'll need to sign in again to apply or track applications."
+        confirmLabel="Log out"
+        onConfirm={logout}
+        onCancel={() => setConfirmDialog(null)}
+      />
+      <ConfirmDialog
+        open={confirmDialog === 'clear'}
+        title="Clear local data?"
+        message="This permanently deletes your CV draft, profile details, and applications from this browser. This can't be undone."
+        confirmLabel="Clear data"
+        onConfirm={clearMemory}
+        onCancel={() => setConfirmDialog(null)}
+      />
     </div>
   );
 }

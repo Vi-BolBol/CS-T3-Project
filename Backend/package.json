@@ -14,7 +14,8 @@
     "push": "prisma db push",
     "seed": "prisma db seed",
     "studio": "prisma studio",
-    "test": "echo \"No tests specified\" && exit 0"
+    "test": "echo \"No tests specified\" && exit 0",
+    "make-admin": "node scripts/makeAdmin.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
@@ -29,7 +30,10 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.5.2",
+    "helmet": "^8.2.0",
     "jsonwebtoken": "^9.0.3",
+    "morgan": "^1.11.0",
     "pdf-parse": "^2.4.5"
   },
   "devDependencies": {

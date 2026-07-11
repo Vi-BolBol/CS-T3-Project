@@ -25,15 +25,15 @@ function StepProgressBar({currentStep}) {
                                 <div className={`
                                     w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all
                                     ${(isCompleted || isPast || isCurrent)
-                                        ? "bg-emerald-400 border-emerald-400 text-slate-900"
-                                        : "bg-transparent border-slate-600 text-slate-500"
+                                        ? "bg-accent border-accent text-accent-ink"
+                                        : "bg-transparent border-line text-faint"
                                     }
                                 `}>
                                     {(isCompleted || isPast) ? "✓" : step.n}
                                 </div>
                                 <span className={`
                                     text-xs font-medium
-                                    ${(isCompleted || isPast || isCurrent) ? "text-emerald-400" : "text-slate-500"}
+                                    ${(isCompleted || isPast || isCurrent) ? "text-accent" : "text-faint"}
                                 `}>
                                     {step.label}
                                 </span>
@@ -41,7 +41,7 @@ function StepProgressBar({currentStep}) {
                             {index < steps.length - 1 && (
                                 <div className={`
                                     h-0.5 w-16 sm:w-24 mx-2 mb-6 transition-all
-                                    ${step.n < currentStep ? "bg-emerald-400" : "bg-slate-700"}
+                                    ${step.n < currentStep ? "bg-accent" : "bg-muted"}
                                 `} />
                             )}
                         </div>

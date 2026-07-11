@@ -24,7 +24,7 @@ function PalettePicker({ palettes, activePalette, onChange }) {
       ))}
       {/* Active palette name */}
       <div className="w-full mt-1">
-        <span className="text-xs text-slate-400">{activePalette.name}</span>
+        <span className="text-xs text-subtle">{activePalette.name}</span>
       </div>
     </div>
   );

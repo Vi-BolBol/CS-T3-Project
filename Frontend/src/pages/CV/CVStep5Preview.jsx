@@ -9,6 +9,7 @@ import Toast from '../../components/shared/Toast.jsx';
 import { generatePDF } from '../../utils/generatePDF.js';
 import { useState } from 'react';
 import { useCVBuilder } from '../../context/CVBuilderContext.jsx';
+import { saveCvToServer } from '../../hooks/useCvStatus';
 import { useNavigate } from 'react-router-dom';
 
 const COLOR_PALETTES = [
@@ -35,8 +36,12 @@ function CVStep5Preview() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
-  const handleFinish = () => {
+  const handleFinish = async () => {
     markStepComplete(5);
+    const res = await saveCvToServer(cvData);
+    if (!res.success) {
+      setToastMessage?.(res.message || 'Could not save your CV to the server.');
+    }
     navigate('/cv/manage');
   };
 
@@ -55,22 +60,22 @@ function CVStep5Preview() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white flex flex-col items-center py-6 px-4">
+    <div className="min-h-[calc(100vh-4rem)] bg-surface text-content flex flex-col items-center py-6 px-4">
       <StepProgressBar currentStep={5} />
 
       <div className="w-full max-w-6xl mt-6 flex flex-col lg:flex-row gap-6">
 
         <div className="w-full lg:w-72 shrink-0 flex flex-col gap-5">
 
-          <div className="bg-slate-800/60 border border-slate-700/80 rounded-2xl shadow-xl shadow-black/20 p-5 flex flex-col gap-5">
+          <div className="bg-raised/60 border border-line/80 rounded-2xl shadow-xl shadow-black/20 p-5 flex flex-col gap-5">
 
             <div>
               <h2 className="text-lg font-bold mb-0.5">Finish Up</h2>
-              <p className="text-xs text-slate-400">Pick a look, then download your CV.</p>
+              <p className="text-xs text-subtle">Pick a look, then download your CV.</p>
             </div>
 
             <div>
-              <p className="text-sm font-medium text-slate-300 mb-2">Template</p>
+              <p className="text-sm font-medium text-subtle mb-2">Template</p>
               <TemplatePicker 
               templates={TEMPLATES}
               activeTemplate={activeTemplate}
@@ -79,7 +84,7 @@ function CVStep5Preview() {
             </div>
 
             <div>
-              <p className="text-sm font-medium text-slate-300 mb-2">Color Palette</p>
+              <p className="text-sm font-medium text-subtle mb-2">Color Palette</p>
               <PalettePicker 
               palettes={COLOR_PALETTES}
               activePalette={activePalette}
@@ -89,7 +94,7 @@ function CVStep5Preview() {
 
             <button
               onClick={handleFinish}
-              className="w-full py-2.5 bg-emerald-400 text-slate-900 font-bold rounded-lg text-sm hover:bg-emerald-300 transition shadow-md shadow-emerald-400/20"
+              className="w-full py-2.5 bg-accent text-accent-ink font-bold rounded-lg text-sm hover:bg-accent transition shadow-md shadow-accent/20"
             >
               ✓ Finish CV
             </button>
@@ -99,8 +104,8 @@ function CVStep5Preview() {
               disabled={isGenerating}
               className={`w-full py-2.5 font-semibold rounded-lg text-sm border transition ${
                 isGenerating
-                  ? 'border-slate-700 text-slate-500 cursor-not-allowed'
-                  : 'border-emerald-400/50 text-emerald-300 hover:bg-emerald-400/10'
+                  ? 'border-line text-faint cursor-not-allowed'
+                  : 'border-accent/50 text-accent hover:bg-accent/10'
               }`}
             >
               {isGenerating ? 'Generating PDF...' : 'Download PDF'}
@@ -108,7 +113,7 @@ function CVStep5Preview() {
 
             <button
               onClick={() => navigate('/cv/step4')}
-              className="w-full py-2.5 bg-slate-700 text-white font-semibold rounded-lg text-sm hover:bg-slate-600 transition"
+              className="w-full py-2.5 bg-muted text-content font-semibold rounded-lg text-sm hover:bg-muted transition"
             >
               ← Back to Experience
             </button>
@@ -118,7 +123,7 @@ function CVStep5Preview() {
 
 
         <div
-        className="flex-1 bg-slate-800/60 border border-slate-700/80 rounded-2xl shadow-xl shadow-black/20 p-4"
+        className="flex-1 bg-raised/60 border border-line/80 rounded-2xl shadow-xl shadow-black/20 p-4"
         style={{
           overflow: 'auto',
           maxHeight: 'calc(100vh - 200px)',

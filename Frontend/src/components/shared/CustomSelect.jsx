@@ -51,16 +51,16 @@ function CustomSelect({ value, onChange, options, placeholder = 'Select...' }) {
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-left w-full flex items-center justify-between gap-2 focus:outline-none focus:border-emerald-400"
+        className="bg-raised border border-line rounded-lg px-3 py-2 text-sm text-left w-full flex items-center justify-between gap-2 focus:outline-none focus:border-accent"
       >
-        <span className={`${selectedOption ? 'text-white' : 'text-slate-500'} whitespace-nowrap`}>
+        <span className={`${selectedOption ? 'text-content' : 'text-faint'} whitespace-nowrap`}>
           {displayText}
         </span>
-        <span className={`text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}>▾</span>
+        <span className={`text-subtle transition-transform ${isOpen ? 'rotate-180' : ''}`}>▾</span>
       </button>
 
       {isOpen && (
-        <div className="absolute z-10 mt-1 w-full max-h-48 overflow-y-auto overflow-x-hidden bg-slate-800 border border-slate-600 rounded-lg shadow-lg custom-scrollbar">
+        <div className="absolute z-10 mt-1 w-full max-h-48 overflow-y-auto overflow-x-hidden bg-raised border border-line rounded-lg shadow-lg custom-scrollbar">
           {options.map((option) => (
             <button
               key={option.value}
@@ -68,8 +68,8 @@ function CustomSelect({ value, onChange, options, placeholder = 'Select...' }) {
               onClick={() => handleSelect(option.value)}
               className={`w-full text-left px-3 py-2 text-sm transition ${
                 String(option.value) === String(value)
-                  ? 'bg-emerald-400 text-slate-900'
-                  : 'text-slate-200 hover:bg-slate-700'
+                  ? 'bg-accent text-accent-ink'
+                  : 'text-content hover:bg-muted'
               }`}
             >
               {option.label}

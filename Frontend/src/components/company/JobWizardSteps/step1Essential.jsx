@@ -34,21 +34,21 @@ export default function Step1Essential({ data, onChange, onNext, onCancel }) {
 
       <div>
         <div className="mb-6">
-          <h2 className="text-xl font-bold tracking-tight text-white">Job Essentials</h2>
-          <p className="text-xs text-gray-400 mt-1">Start by providing the core identifiers of this open tracking position.</p>
+          <h2 className="text-xl font-bold tracking-tight text-content">Job Essentials</h2>
+          <p className="text-xs text-subtle mt-1">Start by providing the core identifiers of this open tracking position.</p>
         </div>
 
         <div className="space-y-5">
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Job Title</label>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-subtle mb-2">Job Title</label>
             <input
               type="text"
               value={data.title}
               onChange={(e) => onChange('title', e.target.value)}
               onBlur={() => markTouched('title')}
               placeholder="e.g. Software Engineering Intern"
-              className={`w-full px-4 py-3 rounded-xl border bg-[#070B19]/60 text-sm text-white placeholder-gray-600 focus:outline-none transition ${
-                touched.title && errors.title ? 'border-rose-500/40 focus:border-rose-500/40' : 'border-white/5 focus:border-emerald-500/40'
+              className={`w-full px-4 py-3 rounded-xl border bg-surface/60 text-sm text-content placeholder-gray-600 focus:outline-none transition ${
+                touched.title && errors.title ? 'border-rose-500/40 focus:border-rose-500/40' : 'border-white/5 focus:border-accent/40'
               }`}
             />
             {touched.title && errors.title && <p className="text-[10px] text-rose-400 mt-1.5 font-medium">{errors.title}</p>}
@@ -56,13 +56,13 @@ export default function Step1Essential({ data, onChange, onNext, onCancel }) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Department</label>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-subtle mb-2">Department</label>
               <select
                 value={data.department}
                 onChange={(e) => onChange('department', e.target.value)}
                 onBlur={() => markTouched('department')}
-                className={`w-full px-4 py-3 rounded-xl border bg-[#070B19]/60 text-sm text-gray-300 focus:outline-none transition ${
-                  touched.department && errors.department ? 'border-rose-500/40 focus:border-rose-500/40' : 'border-white/5 focus:border-emerald-500/40'
+                className={`w-full px-4 py-3 rounded-xl border bg-surface/60 text-sm text-subtle focus:outline-none transition ${
+                  touched.department && errors.department ? 'border-rose-500/40 focus:border-rose-500/40' : 'border-white/5 focus:border-accent/40'
                 }`}
               >
                 <option value="">Select Department</option>
@@ -74,14 +74,14 @@ export default function Step1Essential({ data, onChange, onNext, onCancel }) {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Work Arrangement</label>
-              <div className="grid grid-cols-3 gap-2 p-1 bg-[#070B19]/60 rounded-xl border border-white/5">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-subtle mb-2">Work Arrangement</label>
+              <div className="grid grid-cols-3 gap-2 p-1 bg-surface/60 rounded-xl border border-white/5">
                 {WORK_TYPES.map((type) => (
                   <button
                     key={type}
                     type="button"
                     onClick={() => onChange('workEnvironment', type)}
-                    className={`py-2 text-xs font-medium rounded-lg transition ${data.workEnvironment === type ? 'bg-emerald-500 text-[#070B19] font-bold' : 'text-gray-400 hover:text-white'}`}
+                    className={`py-2 text-xs font-medium rounded-lg transition ${data.workEnvironment === type ? 'bg-accent text-[#070B19] font-bold' : 'text-subtle hover:text-content'}`}
                   >
                     {type}
                   </button>
@@ -91,30 +91,30 @@ export default function Step1Essential({ data, onChange, onNext, onCancel }) {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Location</label>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-subtle mb-2">Location</label>
             <input
               type="text"
               value={data.location}
               onChange={(e) => onChange('location', e.target.value)}
               onBlur={() => markTouched('location')}
               placeholder="e.g. Phnom Penh, Cambodia"
-              className={`w-full px-4 py-3 rounded-xl border bg-[#070B19]/60 text-sm text-white placeholder-gray-600 focus:outline-none transition ${
-                touched.location && errors.location ? 'border-rose-500/40 focus:border-rose-500/40' : 'border-white/5 focus:border-emerald-500/40'
+              className={`w-full px-4 py-3 rounded-xl border bg-surface/60 text-sm text-content placeholder-gray-600 focus:outline-none transition ${
+                touched.location && errors.location ? 'border-rose-500/40 focus:border-rose-500/40' : 'border-white/5 focus:border-accent/40'
               }`}
             />
             {touched.location && errors.location && <p className="text-[10px] text-rose-400 mt-1.5 font-medium">{errors.location}</p>}
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Job Description</label>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-subtle mb-2">Job Description</label>
             <textarea
               rows={5}
               value={data.description}
               onChange={(e) => onChange('description', e.target.value)}
               onBlur={() => markTouched('description')}
               placeholder="Describe the tasks, requirements, and tech stack options..."
-              className={`w-full px-4 py-3 rounded-xl border bg-[#070B19]/60 text-sm text-white placeholder-gray-600 focus:outline-none transition resize-none ${
-                touched.description && errors.description ? 'border-rose-500/40 focus:border-rose-500/40' : 'border-white/5 focus:border-emerald-500/40'
+              className={`w-full px-4 py-3 rounded-xl border bg-surface/60 text-sm text-content placeholder-gray-600 focus:outline-none transition resize-none ${
+                touched.description && errors.description ? 'border-rose-500/40 focus:border-rose-500/40' : 'border-white/5 focus:border-accent/40'
               }`}
             />
             {touched.description && errors.description && <p className="text-[10px] text-rose-400 mt-1.5 font-medium">{errors.description}</p>}
@@ -124,12 +124,12 @@ export default function Step1Essential({ data, onChange, onNext, onCancel }) {
 
       {/* Navigation Foot Actions */}
       <div className="mt-8 pt-5 border-t border-white/5 flex items-center justify-between">
-        <button onClick={onCancel} className="px-5 py-2.5 rounded-xl text-xs font-semibold border border-white/10 text-gray-400 hover:text-white hover:bg-white/5 transition">
+        <button onClick={onCancel} className="px-5 py-2.5 rounded-xl text-xs font-semibold border border-white/10 text-subtle hover:text-content hover:bg-raised/5 transition">
           Cancel
         </button>
         <button
           onClick={handleNext}
-          className="px-6 py-2.5 rounded-xl text-xs font-bold bg-emerald-500 text-[#070B19] hover:bg-emerald-400 transition flex items-center gap-1 shadow-lg shadow-emerald-500/10"
+          className="px-6 py-2.5 rounded-xl text-xs font-bold bg-accent text-[#070B19] hover:bg-accent transition flex items-center gap-1 shadow-lg shadow-accent/10"
         >
           Next Step <span>-&gt;</span>
         </button>

@@ -12,7 +12,7 @@ export default function SidebarNav({ activeTab, setActiveTab }) {
   return (
     <div className="rounded-2xl border border-white/5 bg-[#111B34]/30 p-3 space-y-1">
       <div className="px-3 pt-2 pb-3 border-b border-white/5 mb-2">
-        <span className="text-[10px] uppercase font-bold tracking-widest text-gray-500 block">Account Settings</span>
+        <span className="text-[10px] uppercase font-bold tracking-widest text-subtle block">Account Settings</span>
       </div>
 
       <nav className="space-y-1">
@@ -26,8 +26,8 @@ export default function SidebarNav({ activeTab, setActiveTab }) {
               onClick={() => setActiveTab(item.name)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition duration-150 ${
                 isActive
-                  ? 'bg-emerald-500 text-[#070B19] shadow-md shadow-emerald-500/10 font-bold'
-                  : 'text-gray-400 hover:text-white hover:bg-white/[0.02]'
+                  ? 'bg-accent text-[#070B19] shadow-md shadow-accent/10 font-bold'
+                  : 'text-subtle hover:text-content hover:bg-raised/[0.02]'
               }`}
             >
               <span className={`text-[10px] min-w-8 ${isActive ? 'opacity-100' : 'opacity-60'}`}>{item.icon}</span>

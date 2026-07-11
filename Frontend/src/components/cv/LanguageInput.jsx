@@ -3,10 +3,10 @@ import { useState, useRef, useEffect } from 'react';
 const PROFICIENCY_LEVELS = ['Native', 'Fluent', 'Intermediate', 'Basic'];
 
 const PROFICIENCY_COLORS = {
-  Native: 'bg-emerald-400/20 text-emerald-300 border-emerald-400/30',
+  Native: 'bg-accent/20 text-accent border-accent/30',
   Fluent: 'bg-blue-400/20 text-blue-300 border-blue-400/30',
   Intermediate: 'bg-yellow-400/20 text-yellow-300 border-yellow-400/30',
-  Basic: 'bg-slate-400/20 text-slate-300 border-slate-400/30',
+  Basic: 'bg-muted/20 text-subtle border-line/30',
 };
 
 const SUGGESTED_LANGUAGES = [
@@ -78,7 +78,7 @@ function LanguageInput({ languages, onChange }) {
     <div className="flex flex-col gap-3" ref={wrapperRef}>
 
       {/* Input area */}
-      <div className="bg-slate-800 border border-slate-600 rounded-lg p-3 flex flex-col gap-2 focus-within:border-emerald-400 relative">
+      <div className="bg-raised border border-line rounded-lg p-3 flex flex-col gap-2 focus-within:border-accent relative">
         <input
           type="text"
           value={langInput}
@@ -89,7 +89,7 @@ function LanguageInput({ languages, onChange }) {
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder="Search or type a language..."
-          className="bg-transparent text-sm outline-none placeholder-slate-500 text-white"
+          className="bg-transparent text-sm outline-none placeholder-faint text-content"
         />
 
         {/* Proficiency selector + Add button */}
@@ -103,7 +103,7 @@ function LanguageInput({ languages, onChange }) {
                 className={`px-2 py-0.5 text-xs rounded-full border transition ${
                   selectedProficiency === level
                     ? PROFICIENCY_COLORS[level]
-                    : 'text-slate-500 border-slate-600 hover:border-slate-400'
+                    : 'text-faint border-line hover:border-line'
                 }`}
               >
                 {level}
@@ -119,7 +119,7 @@ function LanguageInput({ languages, onChange }) {
                 addLanguage(langInput);
               }
             }}
-            className="px-3 py-1 bg-emerald-400 text-slate-900 text-xs font-semibold rounded-lg hover:bg-emerald-300 transition"
+            className="px-3 py-1 bg-accent text-accent-ink text-xs font-semibold rounded-lg hover:bg-accent transition"
           >
             Add
           </button>
@@ -127,14 +127,14 @@ function LanguageInput({ languages, onChange }) {
 
         {/* Suggestions dropdown */}
         {isOpen && langInput.length > 0 && (
-          <div className="absolute left-0 right-0 top-full mt-1 z-10 max-h-48 overflow-y-auto bg-slate-800 border border-slate-600 rounded-lg shadow-lg custom-scrollbar">
+          <div className="absolute left-0 right-0 top-full mt-1 z-10 max-h-48 overflow-y-auto bg-raised border border-line rounded-lg shadow-lg custom-scrollbar">
             {filtered.length > 0 ? (
               filtered.map((suggestion) => (
                 <button
                   key={suggestion}
                   type="button"
                   onClick={() => addLanguage(suggestion)}
-                  className="w-full text-left px-3 py-2 text-sm text-slate-200 hover:bg-slate-700 transition"
+                  className="w-full text-left px-3 py-2 text-sm text-content hover:bg-muted transition"
                 >
                   {suggestion}
                 </button>
@@ -143,7 +143,7 @@ function LanguageInput({ languages, onChange }) {
               <button
                 type="button"
                 onClick={() => addLanguage(langInput)}
-                className="w-full text-left px-3 py-2 text-sm text-emerald-400 hover:bg-slate-700 transition"
+                className="w-full text-left px-3 py-2 text-sm text-accent hover:bg-muted transition"
               >
                 + Add "{langInput}" as custom
               </button>
@@ -158,9 +158,9 @@ function LanguageInput({ languages, onChange }) {
           {languages.map((entry) => (
             <div
               key={entry.language}
-              className="relative flex items-center gap-1.5 bg-slate-800 border border-slate-600 rounded-full pl-3 pr-1 py-1"
+              className="relative flex items-center gap-1.5 bg-raised border border-line rounded-full pl-3 pr-1 py-1"
             >
-              <span className="text-sm text-white">{entry.language}</span>
+              <span className="text-sm text-content">{entry.language}</span>
 
               {/* Proficiency badge — clicking opens a dropdown */}
               <button
@@ -177,7 +177,7 @@ function LanguageInput({ languages, onChange }) {
 
               {/* Proficiency dropdown for this tag */}
               {openProficiencyFor === entry.language && (
-                <div className="absolute left-0 top-full mt-1 z-20 bg-slate-800 border border-slate-600 rounded-lg shadow-lg overflow-hidden">
+                <div className="absolute left-0 top-full mt-1 z-20 bg-raised border border-line rounded-lg shadow-lg overflow-hidden">
                   {PROFICIENCY_LEVELS.map((level) => (
                     <button
                       key={level}
@@ -186,7 +186,7 @@ function LanguageInput({ languages, onChange }) {
                       className={`w-full text-left px-3 py-2 text-xs transition ${
                         level === entry.proficiency
                           ? PROFICIENCY_COLORS[level]
-                          : 'text-slate-200 hover:bg-slate-700'
+                          : 'text-content hover:bg-muted'
                       }`}
                     >
                       {level}
@@ -198,7 +198,7 @@ function LanguageInput({ languages, onChange }) {
               <button
                 type="button"
                 onClick={() => handleRemove(entry.language)}
-                className="text-slate-400 hover:text-red-400 transition text-sm ml-0.5 w-5 h-5 flex items-center justify-center"
+                className="text-subtle hover:text-red-400 transition text-sm ml-0.5 w-5 h-5 flex items-center justify-center"
               >
                 ×
               </button>

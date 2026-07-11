@@ -1,70 +1,201 @@
-import { Link, useLocation } from 'react-router-dom';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import useApplicantAlerts from '../../hooks/useApplicantAlerts';
+import { searchAll } from '../../api/companyApi';
 
 export default function CompanyNavbar() {
-  const location = useLocation();
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const [suggestions, setSuggestions] = useState({ students: [], companies: [], internships: [] });
+  const [showSuggest, setShowSuggest] = useState(false);
+  const searchRef = useRef(null);
 
-  const navLinks = [
-    { name: 'Home', path: '/company/home' },
-    { name: 'Dashboard', path: '/company/dashboard' },
-    { name: 'Profile', path: '/company/profile' },
-    { name: 'Settings', path: '/company/settings' },
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { count } = useApplicantAlerts();
+
+  const links = [
+    { label: 'Home', path: '/company/home' },
+    { label: 'Dashboard', path: '/company/dashboard' },
+    { label: 'Internships', path: '/company/internships', alert: true },
   ];
 
+  // Live suggestions across students, companies, and internships.
+  useEffect(() => {
+    const q = query.trim();
+    if (q.length < 2) { setSuggestions({ students: [], companies: [], internships: [] }); return; }
+    const t = setTimeout(async () => {
+      const res = await searchAll(q);
+      if (res.success) setSuggestions(res.results);
+    }, 250);
+    return () => clearTimeout(t);
+  }, [query]);
+
+  useEffect(() => {
+    const onClick = (e) => {
+      if (searchRef.current && !searchRef.current.contains(e.target)) setShowSuggest(false);
+    };
+    document.addEventListener('mousedown', onClick);
+    return () => document.removeEventListener('mousedown', onClick);
+  }, []);
+
+  const flat = useMemo(() => [
+    ...(suggestions.internships || []).slice(0, 3).map((i) => ({
+      key: `i-${i.id}`, icon: 'bi-briefcase', label: i.title,
+      sub: i.company?.companyName || 'Internship', to: `/view-detail?id=${i.id}`,
+    })),
+    ...(suggestions.students || []).slice(0, 3).map((s) => ({
+      key: `s-${s.id}`, icon: 'bi-person', label: s.fullName || 'Student',
+      sub: s.education || 'Student', to: `/user/profile/${s.userId}`,
+    })),
+    ...(suggestions.companies || []).slice(0, 2).map((c) => ({
+      key: `c-${c.id}`, icon: 'bi-building', label: c.companyName || 'Company',
+      sub: c.industry || 'Company', to: `/company/${c.id}`,
+    })),
+  ], [suggestions]);
+
+  const runSearch = (e) => {
+    e.preventDefault();
+    const q = query.trim();
+    setShowSuggest(false);
+    navigate(q ? `/company/search?q=${encodeURIComponent(q)}` : '/company/search');
+  };
+
+  const isActive = (p) => location.pathname.startsWith(p);
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-[#070B19]/80 backdrop-blur-md">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between gap-4">
+    <nav className="sticky top-0 z-50 w-full border-b border-line bg-raised/90 backdrop-blur-md">
+      <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6 lg:px-8">
+        <Link to="/company/home" className="flex flex-shrink-0 items-center gap-2">
+          <span className="grid h-7 w-7 place-items-center rounded-lg bg-accent text-xs font-black text-accent-ink">IF</span>
+          <span className="hidden text-sm font-black text-content sm:inline">Internship Finder</span>
+        </Link>
 
-          {/* Brand Platform Logo Anchor */}
-          <div className="flex items-center gap-8">
-            <Link to="/company/home" className="flex items-center gap-2 group">
-              <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center font-black text-xs text-[#070B19] shadow-md shadow-emerald-500/20">
-                IF
-              </div>
-              <span className="text-sm font-black tracking-tight text-white group-hover:text-emerald-400 transition-colors">
-                Internship Finder
-              </span>
-            </Link>
-
-            {/* Inner Dashboard View Navigation Tabs */}
-            <nav className="hidden md:flex items-center gap-1">
-              {navLinks.map((tab) => {
-                const isActive = location.pathname === tab.path;
-                return (
-                  <Link
-                    key={tab.path}
-                    to={tab.path}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                      isActive
-                        ? 'bg-white/5 text-emerald-400'
-                        : 'text-gray-400 hover:text-white hover:bg-white/[0.02]'
-                    }`}
-                  >
-                    {tab.name}
-                  </Link>
-                );
-              })}
-            </nav>
-          </div>
-
-          {/* Context Controls Deck */}
-          <div className="flex items-center gap-4">
-            {/* Design Call to Action matching the global '+ Create an Internship' design boundary */}
+        <div className="ml-2 hidden items-center gap-1 md:flex">
+          {links.map((l) => (
             <Link
-              to="/company/create-internship"
-              className="hidden sm:inline-flex items-center justify-center px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-[#070B19] font-bold text-xs transition duration-150 shadow-md shadow-emerald-500/10"
+              key={l.path}
+              to={l.path}
+              className={`relative rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
+                isActive(l.path) ? 'bg-accent-soft text-accent' : 'text-subtle hover:bg-muted hover:text-content'
+              }`}
             >
-              + Create an Internship
+              {l.label}
+              {l.alert && count > 0 && (
+                <span className="absolute -right-1.5 -top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-accent px-1 text-[10px] font-bold text-accent-ink">
+                  {count > 9 ? '9+' : count}
+                </span>
+              )}
             </Link>
-
-            {/* User Meta Tracking Badge */}
-            <div className="h-8 w-8 rounded-full border border-white/10 bg-[#111B34] flex items-center justify-center font-bold text-xs text-emerald-400 cursor-pointer hover:border-emerald-500/40 transition">
-              NG
-            </div>
-          </div>
-
+          ))}
         </div>
+
+        {/* Search: students, companies, internships */}
+        <div ref={searchRef} className="relative ml-auto hidden max-w-xs flex-1 lg:block">
+          <form onSubmit={runSearch}>
+            <div className="flex items-center gap-2 rounded-lg border border-line bg-muted px-3 py-1.5 focus-within:border-accent">
+              <i className="bi bi-search text-sm text-faint" />
+              <input
+                value={query}
+                onChange={(e) => { setQuery(e.target.value); setShowSuggest(true); }}
+                onFocus={() => setShowSuggest(true)}
+                placeholder="Search students, companies, internships"
+                aria-label="Search"
+                className="w-full bg-transparent text-xs text-content placeholder:text-faint focus:outline-none"
+              />
+            </div>
+          </form>
+
+          {showSuggest && flat.length > 0 && (
+            <ul className="absolute left-0 right-0 top-full z-50 mt-1.5 overflow-hidden rounded-lg border border-line bg-raised shadow-lg">
+              {flat.map((s) => (
+                <li key={s.key}>
+                  <Link
+                    to={s.to}
+                    onClick={() => setShowSuggest(false)}
+                    className="flex items-center gap-2 px-3 py-2 transition-colors hover:bg-muted"
+                  >
+                    <i className={`bi ${s.icon} text-xs text-faint`} />
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-xs font-semibold text-content">{s.label}</span>
+                      <span className="block truncate text-[11px] text-subtle">{s.sub}</span>
+                    </span>
+                  </Link>
+                </li>
+              ))}
+              <li className="border-t border-line">
+                <button onClick={runSearch} className="w-full px-3 py-2 text-left text-[11px] font-semibold text-accent hover:bg-muted">
+                  See all results for “{query}”
+                </button>
+              </li>
+            </ul>
+          )}
+        </div>
+
+        <div className="ml-auto hidden items-center gap-2 md:flex lg:ml-3">
+          <Link
+            to="/company/settings"
+            aria-label="Settings"
+            className={`grid h-9 w-9 place-items-center rounded-lg border border-line transition-colors ${
+              isActive('/company/settings') ? 'bg-accent-soft text-accent' : 'text-subtle hover:bg-muted hover:text-content'
+            }`}
+          >
+            <i className="bi bi-gear text-[15px]" />
+          </Link>
+          <Link
+            to="/company/profile"
+            aria-label="Company profile"
+            className={`grid h-9 w-9 place-items-center rounded-full border transition-all ${
+              isActive('/company/profile') ? 'border-accent' : 'border-line hover:border-faint'
+            }`}
+          >
+            <i className="bi bi-building text-sm text-subtle" />
+          </Link>
+        </div>
+
+        <button
+          onClick={() => setOpen((o) => !o)}
+          aria-label="Toggle menu"
+          className="ml-auto inline-flex h-9 w-9 items-center justify-center rounded-lg border border-line bg-muted text-content md:hidden"
+        >
+          <i className={`bi ${open ? 'bi-x-lg' : 'bi-list'} text-lg`} />
+        </button>
       </div>
-    </header>
+
+      {open && (
+        <div className="border-t border-line bg-raised md:hidden">
+          <div className="mx-auto flex max-w-7xl flex-col gap-1 px-4 py-4">
+            <form onSubmit={runSearch} className="mb-2">
+              <div className="flex items-center gap-2 rounded-lg border border-line bg-muted px-3 py-2 focus-within:border-accent">
+                <i className="bi bi-search text-sm text-faint" />
+                <input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search students, companies, internships"
+                  className="w-full bg-transparent text-sm text-content placeholder:text-faint focus:outline-none"
+                />
+              </div>
+            </form>
+            {[...links, { label: 'Settings', path: '/company/settings' }, { label: 'Profile', path: '/company/profile' }].map((l) => (
+              <Link
+                key={l.path}
+                to={l.path}
+                onClick={() => setOpen(false)}
+                className={`flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium ${
+                  isActive(l.path) ? 'bg-accent-soft text-accent' : 'text-subtle hover:bg-muted hover:text-content'
+                }`}
+              >
+                {l.label}
+                {l.alert && count > 0 && (
+                  <span className="grid h-5 min-w-5 place-items-center rounded-full bg-accent px-1.5 text-[11px] font-bold text-accent-ink">
+                    {count > 9 ? '9+' : count}
+                  </span>
+                )}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+    </nav>
   );
 }

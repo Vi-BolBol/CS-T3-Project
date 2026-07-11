@@ -36,27 +36,27 @@ function CVStep4Experience() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white flex flex-col items-center py-6 px-4">
+    <div className="min-h-[calc(100vh-4rem)] bg-surface text-content flex flex-col items-center py-6 px-4">
       <StepProgressBar currentStep={4} />
       <SuggestionBanner />
 
-      <div className="w-full max-w-2xl bg-slate-800/60 border border-slate-700/80 rounded-2xl shadow-xl shadow-black/20 p-6 sm:p-8 mt-6 flex flex-col gap-6">
+      <div className="w-full max-w-2xl bg-raised/60 border border-line/80 rounded-2xl shadow-xl shadow-black/20 p-6 sm:p-8 mt-6 flex flex-col gap-6">
 
         <div>
           <h2 className="text-lg font-bold">Experience</h2>
-          <p className="text-sm text-slate-400 mt-1">Your work history, education, and references.</p>
+          <p className="text-sm text-subtle mt-1">Your work history, education, and references.</p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1.5">
+          <label className="block text-sm font-medium text-subtle mb-1.5">
             Work Experience
-            <span className="text-slate-500 font-normal ml-1">(optional)</span>
+            <span className="text-faint font-normal ml-1">(optional)</span>
           </label>
           <WorkExperienceInput entries={workExperience} onChange={setWorkExperience} />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1.5">
+          <label className="block text-sm font-medium text-subtle mb-1.5">
             Education
             <span className="text-red-400 ml-1">*</span>
           </label>
@@ -69,20 +69,20 @@ function CVStep4Experience() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1.5">
+          <label className="block text-sm font-medium text-subtle mb-1.5">
             References
-            <span className="text-slate-500 font-normal ml-1">(optional)</span>
+            <span className="text-faint font-normal ml-1">(optional)</span>
           </label>
           <ReferenceInput entries={references} onChange={setReferences} />
         </div>
 
-        <div className="flex justify-between items-center border-t border-slate-700/80 pt-5 mt-1">
+        <div className="flex justify-between items-center border-t border-line/80 pt-5 mt-1">
           <button onClick={() => navigate('/cv/step3')}
-            className="px-6 py-2 bg-slate-700 text-white font-semibold rounded-lg hover:bg-slate-600 transition">
+            className="px-6 py-2 bg-muted text-content font-semibold rounded-lg hover:bg-muted transition">
             ← Back
           </button>
           <button onClick={handleNext}
-            className="px-6 py-2 bg-emerald-400 text-slate-900 font-semibold rounded-lg hover:bg-emerald-300 transition">
+            className="px-6 py-2 bg-accent text-accent-ink font-semibold rounded-lg hover:bg-accent transition">
             Next →
           </button>
         </div>
