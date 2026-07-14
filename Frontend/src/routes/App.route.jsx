@@ -4,6 +4,7 @@ import Home from "../pages/Home";
 import About from "../pages/About";
 import Contact from "../pages/Contact";
 import Explore from "../pages/Explore";
+import InternshipDetail from "../pages/InternshipDetail";
 import NotFound from "../pages/NotFound";
 
 import Login from "../pages/auth/Login.auth";
@@ -42,14 +43,7 @@ import CVStep3About from "../pages/cv/CVStep3About";
 import CVStep4Experience from "../pages/cv/CVStep4Experience";
 import CVStep5Preview from "../pages/cv/CVStep5Preview";
 
-/* ---------- Legacy redirects ----------
-   Old public URLs used to be separate pages (/internships/:id, /company/:id).
-   Details now open in a pane on /explore instead of navigating, so these keep
-   any stale link or bookmark working. */
-function LegacyInternship() {
-  const { id } = useParams();
-  return <Navigate to={`/explore?type=internships&job=${id}`} replace />;
-}
+/* ---------- Legacy redirects ---------- */
 function LegacyCompany() {
   const { id } = useParams();
   return <Navigate to={`/explore?type=companies&company=${id}`} replace />;
@@ -106,7 +100,9 @@ export default function AppRoute() {
         {/* Old public URLs -> the single Explore page */}
         <Route path="/internships" element={<Navigate to="/explore?type=internships" replace />} />
         <Route path="/companies" element={<Navigate to="/explore?type=companies" replace />} />
-        <Route path="/internships/:id" element={<LegacyInternship />} />
+        {/* Full listing page. The Explore pane is a summary; this is the whole thing.
+            Public route — it renders the student shell if a student opens it. */}
+        <Route path="/internships/:id" element={<InternshipDetail />} />
         <Route path="/companies/:id" element={<LegacyCompany />} />
         <Route path="/view-detail" element={<LegacyViewDetail />} />
 

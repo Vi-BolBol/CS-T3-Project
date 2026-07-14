@@ -47,9 +47,8 @@ export default function Explore() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // The "c" column.
+  // The "c" column. A summary — the full listing has its own page.
   const [selected, setSelected] = useState(null);   // { kind: 'job'|'company', id }
-  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -89,10 +88,7 @@ export default function Explore() {
     setSearchParams(next, { replace: true });
   };
 
-  const select = (kind, id) => {
-    setSelected({ kind, id });
-    setExpanded(false);   // every new selection starts collapsed — "Show more" is always there
-  };
+  const select = (kind, id) => setSelected({ kind, id });
 
   const { categories, companyNames, industries } = useMemo(() => {
     const c = new Set(), co = new Set(), ind = new Set();
@@ -260,7 +256,7 @@ export default function Explore() {
 
         <div className="flex flex-1 flex-col gap-5 lg:min-h-0 lg:flex-row">
           {/* (a) Filters */}
-          <aside className={`${showFilters ? 'block' : 'hidden'} lg:block lg:w-60 lg:flex-shrink-0`}>
+          <aside className={`${showFilters ? 'block' : 'hidden'} lg:block lg:w-56 lg:flex-shrink-0`}>
             <div className="custom-scrollbar h-full space-y-4 overflow-y-auto rounded-xl border border-line bg-raised p-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-sm font-bold text-content">Filters</h2>
@@ -456,12 +452,10 @@ export default function Explore() {
 
           {/* (c) Detail — appears beside the list, never replaces the page */}
           {hasDetail && (
-            <section className="max-h-[75vh] lg:max-h-none lg:h-full lg:w-[34rem] lg:flex-shrink-0 xl:w-[40rem]">
+            <section className="max-h-[75vh] lg:max-h-none lg:h-full lg:w-[42rem] lg:flex-shrink-0 xl:w-[48rem]">
               {selectedJob && (
                 <InternshipPane
                   job={selectedJob}
-                  expanded={expanded}
-                  onToggleExpand={() => setExpanded((v) => !v)}
                   onClose={() => setSelected(null)}
                   actions={applyGate(selectedJob.id)}
                 />
@@ -470,8 +464,6 @@ export default function Explore() {
                 <CompanyPane
                   company={selectedCompany}
                   listings={selectedCompanyListings}
-                  expanded={expanded}
-                  onToggleExpand={() => setExpanded((v) => !v)}
                   onClose={() => setSelected(null)}
                   onSelectJob={(job) => { setFilters((p) => ({ ...p, type: 'internships' })); select('job', job.id); }}
                 />

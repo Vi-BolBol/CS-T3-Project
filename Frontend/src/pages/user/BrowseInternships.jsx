@@ -58,9 +58,9 @@ export default function BrowseInternships() {
   const [savedIds, setSavedIds] = useState(new Set());
   const [appliedIds, setAppliedIds] = useState(new Set());
 
-  // The "c" column: which item the detail pane is showing, and how much of it.
+  // The "c" column: which item the detail pane is showing. A summary — the full
+  // listing has its own page (/internships/:id).
   const [selected, setSelected] = useState(null);   // { kind: 'job'|'company', id }
-  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     fetchInternships();
@@ -166,11 +166,7 @@ export default function BrowseInternships() {
     setSelected(null);
   };
 
-  // Every new selection starts collapsed, so "Show more" is always offered again.
-  const select = (kind, id) => {
-    setSelected({ kind, id });
-    setExpanded(false);
-  };
+  const select = (kind, id) => setSelected({ kind, id });
 
   const clearAll = () => {
     setSearchQuery('');
@@ -297,7 +293,7 @@ export default function BrowseInternships() {
 
         <div className="flex flex-1 flex-col gap-5 lg:min-h-0 lg:flex-row">
           {/* (a) Filters */}
-          <aside className={`${showFilters ? 'block' : 'hidden'} lg:block lg:w-60 lg:flex-shrink-0`}>
+          <aside className={`${showFilters ? 'block' : 'hidden'} lg:block lg:w-56 lg:flex-shrink-0`}>
             <div className="custom-scrollbar h-full space-y-4 overflow-y-auto rounded-xl border border-line bg-raised p-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-sm font-bold text-content">Filters</h2>
@@ -537,12 +533,10 @@ export default function BrowseInternships() {
 
           {/* (c) Detail */}
           {hasDetail && (
-            <section className="max-h-[75vh] lg:max-h-none lg:h-full lg:w-[34rem] lg:flex-shrink-0 xl:w-[40rem]">
+            <section className="max-h-[75vh] lg:max-h-none lg:h-full lg:w-[42rem] lg:flex-shrink-0 xl:w-[48rem]">
               {selectedJob && (
                 <InternshipPane
                   job={selectedJob}
-                  expanded={expanded}
-                  onToggleExpand={() => setExpanded((v) => !v)}
                   onClose={() => setSelected(null)}
                   actions={jobActions(selectedJob)}
                 />
@@ -551,8 +545,6 @@ export default function BrowseInternships() {
                 <CompanyPane
                   company={selectedCompany}
                   listings={selectedCompanyListings}
-                  expanded={expanded}
-                  onToggleExpand={() => setExpanded((v) => !v)}
                   onClose={() => setSelected(null)}
                   onSelectJob={(job) => { setFilters((p) => ({ ...p, type: 'internships' })); select('job', job.id); }}
                 />
