@@ -67,12 +67,12 @@ export default function EditableListInput({ items, onChange, placeholder = 'Type
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={handleAddKeyDown}
           placeholder={placeholder}
-          className="flex-1 px-4 py-3 rounded-xl border border-white/5 bg-surface/60 text-sm text-content placeholder-gray-600 focus:outline-none focus:border-accent/40 transition"
+          className="flex-1 px-4 py-3 rounded-xl border border-line bg-surface/60 text-sm text-content placeholder:text-faint focus:outline-none focus:border-accent/40 transition"
         />
         <button
           type="button"
           onClick={commitAdd}
-          className="px-4 py-2 rounded-xl text-xs font-bold border border-white/10 bg-raised/5 text-subtle hover:bg-raised/10 hover:text-content transition"
+          className="px-4 py-2 rounded-xl text-xs font-bold border border-line bg-raised/5 text-subtle hover:bg-raised/10 hover:text-content transition"
         >
           Add
         </button>
@@ -83,7 +83,7 @@ export default function EditableListInput({ items, onChange, placeholder = 'Type
           {items.map((item, idx) => (
             <li
               key={idx}
-              className="flex items-start gap-3 text-xs bg-surface/40 border border-white/5 rounded-lg px-3 py-2.5"
+              className="flex items-start gap-3 text-xs bg-surface/40 border border-line rounded-lg px-3 py-2.5"
             >
               <span className="text-accent font-bold shrink-0 mt-0.5">{idx + 1}.</span>
 

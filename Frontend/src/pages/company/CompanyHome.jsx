@@ -211,7 +211,7 @@ export default function CompanyHome() {
                       {connections.map((c) => (
                         <Link
                           key={c.id}
-                          to={`/company/${c.id}`}
+                          to={`/explore?type=companies&company=${c.id}`}
                           className="flex items-center gap-3 rounded-xl border border-line bg-raised p-3 transition hover:border-accent/60"
                         >
                           {c.logoUrl ? (

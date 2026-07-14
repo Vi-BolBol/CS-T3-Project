@@ -52,10 +52,10 @@ export default function Step3Compensation({ data, onChange, onNext, onBack }) {
   const errClass = (field) =>
     touched[field] && errors[field]
       ? 'border-rose-500/40 focus:border-rose-500/40'
-      : 'border-white/5 focus:border-accent/40';
+      : 'border-line focus:border-accent/40';
 
   return (
-    <div className="w-full max-w-4xl mx-auto rounded-2xl border border-white/5 bg-[#111B34]/40 p-6 sm:p-8 shadow-2xl backdrop-blur-md">
+    <div className="w-full max-w-4xl mx-auto rounded-2xl border border-line bg-raised p-6 sm:p-8 shadow-2xl backdrop-blur-md">
 
       <div className="mb-6">
         <span className="text-[10px] uppercase font-bold tracking-widest text-accent bg-accent/10 px-2.5 py-1 rounded-full">
@@ -79,7 +79,7 @@ export default function Step3Compensation({ data, onChange, onNext, onBack }) {
                   onChange={(e) => handleNumericChange('payMin', e.target.value)}
                   onBlur={() => markTouched('payMin')}
                   placeholder="Min (e.g. 4000)"
-                  className={`w-full pl-8 pr-4 py-3 rounded-xl border bg-surface/60 text-sm text-content placeholder-gray-600 focus:outline-none transition ${errClass('payMin')}`}
+                  className={`w-full pl-8 pr-4 py-3 rounded-xl border bg-surface/60 text-sm text-content placeholder:text-faint focus:outline-none transition ${errClass('payMin')}`}
                 />
               </div>
               {touched.payMin && errors.payMin && <p className="text-[10px] text-rose-400 mt-1.5 font-medium">{errors.payMin}</p>}
@@ -94,7 +94,7 @@ export default function Step3Compensation({ data, onChange, onNext, onBack }) {
                   onChange={(e) => handleNumericChange('payMax', e.target.value)}
                   onBlur={() => markTouched('payMax')}
                   placeholder="Max (e.g. 6000)"
-                  className={`w-full pl-8 pr-4 py-3 rounded-xl border bg-surface/60 text-sm text-content placeholder-gray-600 focus:outline-none transition ${errClass('payMax')}`}
+                  className={`w-full pl-8 pr-4 py-3 rounded-xl border bg-surface/60 text-sm text-content placeholder:text-faint focus:outline-none transition ${errClass('payMax')}`}
                 />
               </div>
               {touched.payMax && errors.payMax && <p className="text-[10px] text-rose-400 mt-1.5 font-medium">{errors.payMax}</p>}
@@ -113,14 +113,14 @@ export default function Step3Compensation({ data, onChange, onNext, onBack }) {
                 onChange={(e) => handleNumericChange('durationValue', e.target.value)}
                 onBlur={() => markTouched('durationValue')}
                 placeholder="e.g. 3"
-                className={`w-full px-4 py-3 rounded-xl border bg-surface/60 text-sm text-content placeholder-gray-600 focus:outline-none transition ${errClass('durationValue')}`}
+                className={`w-full px-4 py-3 rounded-xl border bg-surface/60 text-sm text-content placeholder:text-faint focus:outline-none transition ${errClass('durationValue')}`}
               />
               {touched.durationValue && errors.durationValue && <p className="text-[10px] text-rose-400 mt-1.5 font-medium">{errors.durationValue}</p>}
             </div>
             <select
               value={data.durationUnit}
               onChange={(e) => onChange('durationUnit', e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-white/5 bg-surface/60 text-sm text-subtle focus:outline-none focus:border-accent/40 transition"
+              className="w-full px-4 py-3 rounded-xl border border-line bg-surface/60 text-sm text-subtle focus:outline-none focus:border-accent/40 transition"
             >
               {DURATION_UNITS.map((unit) => (
                 <option key={unit} value={unit}>{unit}</option>
@@ -130,9 +130,9 @@ export default function Step3Compensation({ data, onChange, onNext, onBack }) {
         </div>
       </div>
 
-      <div className="mt-8 pt-5 border-t border-white/5 flex items-center justify-between">
-        <button onClick={onBack} className="px-5 py-2.5 rounded-xl text-xs font-semibold border border-white/10 text-subtle hover:text-content hover:bg-raised/5 transition">Back</button>
-        <button onClick={handleNext} className="px-6 py-2.5 rounded-xl text-xs font-bold bg-accent text-[#070B19] hover:bg-accent transition shadow-lg shadow-accent/10">Next Step</button>
+      <div className="mt-8 pt-5 border-t border-line flex items-center justify-between">
+        <button onClick={onBack} className="px-5 py-2.5 rounded-xl text-xs font-semibold border border-line text-subtle hover:text-content hover:bg-raised/5 transition">Back</button>
+        <button onClick={handleNext} className="px-6 py-2.5 rounded-xl text-xs font-bold bg-accent text-accent-ink hover:bg-accent transition shadow-lg shadow-accent/10">Next Step</button>
       </div>
     </div>
   );

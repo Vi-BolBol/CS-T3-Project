@@ -1,4 +1,5 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import useLogout from '../../hooks/useLogout';
 
 const LINKS = [
   { label: 'Dashboard', path: '/admin', icon: 'bi-speedometer2' },
@@ -8,13 +9,8 @@ const LINKS = [
 
 export default function AdminNavbar() {
   const location = useLocation();
-  const navigate = useNavigate();
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    navigate('/login');
-  };
+  const logout = useLogout();
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-line bg-raised/90 backdrop-blur-md">

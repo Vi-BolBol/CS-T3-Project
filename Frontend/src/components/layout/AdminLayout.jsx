@@ -1,4 +1,5 @@
-import { Link, useLocation, useNavigate, Navigate } from 'react-router-dom';
+import { Link, useLocation, Navigate } from 'react-router-dom';
+import useLogout from '../../hooks/useLogout';
 import ThemeToggle from '../shared/ThemeToggle';
 
 const NAV = [
@@ -16,7 +17,6 @@ function currentUser() {
 
 export default function AdminLayout({ children, title, subtitle }) {
   const location = useLocation();
-  const navigate = useNavigate();
   const user = currentUser();
 
   if (!user) return <Navigate to="/login" replace />;
@@ -25,11 +25,7 @@ export default function AdminLayout({ children, title, subtitle }) {
   const isActive = (item) =>
     item.exact ? location.pathname === item.to : location.pathname.startsWith(item.to);
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    navigate('/login');
-  };
+  const logout = useLogout();
 
   return (
     <div className="flex min-h-screen flex-col bg-surface">

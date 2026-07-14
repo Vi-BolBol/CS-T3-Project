@@ -7,23 +7,23 @@ export default function CompanyCard({
   jobs,
 }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+    <div className="rounded-2xl border border-line bg-muted p-6">
 
-      <div className="h-16 w-16 rounded-2xl bg-greenMain/20"></div>
+      <div className="h-16 w-16 rounded-2xl bg-accent/20"></div>
 
       <h3 className="mt-4 text-2xl font-bold">
         {name}
       </h3>
 
-      <p className="mt-2 text-gray-400">
+      <p className="mt-2 text-subtle">
         {industry}
       </p>
 
-      <p className="mt-1 text-gray-400">
+      <p className="mt-1 text-subtle">
         📍 {location}
       </p>
 
-      <p className="mt-4 text-greenMain">
+      <p className="mt-4 text-accent">
         {jobs} Open Positions
       </p>
 

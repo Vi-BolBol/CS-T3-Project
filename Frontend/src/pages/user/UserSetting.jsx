@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
+import useLogout from '../../hooks/useLogout';
 import Navbar from '../../components/layout/StudentNavbar';
 import Footer from '../../components/layout/StudentFooter';
 import ThemeToggle from '../../components/shared/ThemeToggle';
@@ -28,7 +29,6 @@ function Panel({ title, description, children }) {
 }
 
 export default function UserSetting() {
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const active = SECTIONS.some((s) => s.id === searchParams.get('s'))
     ? searchParams.get('s')
@@ -50,11 +50,7 @@ export default function UserSetting() {
     showToast('Password change isn’t wired to the backend yet.');
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    navigate('/login');
-  };
+  const logout = useLogout();
 
   // Everything this app stores on-device (CV, profile, applications, theme).
   const clearMemory = () => {

@@ -54,7 +54,7 @@ export default function Step5Checkout({ data, onChange, onSubmit, onBack, loadin
   const errClass = (field) =>
     touched[field] && errors[field]
       ? 'border-rose-500/40 focus:border-rose-500/40'
-      : 'border-white/5 focus:border-accent/40';
+      : 'border-line focus:border-accent/40';
 
   // --- Card number: digits only, live "1234-1234-1234-1234" formatting, 16-digit cap ---
   const handleCardNumberChange = (e) => {
@@ -122,10 +122,10 @@ export default function Step5Checkout({ data, onChange, onSubmit, onBack, loadin
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto rounded-2xl border border-white/5 bg-[#111B34]/40 p-6 sm:p-8 shadow-2xl backdrop-blur-md">
+    <div className="w-full max-w-2xl mx-auto rounded-2xl border border-line bg-raised p-6 sm:p-8 shadow-2xl backdrop-blur-md">
 
 
-      <div className="text-center pb-6 border-b border-white/5 mb-6">
+      <div className="text-center pb-6 border-b border-line mb-6">
         <span className="text-[10px] uppercase font-bold tracking-widest text-accent bg-accent/10 px-2.5 py-1 rounded-full">
           Stage 5 of 5
         </span>
@@ -135,7 +135,7 @@ export default function Step5Checkout({ data, onChange, onSubmit, onBack, loadin
 
       <div className="space-y-5">
         {/* Package Recap Summary */}
-        <div className="p-4 rounded-xl border border-white/5 bg-surface/50">
+        <div className="p-4 rounded-xl border border-line bg-surface/50">
           <span className="font-bold text-subtle text-xs">INTERNSHIP SUMMARY</span>
           <p className="text-sm font-bold text-content mt-1.5">{data.title || 'Untitled Internship'}</p>
           <p className="text-xs text-subtle mt-0.5">
@@ -155,8 +155,8 @@ export default function Step5Checkout({ data, onChange, onSubmit, onBack, loadin
                   onClick={() => onChange('plan', plan.id)}
                   className={`p-4 rounded-xl border flex items-start gap-3 cursor-pointer transition ${
                     isSelected
-                      ? 'border-accent/30 bg-[#111B34]/60 shadow-md shadow-accent/10'
-                      : 'border-white/5 bg-surface/20 hover:border-white/10'
+                      ? 'border-accent/30 bg-raised shadow-md shadow-accent/10'
+                      : 'border-line bg-surface/20 hover:border-accent/40'
                   }`}
                 >
                   <input
@@ -180,7 +180,7 @@ export default function Step5Checkout({ data, onChange, onSubmit, onBack, loadin
         </div>
 
         {/* Payment Details */}
-        <div className="border-t border-white/5 pt-4 space-y-3.5">
+        <div className="border-t border-line pt-4 space-y-3.5">
           <label className="block text-xs font-semibold uppercase tracking-wider text-subtle">Payment Details</label>
 
           <div>
@@ -260,19 +260,19 @@ export default function Step5Checkout({ data, onChange, onSubmit, onBack, loadin
         )}
 
         {/* Totals + Actions */}
-        <div className="pt-4 border-t border-white/5 flex items-center justify-between">
+        <div className="pt-4 border-t border-line flex items-center justify-between">
           <div>
             <span className="text-[10px] text-subtle uppercase tracking-wider block">Total Due</span>
             <span className="text-2xl font-black text-accent">${selectedPlan.price}.00</span>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={onBack} disabled={loading} className="px-4 py-2.5 rounded-xl text-xs font-semibold border border-white/10 text-subtle hover:bg-raised/5 transition disabled:opacity-40">
+            <button onClick={onBack} disabled={loading} className="px-4 py-2.5 rounded-xl text-xs font-semibold border border-line text-subtle hover:bg-raised/5 transition disabled:opacity-40">
               Back
             </button>
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="px-6 py-2.5 rounded-xl text-xs font-bold bg-accent text-[#070B19] hover:bg-accent transition shadow-lg shadow-accent/10 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-6 py-2.5 rounded-xl text-xs font-bold bg-accent text-accent-ink hover:bg-accent transition shadow-lg shadow-accent/10 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {loading ? 'Publishing...' : 'Publish Internship'}
             </button>

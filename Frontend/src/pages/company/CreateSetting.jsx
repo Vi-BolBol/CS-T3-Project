@@ -11,8 +11,8 @@ export default function CreateSetting() {
       <CompanyNavbar />
 
       <main className="flex-1 mx-auto w-full max-w-xl px-4 py-16 flex flex-col justify-center">
-        <Card glow className="border border-white/10">
-          <div className="text-center pb-4 border-b border-white/5 mb-6">
+        <Card glow className="border border-line">
+          <div className="text-center pb-4 border-b border-line mb-6">
             <h2 className="text-xl font-black tracking-tight text-content">Initialize Corporate Workspace</h2>
             <p className="text-xs text-subtle mt-1">Configure your foundational configuration matrix to unlock onboarding candidate searches.</p>
           </div>

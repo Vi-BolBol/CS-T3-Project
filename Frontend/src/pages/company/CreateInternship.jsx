@@ -61,7 +61,7 @@ export default function CreateInternship() {
   };
 
   return (
-    <div className="min-h-screen bg-surface text-content selection:bg-accent selection:text-[#070B19] flex flex-col justify-between">
+    <div className="min-h-screen bg-surface text-content selection:bg-accent selection:text-accent-ink flex flex-col justify-between">
       <CompanyNavbar />
 
       <main className="min-h-screen w-full flex flex-col px-4 pt-4 pb-12 sm:px-6 lg:px-8">

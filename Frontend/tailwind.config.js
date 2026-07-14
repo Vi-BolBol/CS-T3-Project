@@ -5,9 +5,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Legacy — kept so untouched components still compile.
-        darkBlue: '#0F172A',
-        greenMain: '#227562',
+        // Legacy palette removed — every component is on tokens now, and leaving
+        // `greenMain`/`darkBlue` in the config just invites someone to reach for
+        // a hardcoded colour again.
         // Semantic tokens (auto light/dark via CSS vars in index.css)
         surface: 'rgb(var(--c-surface) / <alpha-value>)',
         raised: 'rgb(var(--c-raised) / <alpha-value>)',

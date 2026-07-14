@@ -13,6 +13,7 @@ import studentRoutes from "../routes/student.routes.js";
 import applicationRoutes from "../routes/application.routes.js";
 import adminRoutes from "../routes/admin.routes.js";
 import companyRoutes from "../routes/company.routes.js";
+import publicRoutes from "../routes/public.routes.js";
 import { notFound, errorHandler } from "../middleware/error.middleware.js";
 
 const prisma = new PrismaClient();
@@ -57,11 +58,11 @@ app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 /* ---------- Rate limiting ---------- */
 // Brute-force protection on credentials.
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,              // 15 minutes
+  windowMs: 60 * 1000,                   // 60-second window
   max: 10,                               // 10 attempts per IP per window
   standardHeaders: true,
   legacyHeaders: false,
-  message: { success: false, message: "Too many attempts. Try again in 15 minutes." },
+  message: { success: false, message: "Too many attempts. Try again in a minute." },
 });
 
 // The CV routes call paid AI APIs — cap them separately.
@@ -84,6 +85,7 @@ app.use("/api/student", studentRoutes);
 app.use("/api/applications", applicationRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/company", companyRoutes);
+app.use("/api/public", publicRoutes);   // logged-out browsing: companies + unified search
 
 /* ---------- Error handling (must come last) ---------- */
 app.use(notFound);

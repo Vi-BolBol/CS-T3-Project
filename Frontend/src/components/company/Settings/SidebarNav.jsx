@@ -10,8 +10,8 @@ export default function SidebarNav({ activeTab, setActiveTab }) {
   ];
 
   return (
-    <div className="rounded-2xl border border-white/5 bg-[#111B34]/30 p-3 space-y-1">
-      <div className="px-3 pt-2 pb-3 border-b border-white/5 mb-2">
+    <div className="rounded-2xl border border-line bg-raised p-3 space-y-1">
+      <div className="px-3 pt-2 pb-3 border-b border-line mb-2">
         <span className="text-[10px] uppercase font-bold tracking-widest text-subtle block">Account Settings</span>
       </div>
 
@@ -26,7 +26,7 @@ export default function SidebarNav({ activeTab, setActiveTab }) {
               onClick={() => setActiveTab(item.name)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition duration-150 ${
                 isActive
-                  ? 'bg-accent text-[#070B19] shadow-md shadow-accent/10 font-bold'
+                  ? 'bg-accent text-accent-ink shadow-md shadow-accent/10 font-bold'
                   : 'text-subtle hover:text-content hover:bg-raised/[0.02]'
               }`}
             >
@@ -37,7 +37,7 @@ export default function SidebarNav({ activeTab, setActiveTab }) {
         })}
       </nav>
 
-      <div className="pt-4 mt-4 border-t border-white/5 px-2">
+      <div className="pt-4 mt-4 border-t border-line px-2">
         <button
           type="button"
           onClick={() => alert('Logging out...')}

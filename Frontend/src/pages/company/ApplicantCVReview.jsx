@@ -47,7 +47,7 @@ export default function ApplicantCVReview() {
   const TemplateComponent = applicant ? TEMPLATE_COMPONENTS[applicant.template] || ClassicTemplate : null;
 
   return (
-    <div className="min-h-screen bg-surface text-content flex flex-col justify-between selection:bg-accent selection:text-[#070B19]">
+    <div className="min-h-screen bg-surface text-content flex flex-col justify-between selection:bg-accent selection:text-accent-ink">
       <CompanyNavbar />
 
       <main className="flex-1 mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
@@ -60,18 +60,18 @@ export default function ApplicantCVReview() {
         </button>
 
         {notFound ? (
-          <div className="rounded-2xl border border-white/5 bg-[#111B34]/40 p-12 text-center text-sm text-subtle">
+          <div className="rounded-2xl border border-line bg-raised p-12 text-center text-sm text-subtle">
             Applicant not found.
           </div>
         ) : !applicant ? (
-          <div className="rounded-2xl border border-white/5 bg-[#111B34]/40 p-12 text-center text-sm text-subtle">
+          <div className="rounded-2xl border border-line bg-raised p-12 text-center text-sm text-subtle">
             Loading CV…
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Candidate summary + actions */}
             <div className="lg:col-span-4 space-y-4">
-              <div className="rounded-2xl border border-white/5 bg-[#111B34]/40 p-5">
+              <div className="rounded-2xl border border-line bg-raised p-5">
                 <div className="flex items-center gap-3">
                   <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-accent/20 to-teal-500/20 border border-accent/20 flex items-center justify-center font-black text-sm text-accent">
                     {applicant.avatar}
@@ -82,7 +82,7 @@ export default function ApplicantCVReview() {
                   </div>
                 </div>
 
-                <div className="mt-4 pt-4 border-t border-white/5 space-y-2 text-xs text-subtle">
+                <div className="mt-4 pt-4 border-t border-line space-y-2 text-xs text-subtle">
                   <div className="flex justify-between">
                     <span>School</span>
                     <span className="text-content">{applicant.university}</span>
@@ -98,12 +98,12 @@ export default function ApplicantCVReview() {
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-white/5 bg-[#111B34]/40 p-5 space-y-2">
+              <div className="rounded-2xl border border-line bg-raised p-5 space-y-2">
                 <button
                   type="button"
                   disabled={isProcessing}
                   onClick={() => handleStatusChange('accepted')}
-                  className="w-full py-2.5 rounded-xl bg-accent hover:bg-accent text-[#070B19] text-xs font-bold transition disabled:opacity-40"
+                  className="w-full py-2.5 rounded-xl bg-accent hover:bg-accent text-accent-ink text-xs font-bold transition disabled:opacity-40"
                 >
                   Shortlist Candidate
                 </button>
@@ -111,7 +111,7 @@ export default function ApplicantCVReview() {
                   type="button"
                   disabled={isProcessing}
                   onClick={() => handleStatusChange('reviewed')}
-                  className="w-full py-2.5 rounded-xl border border-white/10 bg-raised/5 text-xs text-subtle hover:bg-raised/10 transition disabled:opacity-40"
+                  className="w-full py-2.5 rounded-xl border border-line bg-raised/5 text-xs text-subtle hover:bg-raised/10 transition disabled:opacity-40"
                 >
                   Mark as Reviewed
                 </button>
@@ -128,7 +128,7 @@ export default function ApplicantCVReview() {
 
             {/* CV render */}
             <div className="lg:col-span-8">
-              <div className="rounded-2xl border border-white/10 bg-[#111B34]/60 p-4 sm:p-6 shadow-2xl overflow-x-auto">
+              <div className="rounded-2xl border border-line bg-raised p-4 sm:p-6 shadow-2xl overflow-x-auto">
                 <div className="mx-auto w-fit shadow-2xl">
                   <TemplateComponent cvData={applicant.cvData} palette={applicant.palette} />
                 </div>

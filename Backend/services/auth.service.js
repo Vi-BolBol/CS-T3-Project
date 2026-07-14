@@ -45,9 +45,22 @@ export const registerService = async (payload = {}) => {
 
   await logAction({ userId: user.id, action: "USER_REGISTERED", entityType: "User", entityId: user.id });
 
+  // Register now issues a session, exactly like login.
+  //
+  // It previously returned no token. The frontend did `if (res.token) setItem(...)`,
+  // so on a machine that had logged in before, the NEW user object was written over
+  // the OLD token — and every subsequent request authenticated as the *previous*
+  // account. That's the "signing up drops me into someone else's account" bug.
+  const token = jwt.sign(
+    { id: user.id, email: user.email, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: process.env.JWT_EXPIRES_IN || "1d" }
+  );
+
   return {
     success: true,
     message: "Register successful",
+    token,
     user: { id: user.id, email: user.email, role: user.role },
   };
 };

@@ -11,21 +11,21 @@ export default function DetailsTab({ job }) {
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="rounded-xl border border-white/5 bg-surface/50 p-3">
+        <div className="rounded-xl border border-line bg-surface/50 p-3">
           <p className="text-[10px] uppercase tracking-wider text-subtle">Department</p>
           <p className="text-xs font-semibold text-content mt-1">{job.category || '—'}</p>
         </div>
-        <div className="rounded-xl border border-white/5 bg-surface/50 p-3">
+        <div className="rounded-xl border border-line bg-surface/50 p-3">
           <p className="text-[10px] uppercase tracking-wider text-subtle">Work Environment</p>
           <p className="text-xs font-semibold text-content mt-1">{job.workEnvironment}</p>
         </div>
-        <div className="rounded-xl border border-white/5 bg-surface/50 p-3">
+        <div className="rounded-xl border border-line bg-surface/50 p-3">
           <p className="text-[10px] uppercase tracking-wider text-subtle">Duration</p>
           <p className="text-xs font-semibold text-content mt-1">
             {job.durationValue ? `${job.durationValue} ${job.durationUnit}` : '—'}
           </p>
         </div>
-        <div className="rounded-xl border border-white/5 bg-surface/50 p-3">
+        <div className="rounded-xl border border-line bg-surface/50 p-3">
           <p className="text-[10px] uppercase tracking-wider text-subtle">Compensation</p>
           <p className="text-xs font-semibold text-accent mt-1">{job.salaryRange}</p>
         </div>
@@ -36,7 +36,7 @@ export default function DetailsTab({ job }) {
         {job.skills.length > 0 ? (
           <div className="flex flex-wrap gap-1.5">
             {job.skills.map((skill) => (
-              <span key={skill} className="text-[11px] bg-surface/60 border border-white/5 text-subtle px-2.5 py-1 rounded-lg font-medium">
+              <span key={skill} className="text-[11px] bg-surface/60 border border-line text-subtle px-2.5 py-1 rounded-lg font-medium">
                 {skill}
               </span>
             ))}
@@ -59,7 +59,7 @@ export default function DetailsTab({ job }) {
         )}
       </div>
 
-      <div className="flex flex-wrap gap-4 text-xs text-subtle pt-4 border-t border-white/5">
+      <div className="flex flex-wrap gap-4 text-xs text-subtle pt-4 border-t border-line">
         <div>Listing ID: <span className="text-content font-mono">{job.code}</span></div>
         <div>Posted: <span className="text-content">{job.postedDate}</span></div>
         <div>Plan: <span className="text-content capitalize">{job.plan || 'standard'}</span></div>

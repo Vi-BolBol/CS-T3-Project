@@ -42,7 +42,7 @@ export default function CompanyNavbar() {
   const flat = useMemo(() => [
     ...(suggestions.internships || []).slice(0, 3).map((i) => ({
       key: `i-${i.id}`, icon: 'bi-briefcase', label: i.title,
-      sub: i.company?.companyName || 'Internship', to: `/view-detail?id=${i.id}`,
+      sub: i.company?.companyName || 'Internship', to: `/explore?job=${i.id}`,
     })),
     ...(suggestions.students || []).slice(0, 3).map((s) => ({
       key: `s-${s.id}`, icon: 'bi-person', label: s.fullName || 'Student',
@@ -50,7 +50,7 @@ export default function CompanyNavbar() {
     })),
     ...(suggestions.companies || []).slice(0, 2).map((c) => ({
       key: `c-${c.id}`, icon: 'bi-building', label: c.companyName || 'Company',
-      sub: c.industry || 'Company', to: `/company/${c.id}`,
+      sub: c.industry || 'Company', to: `/explore?type=companies&company=${c.id}`,
     })),
   ], [suggestions]);
 

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
+import useLogout from '../../hooks/useLogout';
 import CompanyNavbar from '../../components/layout/CompanyNavbar';
 import Footer from '../../components/layout/CompanyFooter';
 import ThemeToggle from '../../components/shared/ThemeToggle';
@@ -27,7 +28,6 @@ function Panel({ title, description, children }) {
 }
 
 export default function CompanySetting() {
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const active = SECTIONS.some((s) => s.id === searchParams.get('s')) ? searchParams.get('s') : 'appearance';
 
@@ -47,11 +47,7 @@ export default function CompanySetting() {
     showToast('Password change isn’t wired to the backend yet.');
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    navigate('/login');
-  };
+  const logout = useLogout();
 
   return (
     <div className="flex min-h-screen flex-col bg-surface">

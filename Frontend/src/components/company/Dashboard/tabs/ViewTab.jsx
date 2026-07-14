@@ -47,12 +47,12 @@ export default function ViewTab({ job }) {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search applicants..."
-            className="px-3 py-1.5 rounded-lg border border-white/5 bg-surface/60 text-xs text-content placeholder-gray-500 focus:outline-none focus:border-accent/40 w-40 sm:w-48"
+            className="px-3 py-1.5 rounded-lg border border-line bg-surface/60 text-xs text-content placeholder:text-faint focus:outline-none focus:border-accent/40 w-40 sm:w-48"
           />
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value)}
-            className="px-2 py-1.5 rounded-lg border border-white/5 bg-surface/60 text-xs text-subtle focus:outline-none"
+            className="px-2 py-1.5 rounded-lg border border-line bg-surface/60 text-xs text-subtle focus:outline-none"
           >
             <option value="top">Top Match</option>
             <option value="recent">Recent</option>
@@ -61,7 +61,7 @@ export default function ViewTab({ job }) {
       </div>
 
       {loading ? (
-        <div className="text-center py-12 border border-dashed border-white/5 rounded-xl bg-raised/[0.01]">
+        <div className="text-center py-12 border border-dashed border-line rounded-xl bg-raised/[0.01]">
           <p className="text-xs text-subtle">Loading applicants…</p>
         </div>
       ) : visibleApplicants.length > 0 ? (
@@ -71,7 +71,7 @@ export default function ViewTab({ job }) {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12 border border-dashed border-white/5 rounded-xl bg-raised/[0.01]">
+        <div className="text-center py-12 border border-dashed border-line rounded-xl bg-raised/[0.01]">
           <p className="text-xs text-subtle mt-2">No new pending candidates listed in this processing queue.</p>
         </div>
       )}

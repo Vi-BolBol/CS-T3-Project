@@ -1,15 +1,9 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import Navbar from '../../components/layout/StudentNavbar';
-import { InternshipPane, CompanyPane, payRange } from '../../components/shared/DetailPane';
-import Pagination from '../../components/shared/Pagination';
-import useInternships from '../../hooks/useInternships';
-import useSavedInternships from '../../hooks/useSavedInternships';
-import useMyApplications from '../../hooks/useMyApplications';
-import useCvStatus from '../../hooks/useCvStatus';
-import useToast from '../../hooks/useToast';
-import Toast from '../../components/shared/Toast';
-import { getPublicCompanies } from '../../api/publicApi';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import Header from '../components/layout/Header';
+import { InternshipPane, CompanyPane, payRange } from '../components/shared/DetailPane';
+import Pagination from '../components/shared/Pagination';
+import { getPublicInternships, getPublicCompanies } from '../api/publicApi';
 
 const ENV_LABEL = { remote: 'Remote', onsite: 'On-site', hybrid: 'Hybrid' };
 
@@ -21,7 +15,7 @@ const WORK_ENV = [
 ];
 
 const INITIAL = {
-  type: 'internships',        // 'internships' | 'companies'
+  type: 'internships',       // 'internships' | 'companies'
   location: '',
   workEnvironment: 'all',
   category: 'all',
@@ -36,7 +30,7 @@ const PAGE_SIZE = 5;   // 5 per page keeps the list readable without a scroll ma
 const selectCls =
   'w-full rounded-lg border border-line bg-muted px-3 py-2 text-xs text-content focus:border-accent focus:outline-none';
 
-export default function BrowseInternships() {
+export default function Explore() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -48,48 +42,57 @@ export default function BrowseInternships() {
   const [showFilters, setShowFilters] = useState(false);
   const [page, setPage] = useState(1);
 
-  const { internships, fetchInternships, loading, error } = useInternships();
-  const { savedInternships, fetchSaved, saveInternship, unsaveInternship } = useSavedInternships();
-  const { apply, hasApplied } = useMyApplications();
-  const { hasCv } = useCvStatus();
-  const { message: toastMessage, showToast, clearToast } = useToast();
-
+  const [internships, setInternships] = useState([]);
   const [companies, setCompanies] = useState([]);
-  const [savedIds, setSavedIds] = useState(new Set());
-  const [appliedIds, setAppliedIds] = useState(new Set());
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  // The "c" column: which item the detail pane is showing, and how much of it.
+  // The "c" column.
   const [selected, setSelected] = useState(null);   // { kind: 'job'|'company', id }
   const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
-    fetchInternships();
-    fetchSaved();
-    getPublicCompanies().then((res) => {
-      if (res.success) setCompanies(res.companies || []);
-    });
-  }, [fetchInternships, fetchSaved]);
+    let alive = true;
+    (async () => {
+      setLoading(true);
+      const [jobsRes, cosRes] = await Promise.all([getPublicInternships(), getPublicCompanies()]);
+      if (!alive) return;
+      if (jobsRes.success) setInternships(jobsRes.internships || []);
+      if (cosRes.success) setCompanies(cosRes.companies || []);
+      if (!jobsRes.success && !cosRes.success) setError(jobsRes.message || 'Could not load listings.');
+      setLoading(false);
+    })();
+    return () => { alive = false; };
+  }, []);
 
+  // Deep links from elsewhere in the app: /explore?job=12 or /explore?company=3.
   useEffect(() => {
-    setSavedIds(new Set(savedInternships.map((j) => j.id)));
-  }, [savedInternships]);
-
-  // Sync the box when arriving from the navbar / home search (?q=), and open a
-  // deep-linked item (?job= / ?company=) straight into the detail pane.
-  useEffect(() => {
-    const q = searchParams.get('q');
-    if (q !== null && q !== searchQuery) setSearchQuery(q);
-
     const job = searchParams.get('job');
     const company = searchParams.get('company');
     if (job) setSelected({ kind: 'job', id: Number(job) });
     else if (company) setSelected({ kind: 'company', id: Number(company) });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
-  useEffect(() => {
-    setAppliedIds(new Set(internships.filter((j) => hasApplied(j.id)).map((j) => j.id)));
-  }, [internships, hasApplied]);
+  const set = (k, v) => setFilters((p) => ({ ...p, [k]: v }));
+
+  const isCompanies = filters.type === 'companies';
+
+  // Switching type clears the open detail — a company pane over an internship
+  // list is just confusing.
+  const setType = (type) => {
+    setFilters((p) => ({ ...p, type }));
+    setSelected(null);
+    const next = new URLSearchParams(searchParams);
+    next.set('type', type);
+    next.delete('job');
+    next.delete('company');
+    setSearchParams(next, { replace: true });
+  };
+
+  const select = (kind, id) => {
+    setSelected({ kind, id });
+    setExpanded(false);   // every new selection starts collapsed — "Show more" is always there
+  };
 
   const { categories, companyNames, industries } = useMemo(() => {
     const c = new Set(), co = new Set(), ind = new Set();
@@ -99,11 +102,14 @@ export default function BrowseInternships() {
       if (j.company?.industry) ind.add(j.company.industry);
     });
     companies.forEach((x) => { if (x.industry) ind.add(x.industry); });
-    return { categories: [...c].sort(), companyNames: [...co].sort(), industries: [...ind].sort() };
+    return {
+      categories: [...c].sort(),
+      companyNames: [...co].sort(),
+      industries: [...ind].sort(),
+    };
   }, [internships, companies]);
 
   const q = searchQuery.trim().toLowerCase();
-  const isCompanies = filters.type === 'companies';
 
   const jobResults = useMemo(() => internships.filter((job) => {
     if (q) {
@@ -159,55 +165,9 @@ export default function BrowseInternships() {
     (searchQuery ? 1 : 0) +
     Object.entries(filters).filter(([k, v]) => k !== 'type' && v && v !== 'all' && v !== INITIAL[k]).length;
 
-  const set = (k, v) => setFilters((p) => ({ ...p, [k]: v }));
-
-  const setType = (type) => {
-    setFilters((p) => ({ ...p, type }));
-    setSelected(null);
-  };
-
-  // Every new selection starts collapsed, so "Show more" is always offered again.
-  const select = (kind, id) => {
-    setSelected({ kind, id });
-    setExpanded(false);
-  };
-
   const clearAll = () => {
     setSearchQuery('');
     setFilters({ ...INITIAL, type: filters.type });
-    setSearchParams({});
-  };
-
-  const toggleSave = async (id) => {
-    const next = new Set(savedIds);
-    if (next.has(id)) {
-      next.delete(id);
-      setSavedIds(next);
-      await unsaveInternship(id);
-    } else {
-      next.add(id);
-      setSavedIds(next);
-      await saveInternship(id);
-    }
-  };
-
-  // Apply gate: no CV -> send them to the CV page first, then come back.
-  const handleApply = async (job) => {
-    if (!hasCv) {
-      showToast('You need a CV before applying — build or upload one first.');
-      navigate(`/cv?redirect=${encodeURIComponent('/user/internships')}&reason=apply`);
-      return;
-    }
-    const res = await apply(job);
-    if (res.success) {
-      setAppliedIds((prev) => new Set(prev).add(job.id));
-      showToast(`Applied to ${job.title}.`);
-    } else if (res.needsCv) {
-      showToast(res.message || 'You need a CV before applying.');
-      navigate(`/cv?redirect=${encodeURIComponent('/user/internships')}&reason=apply`);
-    } else {
-      showToast(res.message || 'Could not apply.');
-    }
   };
 
   const selectedJob = selected?.kind === 'job' ? internships.find((j) => j.id === selected.id) : null;
@@ -215,40 +175,47 @@ export default function BrowseInternships() {
   const selectedCompanyListings = selectedCompany
     ? internships.filter((j) => j.company?.id === selectedCompany.id)
     : [];
+
   const hasDetail = Boolean(selectedJob || selectedCompany);
 
-  const jobActions = (job) => {
-    const applied = appliedIds.has(job.id);
-    const saved = savedIds.has(job.id);
+  /* The apply gate. Browsing is public; POST /api/applications is student-only,
+     so we say so before the click rather than after a 401.
+
+     Sign up is the PRIMARY action: someone who reached a listing detail on the
+     public site almost certainly has no account yet — pushing them at a login
+     form they can't fill is a dead end. Log in stays available for the minority
+     who do have one. Both carry ?next= so they come back to this exact listing. */
+  const applyGate = (jobId) => {
+    const next = encodeURIComponent(`/explore?job=${jobId}`);
     return (
-      <div className="flex gap-2">
+      <div className="space-y-2">
         <button
           type="button"
-          onClick={() => toggleSave(job.id)}
-          className={`grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg border transition-colors ${
-            saved ? 'border-accent bg-accent-soft text-accent' : 'border-line text-faint hover:text-content'
-          }`}
-          aria-label={saved ? 'Remove from saved' : 'Save internship'}
+          onClick={() => navigate(`/signup?next=${next}`)}
+          className="w-full rounded-lg bg-accent px-3 py-2.5 text-xs font-bold text-accent-ink transition hover:brightness-95"
         >
-          <i className={`bi ${saved ? 'bi-bookmark-fill' : 'bi-bookmark'} text-sm`} />
+          Sign up to apply
         </button>
-        <button
-          type="button"
-          onClick={() => handleApply(job)}
-          disabled={applied}
-          className={`flex-1 rounded-lg px-3 py-2 text-xs font-bold transition-all ${
-            applied ? 'cursor-default bg-muted text-faint' : 'bg-accent text-accent-ink hover:opacity-90'
-          }`}
-        >
-          {applied ? 'Applied' : 'Apply'}
-        </button>
+        <p className="text-center text-[11px] text-subtle">
+          Applying needs a student account — it takes a minute.
+        </p>
+        <p className="text-center text-[11px] text-faint">
+          Already have one?{' '}
+          <button
+            type="button"
+            onClick={() => navigate(`/login?next=${next}`)}
+            className="font-bold text-accent hover:underline"
+          >
+            Log in
+          </button>
+        </p>
       </div>
     );
   };
 
   return (
     <div className="flex min-h-screen flex-col bg-surface lg:h-screen lg:min-h-0 lg:overflow-hidden">
-      <Navbar />
+      <Header />
 
       {/* lg+: the page itself never scrolls. Filters, results, and detail each
           scroll independently inside their own column. Below lg it falls back to
@@ -257,12 +224,12 @@ export default function BrowseInternships() {
         <header className="mb-4 flex-shrink-0">
           <h1 className="text-2xl font-black tracking-tight text-content">Explore</h1>
           <p className="mt-1 text-sm text-subtle">
-            Browse internships and companies, then narrow it down with filters.
+            Search internships and companies. Anyone can browse — you only need an account to apply.
           </p>
         </header>
 
         <form
-          onSubmit={(e) => { e.preventDefault(); setSearchParams(searchQuery.trim() ? { q: searchQuery.trim() } : {}); }}
+          onSubmit={(e) => { e.preventDefault(); }}
           className="mb-4 flex flex-shrink-0 flex-col gap-2 sm:flex-row"
         >
           <div className="flex flex-1 items-center gap-2 rounded-xl border border-line bg-raised px-4 py-2.5 focus-within:border-accent">
@@ -280,10 +247,6 @@ export default function BrowseInternships() {
               </button>
             )}
           </div>
-
-          <button type="submit" className="rounded-xl bg-accent px-5 py-2.5 text-sm font-bold text-accent-ink transition hover:opacity-90">
-            Search
-          </button>
 
           <button
             type="button"
@@ -308,6 +271,7 @@ export default function BrowseInternships() {
                 )}
               </div>
 
+              {/* One list, one type switch — no second nav tab. */}
               <div>
                 <label className="mb-1 block text-xs font-semibold text-subtle">Show</label>
                 <select value={filters.type} onChange={(e) => setType(e.target.value)} className={selectCls}>
@@ -400,11 +364,6 @@ export default function BrowseInternships() {
                 <i className="bi bi-search text-3xl text-faint" />
                 <p className="mt-3 text-sm font-semibold text-content">Nothing matches your search</p>
                 <p className="mt-1 text-xs text-subtle">Try removing a filter or searching for something broader.</p>
-                {activeCount > 0 && (
-                  <button onClick={clearAll} className="mt-4 rounded-lg bg-accent px-4 py-2 text-xs font-bold text-accent-ink">
-                    Clear filters
-                  </button>
-                )}
               </div>
             )}
 
@@ -439,86 +398,46 @@ export default function BrowseInternships() {
                         </div>
                       </button>
                     ))
-                  : pageItems.map((job) => {
-                      const applied = appliedIds.has(job.id);
-                      const saved = savedIds.has(job.id);
-                      return (
-                        <article
-                          key={job.id}
-                          className={`flex flex-col rounded-xl border bg-raised p-4 transition-all hover:border-accent/60 hover:shadow-sm ${
-                            selected?.kind === 'job' && selected.id === job.id ? 'border-accent' : 'border-line'
-                          }`}
-                        >
-                          <div className="flex items-start gap-3">
-                            {job.company?.logoUrl ? (
-                              <img src={job.company.logoUrl} alt="" className="h-11 w-11 flex-shrink-0 rounded-lg border border-line object-cover" />
-                            ) : (
-                              <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-lg bg-accent-soft text-sm font-bold text-accent">
-                                {(job.company?.companyName || '?').charAt(0).toUpperCase()}
-                              </span>
-                            )}
-                            <div className="min-w-0 flex-1">
-                              <h3 className="truncate text-sm font-bold text-content">{job.title}</h3>
-                              <button
-                                type="button"
-                                onClick={() => job.company?.id && select('company', job.company.id)}
-                                className="truncate text-xs text-subtle transition-colors hover:text-accent"
-                              >
-                                {job.company?.companyName || 'Unknown company'}
-                              </button>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => toggleSave(job.id)}
-                              aria-label={saved ? 'Remove from saved' : 'Save internship'}
-                              className={`grid h-8 w-8 flex-shrink-0 place-items-center rounded-lg border transition-colors ${
-                                saved ? 'border-accent bg-accent-soft text-accent' : 'border-line text-faint hover:text-content'
-                              }`}
-                            >
-                              <i className={`bi ${saved ? 'bi-bookmark-fill' : 'bi-bookmark'} text-sm`} />
-                            </button>
-                          </div>
-
-                          <div className="mt-3 flex flex-wrap gap-1.5 text-[11px] text-subtle">
-                            <span className="rounded-md bg-muted px-2 py-0.5">
-                              <i className="bi bi-geo-alt mr-1" />{job.location || 'Not specified'}
+                  : pageItems.map((job) => (
+                      <button
+                        key={job.id}
+                        type="button"
+                        onClick={() => select('job', job.id)}
+                        className={`flex flex-col rounded-xl border bg-raised p-4 text-left transition-all hover:border-accent/60 hover:shadow-sm ${
+                          selected?.kind === 'job' && selected.id === job.id ? 'border-accent' : 'border-line'
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          {job.company?.logoUrl ? (
+                            <img src={job.company.logoUrl} alt="" className="h-11 w-11 flex-shrink-0 rounded-lg border border-line object-cover" />
+                          ) : (
+                            <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-lg bg-accent-soft text-sm font-bold text-accent">
+                              {(job.company?.companyName || '?').charAt(0).toUpperCase()}
                             </span>
-                            {job.workEnvironment && (
-                              <span className="rounded-md bg-muted px-2 py-0.5">
-                                {ENV_LABEL[job.workEnvironment] || job.workEnvironment}
-                              </span>
-                            )}
-                            {job.internshipCategory && (
-                              <span className="rounded-md bg-muted px-2 py-0.5">{job.internshipCategory}</span>
-                            )}
+                          )}
+                          <div className="min-w-0">
+                            <h3 className="truncate text-sm font-bold text-content">{job.title}</h3>
+                            <p className="truncate text-xs text-subtle">{job.company?.companyName || 'Unknown company'}</p>
                           </div>
+                        </div>
 
-                          <div className="mt-4 flex items-center justify-between gap-2 border-t border-line pt-3">
-                            <span className="text-xs font-semibold text-accent">{payRange(job)}</span>
-                            <div className="flex items-center gap-2">
-                              {/* Opens the pane on the right — no navigation. */}
-                              <button
-                                type="button"
-                                onClick={() => select('job', job.id)}
-                                className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-subtle transition-colors hover:bg-muted hover:text-content"
-                              >
-                                Details
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleApply(job)}
-                                disabled={applied}
-                                className={`rounded-lg px-3 py-1.5 text-xs font-bold transition-all ${
-                                  applied ? 'cursor-default bg-muted text-faint' : 'bg-accent text-accent-ink hover:opacity-90'
-                                }`}
-                              >
-                                {applied ? 'Applied' : 'Apply'}
-                              </button>
-                            </div>
-                          </div>
-                        </article>
-                      );
-                    })}
+                        <div className="mt-3 flex flex-wrap gap-1.5 text-[11px] text-subtle">
+                          <span className="rounded-md bg-muted px-2 py-0.5">
+                            <i className="bi bi-geo-alt mr-1" />{job.location || 'Not specified'}
+                          </span>
+                          {job.workEnvironment && (
+                            <span className="rounded-md bg-muted px-2 py-0.5">
+                              {ENV_LABEL[job.workEnvironment] || job.workEnvironment}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="mt-4 flex items-center justify-between border-t border-line pt-3">
+                          <span className="text-xs font-semibold text-accent">{payRange(job)}</span>
+                          <span className="text-xs font-bold text-subtle">Details →</span>
+                        </div>
+                      </button>
+                    ))}
               </div>
             )}
             </div>
@@ -535,7 +454,7 @@ export default function BrowseInternships() {
             </div>
           </section>
 
-          {/* (c) Detail */}
+          {/* (c) Detail — appears beside the list, never replaces the page */}
           {hasDetail && (
             <section className="max-h-[75vh] lg:max-h-none lg:h-full lg:w-[34rem] lg:flex-shrink-0 xl:w-[40rem]">
               {selectedJob && (
@@ -544,7 +463,7 @@ export default function BrowseInternships() {
                   expanded={expanded}
                   onToggleExpand={() => setExpanded((v) => !v)}
                   onClose={() => setSelected(null)}
-                  actions={jobActions(selectedJob)}
+                  actions={applyGate(selectedJob.id)}
                 />
               )}
               {selectedCompany && (
@@ -562,7 +481,6 @@ export default function BrowseInternships() {
         </div>
       </main>
 
-      <Toast message={toastMessage} onClose={clearToast} />
     </div>
   );
 }

@@ -36,7 +36,7 @@ export default function EditTab({ job, onSaved }) {
         <select
           value={formData.department}
           onChange={(e) => updateField('department', e.target.value)}
-          className="w-full px-4 py-2.5 rounded-xl border border-white/5 bg-surface/60 text-xs text-content focus:outline-none focus:border-accent/40"
+          className="w-full px-4 py-2.5 rounded-xl border border-line bg-surface/60 text-xs text-content focus:outline-none focus:border-accent/40"
         >
           <option value="">Select department</option>
           {DEPARTMENTS.map((d) => (
@@ -56,7 +56,7 @@ export default function EditTab({ job, onSaved }) {
               className={`flex-1 py-2 rounded-xl text-xs font-semibold border transition ${
                 formData.workEnvironment === type
                   ? 'bg-accent/10 border-accent/40 text-accent'
-                  : 'border-white/5 bg-surface/40 text-subtle hover:border-white/10'
+                  : 'border-line bg-surface/40 text-subtle hover:border-accent/40'
               }`}
             >
               {type}
@@ -73,7 +73,7 @@ export default function EditTab({ job, onSaved }) {
           value={formData.description}
           onChange={(e) => updateField('description', e.target.value)}
           rows={4}
-          className="w-full px-4 py-3 rounded-xl border border-white/5 bg-surface/60 text-xs text-content placeholder-gray-600 focus:outline-none focus:border-accent/40 resize-none"
+          className="w-full px-4 py-3 rounded-xl border border-line bg-surface/60 text-xs text-content placeholder:text-faint focus:outline-none focus:border-accent/40 resize-none"
         />
       </div>
 
@@ -99,7 +99,7 @@ export default function EditTab({ job, onSaved }) {
           <select
             value={formData.durationUnit}
             onChange={(e) => updateField('durationUnit', e.target.value)}
-            className="w-full px-4 py-2.5 rounded-xl border border-white/5 bg-surface/60 text-xs text-content focus:outline-none focus:border-accent/40"
+            className="w-full px-4 py-2.5 rounded-xl border border-line bg-surface/60 text-xs text-content focus:outline-none focus:border-accent/40"
           >
             {DURATION_UNITS.map((u) => (
               <option key={u} value={u}>{u}</option>
@@ -119,7 +119,7 @@ export default function EditTab({ job, onSaved }) {
           type="button"
           onClick={handleSave}
           disabled={loading}
-          className="px-6 py-2.5 rounded-xl text-xs font-bold bg-accent text-[#070B19] hover:bg-accent transition shadow-lg shadow-accent/10 disabled:opacity-40"
+          className="px-6 py-2.5 rounded-xl text-xs font-bold bg-accent text-accent-ink hover:bg-accent transition shadow-lg shadow-accent/10 disabled:opacity-40"
         >
           {loading ? 'Saving...' : 'Save Changes'}
         </button>

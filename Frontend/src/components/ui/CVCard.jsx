@@ -6,9 +6,9 @@ export default function CVCard({
   onSelect,
 }) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5">
+    <div className="overflow-hidden rounded-2xl border border-line bg-muted">
 
-      <div className="h-80 bg-white/10">
+      <div className="h-80 bg-muted">
         {image ? (
           <img
             src={image}
@@ -16,7 +16,7 @@ export default function CVCard({
             className="h-full w-full object-cover"
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-gray-400">
+          <div className="flex h-full items-center justify-center text-subtle">
             CV Preview
           </div>
         )}

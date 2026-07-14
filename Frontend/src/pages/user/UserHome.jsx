@@ -224,7 +224,7 @@ export default function UserHome() {
               {followedList.map((c) => (
                 <Link
                   key={c.id}
-                  to={`/company/${c.id}`}
+                  to={`/user/internships?type=companies&company=${c.id}`}
                   className="flex items-center gap-3 rounded-xl border border-line bg-raised p-4 transition-all hover:border-accent/60"
                 >
                   {c.logoUrl ? (

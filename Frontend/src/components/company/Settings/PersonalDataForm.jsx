@@ -11,7 +11,7 @@ export default function PersonalDataForm() {
       </div>
 
       {/* Corporate Profile Image File Upload Handler Structure */}
-      <div className="p-4 rounded-2xl border border-white/5 bg-surface/40 flex items-center gap-4">
+      <div className="p-4 rounded-2xl border border-line bg-surface/40 flex items-center gap-4">
         <div className="h-14 w-14 rounded-xl bg-gradient-to-tr from-accent/20 to-teal-500/20 border border-accent/30 flex items-center justify-center font-black text-accent text-sm shadow-md">
           NG
         </div>
@@ -19,10 +19,10 @@ export default function PersonalDataForm() {
           <div className="text-xs font-bold text-content">Company Brand Identity</div>
           <p className="text-[11px] text-subtle mt-0.5">PNG, JPG or SVG formats up to 4MB.</p>
           <div className="mt-2 flex items-center gap-2">
-            <button type="button" className="px-2.5 py-1 rounded bg-accent text-[#070B19] font-bold text-[10px] hover:bg-accent transition">
+            <button type="button" className="px-2.5 py-1 rounded bg-accent text-accent-ink font-bold text-[10px] hover:bg-accent transition">
               Upload New
             </button>
-            <button type="button" className="px-2.5 py-1 rounded border border-white/10 text-subtle text-[10px] hover:text-content hover:bg-raised/5 transition">
+            <button type="button" className="px-2.5 py-1 rounded border border-line text-subtle text-[10px] hover:text-content hover:bg-raised/5 transition">
               Remove
             </button>
           </div>
@@ -37,7 +37,7 @@ export default function PersonalDataForm() {
             <input 
               type="text" 
               defaultValue="Jane Doe" 
-              className="w-full px-4 py-2.5 rounded-xl border border-white/5 bg-surface/60 text-xs text-content focus:outline-none focus:border-accent/40 transition"
+              className="w-full px-4 py-2.5 rounded-xl border border-line bg-surface/60 text-xs text-content focus:outline-none focus:border-accent/40 transition"
             />
           </div>
           <div>
@@ -45,7 +45,7 @@ export default function PersonalDataForm() {
             <input 
               type="email" 
               defaultValue="admin@nexusgenesis.corp" 
-              className="w-full px-4 py-2.5 rounded-xl border border-white/5 bg-surface/60 text-xs text-content focus:outline-none focus:border-accent/40 transition"
+              className="w-full px-4 py-2.5 rounded-xl border border-line bg-surface/60 text-xs text-content focus:outline-none focus:border-accent/40 transition"
             />
           </div>
         </div>
@@ -55,7 +55,7 @@ export default function PersonalDataForm() {
           <input 
             type="text" 
             defaultValue="+1 (555) 124-9832" 
-            className="w-full px-4 py-2.5 rounded-xl border border-white/5 bg-surface/60 text-xs text-content focus:outline-none focus:border-accent/40 transition"
+            className="w-full px-4 py-2.5 rounded-xl border border-line bg-surface/60 text-xs text-content focus:outline-none focus:border-accent/40 transition"
           />
         </div>
 
@@ -64,16 +64,16 @@ export default function PersonalDataForm() {
           <textarea 
             rows={4}
             defaultValue="NexusGenesis is a tech innovator building next-generation B2B architectures and enterprise data structures. Our engineering teams prioritize fast iteration loops and open source workflows." 
-            className="w-full px-4 py-2.5 rounded-xl border border-white/5 bg-surface/60 text-xs text-content focus:outline-none focus:border-accent/40 transition resize-none leading-relaxed"
+            className="w-full px-4 py-2.5 rounded-xl border border-line bg-surface/60 text-xs text-content focus:outline-none focus:border-accent/40 transition resize-none leading-relaxed"
           />
         </div>
 
         {/* Bottom Actions Row */}
-        <div className="pt-4 border-t border-white/5 flex items-center justify-end gap-2">
-          <button type="button" className="px-4 py-2 rounded-xl text-xs font-semibold border border-white/10 text-subtle hover:text-content transition">
+        <div className="pt-4 border-t border-line flex items-center justify-end gap-2">
+          <button type="button" className="px-4 py-2 rounded-xl text-xs font-semibold border border-line text-subtle hover:text-content transition">
             Cancel
           </button>
-          <button type="submit" className="px-5 py-2 rounded-xl text-xs font-bold bg-accent text-[#070B19] hover:bg-accent transition shadow-lg shadow-accent/10">
+          <button type="submit" className="px-5 py-2 rounded-xl text-xs font-bold bg-accent text-accent-ink hover:bg-accent transition shadow-lg shadow-accent/10">
             Save Changes
           </button>
         </div>

@@ -20,7 +20,7 @@ export default function Step2Detail({ data, onChange, onNext, onBack }) {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto rounded-2xl border border-white/5 bg-[#111B34]/40 p-6 sm:p-8 shadow-2xl backdrop-blur-md">
+    <div className="w-full max-w-4xl mx-auto rounded-2xl border border-line bg-raised p-6 sm:p-8 shadow-2xl backdrop-blur-md">
 
       <div className="mb-6">
         <span className="text-[10px] uppercase font-bold tracking-widest text-accent bg-accent/10 px-2.5 py-1 rounded-full">
@@ -51,9 +51,9 @@ export default function Step2Detail({ data, onChange, onNext, onBack }) {
         </div>
       </div>
 
-      <div className="mt-8 pt-5 border-t border-white/5 flex items-center justify-between">
-        <button onClick={onBack} className="px-5 py-2.5 rounded-xl text-xs font-semibold border border-white/10 text-subtle hover:text-content hover:bg-raised/5 transition">Back</button>
-        <button onClick={handleNext} className="px-6 py-2.5 rounded-xl text-xs font-bold bg-accent text-[#070B19] hover:bg-accent transition shadow-lg shadow-accent/10">Next Step</button>
+      <div className="mt-8 pt-5 border-t border-line flex items-center justify-between">
+        <button onClick={onBack} className="px-5 py-2.5 rounded-xl text-xs font-semibold border border-line text-subtle hover:text-content hover:bg-raised/5 transition">Back</button>
+        <button onClick={handleNext} className="px-6 py-2.5 rounded-xl text-xs font-bold bg-accent text-accent-ink hover:bg-accent transition shadow-lg shadow-accent/10">Next Step</button>
       </div>
     </div>
   );

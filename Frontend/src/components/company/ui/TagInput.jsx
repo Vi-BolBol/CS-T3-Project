@@ -26,7 +26,7 @@ function TagInput({ tags, onChange, placeholder = 'Type and press Enter...' }) {
         onChange={(e) => setInputValue(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
-        className="w-full bg-surface/60 border border-white/5 rounded-xl px-4 py-3 text-sm text-content placeholder-gray-600 focus:outline-none focus:border-accent/40 transition"
+        className="w-full bg-surface/60 border border-line rounded-xl px-4 py-3 text-sm text-content placeholder:text-faint focus:outline-none focus:border-accent/40 transition"
       />
       {tags.length > 0 && (
         <div className="flex flex-wrap gap-2 mt-1">

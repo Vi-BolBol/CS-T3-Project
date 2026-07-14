@@ -90,7 +90,7 @@ export default function CompanySearch() {
           <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-raised">
             {tab === 'internships' && results.internships.map((i) => (
               <li key={i.id}>
-                <Link to={`/view-detail?id=${i.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-muted">
+                <Link to={`/explore?job=${i.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-muted">
                   <i className="bi bi-briefcase text-faint" />
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-bold text-content">{i.title}</p>
@@ -122,7 +122,7 @@ export default function CompanySearch() {
 
             {tab === 'companies' && results.companies.map((c) => (
               <li key={c.id}>
-                <Link to={`/company/${c.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-muted">
+                <Link to={`/explore?type=companies&company=${c.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-muted">
                   {c.logoUrl ? (
                     <img src={c.logoUrl} alt="" className="h-9 w-9 rounded-lg border border-line object-cover" />
                   ) : (

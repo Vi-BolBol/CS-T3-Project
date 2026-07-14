@@ -14,7 +14,7 @@ export default function ApplicantRowCard({ applicant }) {
   const navigate = useNavigate();
 
   return (
-    <div className="group rounded-xl border border-white/5 bg-surface/40 p-4 transition-all duration-200 hover:border-white/10 hover:bg-surface/80 flex flex-col justify-between">
+    <div className="group rounded-xl border border-line bg-surface/40 p-4 transition-all duration-200 hover:border-accent/40 hover:bg-surface/80 flex flex-col justify-between">
       <div>
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-3">
@@ -38,14 +38,14 @@ export default function ApplicantRowCard({ applicant }) {
         <p className="text-[11px] text-faint mt-0.5">{timeAgo(applicant.appliedAt)}</p>
       </div>
 
-      <div className="mt-4 pt-3 border-t border-white/5 flex items-center gap-2">
-        <button className="flex-1 py-1.5 rounded-lg bg-accent hover:bg-accent text-[#070B19] text-xs font-bold transition duration-150">
+      <div className="mt-4 pt-3 border-t border-line flex items-center gap-2">
+        <button className="flex-1 py-1.5 rounded-lg bg-accent hover:bg-accent text-accent-ink text-xs font-bold transition duration-150">
           Shortlist
         </button>
         <button
           type="button"
           onClick={() => navigate(`/company/applicant/${applicant.id}/cv`)}
-          className="px-2.5 py-1.5 rounded-lg border border-white/10 bg-raised/5 text-xs text-subtle hover:text-content hover:bg-raised/10 transition"
+          className="px-2.5 py-1.5 rounded-lg border border-line bg-raised/5 text-xs text-subtle hover:text-content hover:bg-raised/10 transition"
         >
           Review CV
         </button>

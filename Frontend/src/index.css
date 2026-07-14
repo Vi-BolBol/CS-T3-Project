@@ -63,3 +63,14 @@ body {
 }
 .phone-input-custom .PhoneInputCountrySelect { background: rgb(var(--c-raised)); color: rgb(var(--c-text)); }
 .phone-input-custom .PhoneInputCountrySelectArrow { color: rgb(var(--c-text-3)); opacity: .8; }
+
+/* Auth role-switch: replays whenever the keyed block remounts (student <-> company). */
+@keyframes if-swap-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.if-swap { animation: if-swap-in .28s cubic-bezier(.22,.61,.36,1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .if-swap { animation: none; }
+}

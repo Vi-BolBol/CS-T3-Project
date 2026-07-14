@@ -48,7 +48,7 @@ export default function InternshipCard({
         <div className="min-w-0 flex-1">
           <h3 className="truncate text-sm font-bold text-content">{job.title}</h3>
           <Link
-            to={job.company?.id ? `/company/${job.company.id}` : '#'}
+            to={job.company?.id ? `/user/internships?type=companies&company=${job.company.id}` : '#'}
             className="truncate text-xs text-subtle transition-colors hover:text-accent"
           >
             {job.company?.companyName || 'Unknown company'}
@@ -103,8 +103,9 @@ export default function InternshipCard({
         <span className="text-xs font-semibold text-accent">{payRange(job)}</span>
 
         <div className="flex items-center gap-2">
+          {/* Opens the detail pane on the Internships page — no separate page. */}
           <Link
-            to={`/view-detail?id=${job.id}`}
+            to={`/user/internships?job=${job.id}`}
             className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-subtle transition-colors hover:bg-muted hover:text-content"
           >
             Details

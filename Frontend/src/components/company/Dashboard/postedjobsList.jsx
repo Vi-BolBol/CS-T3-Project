@@ -6,8 +6,8 @@ export default function PostedJobsList({ jobs, selectedJobId, onSelectJob }) {
   const activeCount = jobs.filter((job) => job.status === 'open').length;
 
   return (
-    <div className="rounded-2xl border border-white/5 bg-[#111B34]/40 p-4 shadow-xl backdrop-blur-sm">
-      <div className="flex items-center justify-between pb-4 border-b border-white/5 mb-4">
+    <div className="rounded-2xl border border-line bg-raised p-4 shadow-xl backdrop-blur-sm">
+      <div className="flex items-center justify-between pb-4 border-b border-line mb-4">
         <div>
           <h2 className="text-sm font-bold uppercase tracking-wider text-accent">Posted Internships</h2>
           <p className="text-xs text-subtle mt-0.5">{jobs.length} Positions Published</p>
@@ -28,8 +28,8 @@ export default function PostedJobsList({ jobs, selectedJobId, onSelectJob }) {
               onClick={() => onSelectJob(job.id)}
               className={`w-full text-left p-4 rounded-xl border transition-all duration-200 cursor-pointer ${
                 isSelected
-                  ? 'bg-[#111B34] border-accent/40 shadow-md shadow-accent/20'
-                  : 'bg-transparent border-white/5 hover:border-white/10 hover:bg-[#111B34]/30'
+                  ? 'bg-raised border-accent/40 shadow-md shadow-accent/20'
+                  : 'bg-transparent border-line hover:border-accent/40 hover:bg-raised'
               }`}
             >
               <div className="flex items-start justify-between gap-2">
@@ -49,7 +49,7 @@ export default function PostedJobsList({ jobs, selectedJobId, onSelectJob }) {
 
               <p className="text-xs text-subtle mt-1">{job.location} - {job.workEnvironment}</p>
 
-              <div className="mt-3 pt-3 border-t border-white/5 flex items-center justify-between text-[11px] text-subtle">
+              <div className="mt-3 pt-3 border-t border-line flex items-center justify-between text-[11px] text-subtle">
                 <span>{job.applicantsCount} Applicants</span>
                 <span className="text-accent font-medium">View Pipeline -&gt;</span>
               </div>
@@ -61,7 +61,7 @@ export default function PostedJobsList({ jobs, selectedJobId, onSelectJob }) {
       <button
         type="button"
         onClick={() => navigate('/company/create-internship')}
-        className="w-full mt-4 bg-accent hover:bg-accent text-[#070B19] font-bold text-xs py-3 rounded-xl transition duration-200 flex items-center justify-center gap-1.5 shadow-lg shadow-accent/10"
+        className="w-full mt-4 bg-accent hover:bg-accent text-accent-ink font-bold text-xs py-3 rounded-xl transition duration-200 flex items-center justify-center gap-1.5 shadow-lg shadow-accent/10"
       >
         <span>+</span> Post a New Job
       </button>

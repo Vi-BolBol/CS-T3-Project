@@ -18,7 +18,7 @@ export default function SelectedJobView({ job, onJobUpdated }) {
 
   if (!job) {
     return (
-      <div className="rounded-2xl border border-dashed border-white/10 bg-raised/[0.01] p-12 text-center text-sm text-subtle">
+      <div className="rounded-2xl border border-dashed border-line bg-raised/[0.01] p-12 text-center text-sm text-subtle">
         Select a job from the list to view its details.
       </div>
     );
@@ -31,8 +31,8 @@ export default function SelectedJobView({ job, onJobUpdated }) {
   };
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-[#111B34]/60 p-6 sm:p-8 shadow-2xl backdrop-blur-md">
-      <div className="border-b border-white/5 pb-6">
+    <div className="rounded-2xl border border-line bg-raised p-6 sm:p-8 shadow-2xl backdrop-blur-md">
+      <div className="border-b border-line pb-6">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
@@ -54,7 +54,7 @@ export default function SelectedJobView({ job, onJobUpdated }) {
           </div>
 
           <div className="flex items-center gap-2 self-start sm:self-auto">
-            <button className="px-3 py-1.5 border border-white/10 rounded-lg bg-raised/5 text-xs text-subtle hover:bg-raised/10 transition">
+            <button className="px-3 py-1.5 border border-line rounded-lg bg-raised/5 text-xs text-subtle hover:bg-raised/10 transition">
               Share
             </button>
             <button
@@ -64,7 +64,7 @@ export default function SelectedJobView({ job, onJobUpdated }) {
               className={`px-3 py-1.5 border rounded-lg text-xs transition disabled:opacity-40 ${
                 job.status === 'open'
                   ? 'border-amber-500/20 text-amber-400 bg-amber-500/5 hover:bg-amber-500/10'
-                  : 'border-accent/20 text-accent bg-accent/5 hover:bg-accent/10'
+                  : 'border-accent/20 text-accent bg-accent/5 hover:brightness-95'
               }`}
             >
               {togglingStatus ? 'Updating…' : job.status === 'open' ? 'Freeze Listing' : 'Resume Listing'}
@@ -81,7 +81,7 @@ export default function SelectedJobView({ job, onJobUpdated }) {
           <div>Volume: <span className="text-accent font-bold">{job.applicantsCount} total tracking profiles</span></div>
         </div>
 
-        <div className="mt-6 flex items-center gap-1 border-b border-white/5 -mb-px">
+        <div className="mt-6 flex items-center gap-1 border-b border-line -mb-px">
           {TABS.map((tab) => (
             <button
               key={tab.id}

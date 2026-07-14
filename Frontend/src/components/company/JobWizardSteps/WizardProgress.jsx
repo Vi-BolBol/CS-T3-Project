@@ -23,8 +23,8 @@ export default function WizardProgress({ currentStep }) {
                 <div
                   className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all ${
                     isActiveOrDone
-                      ? 'bg-accent border-accent text-[#070B19]'
-                      : 'bg-transparent border-white/10 text-subtle'
+                      ? 'bg-accent border-accent text-accent-ink'
+                      : 'bg-transparent border-line text-subtle'
                   }`}
                 >
                   {isPast ? '✓' : step.n}
