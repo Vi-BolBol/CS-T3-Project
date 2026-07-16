@@ -48,7 +48,7 @@ export const getInternship = async (req, res) => {
     const id = Number(req.params.id);
     if (Number.isNaN(id)) return res.status(400).json({ success: false, message: "Invalid internship id" });
 
-    const result = await getInternshipService(id);
+    const result = await getInternshipService(id, req.user || null);
     if (!result.success) return res.status(404).json(result);
     return res.status(200).json(result);
   } catch (error) {

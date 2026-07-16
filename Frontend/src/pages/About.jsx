@@ -1,5 +1,6 @@
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
+import AnimatedBackground from '../components/layout/AnimatedBackground';
 
 const PILLARS = [
   {
@@ -28,10 +29,11 @@ const TEAM = [
 export default function About() {
   return (
     <div className="flex min-h-screen flex-col bg-surface">
+      <AnimatedBackground />
       <Header />
 
       <main className="flex-1">
-        <section className="border-b border-line bg-raised">
+        <section className="border-b border-line bg-raised/70 backdrop-blur-sm">
           <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
             <span className="text-[11px] font-bold uppercase tracking-wider text-accent">
               Our story

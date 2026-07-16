@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import Navbar from '../../components/layout/StudentNavbar';
+import Footer from '../../components/layout/StudentFooter';
 import { InternshipPane, CompanyPane, payRange } from '../../components/shared/DetailPane';
 import Pagination from '../../components/shared/Pagination';
 import useInternships from '../../hooks/useInternships';
@@ -243,13 +244,16 @@ export default function BrowseInternships() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-surface lg:h-screen lg:min-h-0 lg:overflow-hidden">
+    <div className="flex min-h-screen flex-col bg-surface">
       <Navbar />
 
-      {/* lg+: the page itself never scrolls. Filters, results, and detail each
-          scroll independently inside their own column. Below lg it falls back to
-          normal document scrolling, which is what you want on a phone. */}
-      <main className="mx-auto flex w-full max-w-[1600px] flex-1 flex-col px-4 py-6 sm:px-6 lg:min-h-0 lg:px-8">
+      {/* lg+: the column row is pinned to the viewport height, so filters, results,
+          and detail each scroll INSIDE their own column rather than growing the
+          page. The page itself only scrolls the short distance needed to reach the
+          footer — it isn't a second scrollbar competing with the columns.
+          Below lg it falls back to normal document scrolling, which is what you
+          want on a phone; three nested scroll areas on a 390px screen is a trap. */}
+      <main className="mx-auto flex w-full max-w-[1600px] flex-1 flex-col px-4 py-6 sm:px-6 lg:px-8">
         <header className="mb-4 flex-shrink-0">
           <h1 className="text-2xl font-black tracking-tight text-content">Explore</h1>
           <p className="mt-1 text-sm text-subtle">
@@ -291,7 +295,7 @@ export default function BrowseInternships() {
           </button>
         </form>
 
-        <div className="flex flex-1 flex-col gap-5 lg:min-h-0 lg:flex-row">
+        <div className="flex flex-1 flex-col gap-5 lg:h-[calc(100vh-15rem)] lg:min-h-[26rem] lg:flex-row">
           {/* (a) Filters */}
           <aside className={`${showFilters ? 'block' : 'hidden'} lg:block lg:w-56 lg:flex-shrink-0`}>
             <div className="custom-scrollbar h-full space-y-4 overflow-y-auto rounded-xl border border-line bg-raised p-4">
@@ -554,6 +558,7 @@ export default function BrowseInternships() {
         </div>
       </main>
 
+      <Footer />
       <Toast message={toastMessage} onClose={clearToast} />
     </div>
   );

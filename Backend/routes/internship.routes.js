@@ -1,5 +1,5 @@
 import express from "express";
-import { protect } from "../middleware/auth.middleware.js";
+import { protect, optionalAuth } from "../middleware/auth.middleware.js";
 import { authorize } from "../middleware/role.middleware.js";
 import {
   publishInternship,
@@ -22,6 +22,6 @@ router.post("/", protect, authorize("company"), publishInternship);
 router.put("/:id", protect, authorize("company"), updateInternshipController);
 router.delete("/:id", protect, authorize("company"), deleteInternshipController);
 
-router.get("/:id", getInternship);
+router.get("/:id", optionalAuth, getInternship);   // public, but the owner sees more
 
 export default router;

@@ -16,7 +16,6 @@ import CompanyProfile from "../pages/company/CompanyProfile";
 import CompanySetting from "../pages/company/CompanySetting";
 import CompanyInternships from "../pages/company/CompanyInternships";
 import CompanySearch from "../pages/company/CompanySearch";
-import CreateSetting from "../pages/company/CreateSetting";
 import CreateInternship from "../pages/company/CreateInternship";
 import ApplicantCVReview from "../pages/company/ApplicantCVReview";
 
@@ -134,7 +133,6 @@ export default function AppRoute() {
         <Route path="/company/settings" element={company(<CompanySetting />)} />
         <Route path="/company/internships" element={company(<CompanyInternships />)} />
         <Route path="/company/search" element={company(<CompanySearch />)} />
-        <Route path="/company/create-wizard" element={company(<CreateSetting />)} />
         <Route path="/company/create-internship" element={company(<CreateInternship />)} />
         <Route path="/company/applicant/:applicantId/cv" element={company(<ApplicantCVReview />)} />
 

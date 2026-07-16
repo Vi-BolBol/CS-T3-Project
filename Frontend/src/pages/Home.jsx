@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import Header from '../components/layout/Header';
 import HeroSection from '../components/layout/HeroSection';
 import Footer from '../components/layout/Footer';
+import AnimatedBackground from '../components/layout/AnimatedBackground';
 
 const STATS = [
   { value: '2026', label: 'Established' },
@@ -106,6 +107,7 @@ function Steps({ steps }) {
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col bg-surface">
+      <AnimatedBackground />
       <Header />
       <HeroSection />
 
@@ -148,7 +150,7 @@ export default function Home() {
         </section>
 
         {/* How it works — two audiences */}
-        <section className="border-y border-line bg-raised">
+        <section className="border-y border-line bg-raised/70 backdrop-blur-sm">
           <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
             <SectionHead eyebrow="How it works" title="Two sides, one platform" />
             <div className="mt-12 grid gap-6 md:grid-cols-2">
@@ -213,7 +215,7 @@ export default function Home() {
         </section>
 
         {/* Stories */}
-        <section className="border-y border-line bg-raised">
+        <section className="border-y border-line bg-raised/70 backdrop-blur-sm">
           <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
             <SectionHead title="Success stories" subtitle="From students who found a role here." />
             <div className="mt-12 grid gap-5 sm:grid-cols-2">

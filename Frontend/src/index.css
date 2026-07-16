@@ -74,3 +74,45 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .if-swap { animation: none; }
 }
+
+/* ─── Ambient background motion (general-user pages only) ──────────────────
+   Three slow orbs on deliberately mismatched durations (26/34/30s) so the loop
+   never lines up and reads as periodic. Plus a faint grid, masked to fade out. */
+@keyframes if-drift-a {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%      { transform: translate(6vw, -4vh) scale(1.12); }
+  66%      { transform: translate(-4vw, 5vh) scale(0.94); }
+}
+@keyframes if-drift-b {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(-7vw, 6vh) scale(1.15); }
+}
+@keyframes if-drift-c {
+  0%, 100% { transform: translate(0, 0) scale(1.05); }
+  50%      { transform: translate(5vw, 7vh) scale(0.9); }
+}
+
+.if-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+  will-change: transform;
+}
+.if-orb-a { animation: if-drift-a 26s ease-in-out infinite; }
+.if-orb-b { animation: if-drift-b 34s ease-in-out infinite; }
+.if-orb-c { animation: if-drift-c 30s ease-in-out infinite; }
+
+.if-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgb(var(--c-line) / 0.55) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(var(--c-line) / 0.55) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(80% 60% at 50% 0%, #000 0%, transparent 85%);
+          mask-image: radial-gradient(80% 60% at 50% 0%, #000 0%, transparent 85%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .if-orb-a, .if-orb-b, .if-orb-c { animation: none; }
+}

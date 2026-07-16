@@ -124,17 +124,68 @@ export const listCompanyInternshipsService = async (userId) => {
   return { success: true, internships };
 };
 
+/**
+ * `status` is whitelisted, not passed straight through.
+ *
+ * It used to be `query.status || "open"` — so GET /api/internships?status=draft
+ * handed any anonymous visitor every UNPUBLISHED listing on the platform. A
+ * bogus value (?status=foo) also blew up Prisma's enum check into a 500.
+ * "draft" is never browsable; a company sees its own drafts via /mine.
+ */
+const PUBLIC_STATUSES = ["open", "closed"];
+
 export const listPublicInternshipsService = async (query = {}) => {
-  const internships = await findPublicInternships({ status: query.status || "open" });
+  const requested = String(query.status || "").toLowerCase();
+  const status = PUBLIC_STATUSES.includes(requested) ? requested : "open";
+
+  const internships = await findPublicInternships({ status });
   return { success: true, internships };
 };
 
-export const getInternshipService = async (id) => {
+/**
+ * `findInternshipById` includes the WHOLE CompanyProfile row — which carries
+ * `contact` (phone), `telegramLink`, and `userId`, the internal link back to the
+ * account. This route is public, so those were being handed to anyone who asked.
+ *
+ * `requester` comes from optionalAuth: undefined for an anonymous visitor. The
+ * owning company (and an admin) still gets everything, because the company edit
+ * form reads this same endpoint.
+ */
+const PUBLIC_COMPANY_FIELDS = [
+  "id", "companyName", "industry", "description", "website",
+  "logoUrl", "coverUrl", "location", "employeeCount",
+];
+
+export const getInternshipService = async (id, requester = null) => {
   const internship = await findInternshipById(id);
   if (!internship) {
     return { success: false, message: "Internship not found" };
   }
-  return { success: true, internship };
+
+  const isAdmin = requester?.role === "admin";
+  let isOwner = false;
+
+  if (requester?.role === "company") {
+    const profile = await findCompanyProfileByUserId(requester.id);
+    isOwner = Boolean(profile && profile.id === internship.companyId);
+  }
+
+  // A draft is unpublished. Nobody but its owner (or an admin) may read it.
+  if (internship.status === "draft" && !isOwner && !isAdmin) {
+    return { success: false, message: "Internship not found" };
+  }
+
+  if (isOwner || isAdmin) {
+    return { success: true, internship };
+  }
+
+  const company = internship.company
+    ? Object.fromEntries(
+        PUBLIC_COMPANY_FIELDS.map((k) => [k, internship.company[k]])
+      )
+    : null;
+
+  return { success: true, internship: { ...internship, company } };
 };
 
 async function assertOwnership(userId, internshipId) {

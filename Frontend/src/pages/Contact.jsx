@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
+import AnimatedBackground from '../components/layout/AnimatedBackground';
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 
@@ -26,6 +27,7 @@ export default function ContactUs() {
 
   return (
     <div className="flex min-h-screen flex-col bg-surface">
+      <AnimatedBackground />
       <Header />
 
       <main className="flex-1">

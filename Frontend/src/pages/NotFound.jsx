@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
+import AnimatedBackground from '../components/layout/AnimatedBackground';
 
 export default function NotFound() {
   return (
     <div className="flex min-h-screen flex-col bg-surface">
+      <AnimatedBackground />
       <Header />
 
       <main className="flex flex-1 flex-col items-center justify-center px-4 py-24 text-center">

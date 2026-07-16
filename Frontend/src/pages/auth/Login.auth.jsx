@@ -3,6 +3,8 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
 import AuthLayout from './AuthLayout';
+import RolePitch from './RolePitch';
+import SocialSignIn from '../../components/auth/SocialSignIn';
 import { loginUser } from '../../api/authApi';
 
 const HOME_FOR = {
@@ -68,42 +70,22 @@ export default function Login() {
   };
 
   const side = (
-    <div>
-      <h2 className="text-2xl font-black leading-tight tracking-tight text-content">
-        Welcome back.
-      </h2>
-      <p className="mt-2 text-sm leading-relaxed text-subtle">
-        Pick up exactly where you left off.
-      </p>
-      <ul className="mt-6 space-y-3">
-        {POINTS.map((p) => (
-          <li key={p.text} className="flex items-center gap-3 text-xs text-subtle">
-            <span className="grid h-7 w-7 flex-shrink-0 place-items-center rounded-lg bg-accent-soft text-accent">
-              <i className={`bi ${p.icon}`} />
-            </span>
-            {p.text}
-          </li>
-        ))}
-      </ul>
-    </div>
+    <RolePitch
+      eyebrow="Welcome back"
+      icon="bi-box-arrow-in-right"
+      headline="Pick up where you left off."
+      points={POINTS}
+    />
   );
 
   return (
-    <AuthLayout side={side}>
-      <div className="mb-6">
-        <h1 className="text-xl font-black tracking-tight text-content">Log in</h1>
-        <p className="mt-1 text-xs text-subtle">
-          Don&apos;t have an account?{' '}
-          <Link
-            to={next ? `/signup?next=${encodeURIComponent(next)}` : '/signup'}
-            className="font-bold text-accent hover:underline"
-          >
-            Create one
-          </Link>
-        </p>
+    <AuthLayout description={side} descriptionSide="left">
+      <div className="mb-5">
+        <h1 className="text-lg font-black tracking-tight text-content">Log in</h1>
+        <p className="mt-0.5 text-xs text-subtle">Welcome back to Internship Finder.</p>
       </div>
 
-      <form className="space-y-4" onSubmit={handleLogin} noValidate>
+      <form className="mt-5 space-y-4" onSubmit={handleLogin} noValidate>
         <Input
           label="Email address"
           type="email"
@@ -161,11 +143,20 @@ export default function Login() {
             'Log in'
           )}
         </Button>
+
+        <p className="pt-0.5 text-center text-xs text-subtle">
+          Don&apos;t have an account?{' '}
+          <Link
+            to={next ? `/signup?next=${encodeURIComponent(next)}` : '/signup'}
+            className="font-bold text-accent hover:underline"
+          >
+            Create one
+          </Link>
+        </p>
       </form>
 
-      <p className="mt-6 text-center text-[11px] text-faint">
-        By logging in you agree to the platform&apos;s terms of use.
-      </p>
+      {/* Circular provider icons at the foot of the form, same as signup. */}
+      <SocialSignIn action="Log in" />
     </AuthLayout>
   );
 }
