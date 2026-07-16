@@ -58,4 +58,41 @@ export const loginUser = async (loginData) => {
       message: "Cannot connect to server. Please check backend or database.",
     };
   }
+};export const getCurrentUser = async () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      return {
+        success: false,
+        message: "No authentication token found",
+      };
+    }
+
+    const response = await fetch(`${API_URL}/me`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: data.message || "Failed to fetch user",
+      };
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Get current user error:", error);
+
+    return {
+      success: false,
+      message: "Cannot connect to server. Please check backend or database.",
+    };
+  }
 };

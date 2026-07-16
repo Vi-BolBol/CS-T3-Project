@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Input from "../../components/common/Input";
+import Input from "../../components/common/input";
 import Button from "../../components/common/Button";
 import Header from "../../components/layout/Header";
 import { loginUser } from "../../api/authApi";

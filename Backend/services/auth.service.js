@@ -11,7 +11,6 @@ export const registerService = async (payload = {}) => {
       message: "Email and password are required",
     };
   }
-
   const existingUser = await findUserByEmail(email);
 
   if (existingUser) {
@@ -22,7 +21,6 @@ export const registerService = async (payload = {}) => {
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
-
   const user = await createUser({
     email,
     passwordHash: hashedPassword,

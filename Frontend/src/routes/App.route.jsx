@@ -26,6 +26,7 @@ import ViewDetail from "../pages/user/ViewDetail";
 
 import StudentNavbar from "../components/layout/StudentNavbar";
 import StudentFooter from "../components/layout/StudentFooter";
+import ProtectedRoute from "../components/ProtectRoute";
 import { CVBuilderProvider } from "../context/CVBuilderContext";
 import CVChoice from "../pages/cv/CVChoice";
 import CVUploadReview from "../pages/cv/CVUploadReview";
@@ -67,24 +68,25 @@ export default function AppRoute() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
-        <Route path="/company" element={<Company />} />
-        <Route path="/company/:id" element={<CompanyDetail />} />
-
-        <Route path="/company/home" element={<CompanyHome />} />
-        <Route path="/company/dashboard" element={<CompanyDashboard />} />
-        <Route path="/company/profile" element={<CompanyProfile />} />
-        <Route path="/company/settings" element={<CompanySetting />} />
-        <Route path="/company/create-wizard" element={<CreateSetting />} />
-        <Route path="/company/create-internship" element={<CreateInternship />} />
-
-        <Route path="/user/home" element={<UserHome />} />
-        <Route path="/user/profile" element={<UserProfile />} />
-        <Route path="/user/settings" element={<UserSetting />} />
-        <Route path="/user/applications" element={<UserApplication />} />
-        <Route path="/pipeline" element={<Pipeline />} />
-        <Route path="/view-detail" element={<ViewDetail />} />
-
-        <Route path="/cv/*" element={<CVBuilderRoutes />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/company" element={<Company />} />
+          <Route path="/company/:id" element={<CompanyDetail />} />
+          <Route path="/company/home" element={<CompanyHome />} />
+          <Route path="/company/dashboard" element={<CompanyDashboard />} />
+          <Route path="/company/profile" element={<CompanyProfile />} />
+          <Route path="/company/settings" element={<CompanySetting />} />
+          <Route path="/company/create-wizard" element={<CreateSetting />} />
+          <Route path="/company/create-internship" element={<CreateInternship />} />
+          
+          <Route path="/user/home" element={<UserHome />} />
+          <Route path="/user/profile" element={<UserProfile />} />
+          <Route path="/user/settings" element={<UserSetting />} />
+          <Route path="/user/applications" element={<UserApplication />} />
+          <Route path="/pipeline" element={<Pipeline />} />
+          <Route path="/view-detail" element={<ViewDetail />} />
+          
+          <Route path="/cv/*" element={<CVBuilderRoutes />} />
+        </Route>
 
         <Route path="*" element={<NotFound />} />
       </Routes>
