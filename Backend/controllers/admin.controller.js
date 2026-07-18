@@ -15,8 +15,8 @@ export const getStats = async (req, res, next) => {
 
 export const getUsers = async (req, res, next) => {
   try {
-    const { role, status, search } = req.query;
-    return res.status(200).json(await getUsersService({ role, status, search }));
+    const { role, status, search, page, pageSize } = req.query;
+    return res.status(200).json(await getUsersService({ role, status, search, page, pageSize }));
   } catch (err) { next(err); }
 };
 

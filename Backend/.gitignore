@@ -62,3 +62,7 @@ prisma/dev.db-journal
 *.tgz
 *.tar.gz
 *.zip
+
+#Backup
+backups/
+backups/

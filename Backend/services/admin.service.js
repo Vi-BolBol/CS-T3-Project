@@ -18,7 +18,7 @@ export const getStatsService = async () => {
 
 export const getUsersService = async (filters) => {
   const users = await findUsers(filters);
-  return { success: true, users };
+  return { success: true, users, page: filters?.page ?? 1, pageSize: filters?.pageSize ?? 200 };
 };
 
 export const updateUserStatusService = async (adminId, userId, status) => {

@@ -3,6 +3,11 @@
 
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
+// NOTE: pg_trgm GIN indexes for ILIKE search columns (internships.title,
+// company_profiles.companyName, student_profiles.fullName, etc.) are applied
+// via raw SQL migration 20260718070100_search_trigram_indexes and are
+// deliberately NOT declared here.
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -61,6 +66,8 @@ model User {
   followedCompanies FollowedCompany[]
   auditLogs       AuditLog[]
 
+  @@index([role])
+  @@index([status])
   @@map("users")
 }
 
@@ -114,6 +121,7 @@ model Cv {
   student      User          @relation(fields: [studentId], references: [id], onDelete: Cascade)
   applications Application[]
 
+  @@index([studentId, updatedAt])
   @@map("cvs")
 }
 
@@ -146,6 +154,8 @@ model Internship {
   applications     Application[]
   savedInternships SavedInternship[]
 
+  @@index([companyId])
+  @@index([status, createdAt])
   @@map("internships")
 }
 
@@ -163,6 +173,8 @@ model Application {
   cv         Cv?        @relation(fields: [cvId], references: [id], onDelete: SetNull)
 
   @@unique([studentId, internshipId])
+  @@index([internshipId])
+  @@index([status])
   @@map("applications")
 }
 
@@ -200,5 +212,7 @@ model AuditLog {
 
   user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
+  @@index([userId])
+  @@index([action, createdAt])
   @@map("audit_logs")
 }

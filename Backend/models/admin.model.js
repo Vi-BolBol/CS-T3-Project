@@ -16,32 +16,26 @@ export const countAll = async () => {
   return { users, students, companies, admins, internships, applications, suspended };
 };
 
-export const findUsers = ({ role, status, search } = {}) =>
-  prisma.user.findMany({
+export const findUsers = ({ role, status, search, page = 1, pageSize = 200 } = {}) => {
+  const take = Math.min(Math.max(Number(pageSize) || 200, 1), 200);
+  const skip = (Math.max(Number(page) || 1, 1) - 1) * take;
+
+  return prisma.user.findMany({
     where: {
       ...(role ? { role } : {}),
       ...(status ? { status } : {}),
       ...(search ? { email: { contains: search, mode: "insensitive" } } : {}),
     },
     select: {
-      id: true,
-      email: true,
-      role: true,
-      status: true,
-      createdAt: true,
+      id: true, email: true, role: true, status: true, createdAt: true,
       studentProfile: { select: { fullName: true } },
-      companyProfile: { 
-        select: { 
-          companyName: true,
-          _count: { select: { internships: true} },
-        }, 
-      },
+      companyProfile: { select: { companyName: true, _count: { select: { internships: true } } } },
       _count: { select: { applications: true } },
     },
     orderBy: { createdAt: "desc" },
-    take: 200,
+    skip, take,
   });
-
+};
 export const findUserById = (id) =>
   prisma.user.findUnique({ where: { id: Number(id) } });
 
