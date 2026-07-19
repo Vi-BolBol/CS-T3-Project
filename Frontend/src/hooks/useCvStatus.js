@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback } from 'react';
   Now backed by the real API (POST /api/cv, GET /api/cv/mine), built in Session B.
   A local mirror is kept so the CV builder keeps working offline/mid-edit.
 */
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const BASE_URL = import.meta.env.VITE_API_URL || '';
 const KEY = 'if-cv-status';
 const CV_KEY = 'if-cv-data';
 

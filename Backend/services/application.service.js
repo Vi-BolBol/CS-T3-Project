@@ -10,6 +10,7 @@ import {
 } from "../models/application.model.js";
 import { PrismaClient } from "@prisma/client";
 import { logAction } from "../utils/audit.js";
+import { notifyNewApplication, notifyApplicationStatusChanged } from "./notification.service.js";
 
 const prisma = new PrismaClient();
 const VALID_STATUS = ["pending", "reviewed", "accepted", "rejected"];
@@ -55,6 +56,7 @@ export const applyService = async (studentId, { internshipId, cvId = null }) => 
 
   const application = await createApplication({ studentId, internshipId: id, cvId: resolvedCvId });
   await logAction({ userId: studentId, action: "APPLICATION_SUBMITTED", entityType: "Application", entityId: application.id });
+  await notifyNewApplication(application);
   return { success: true, message: "Application submitted", application };
 };
 
@@ -104,5 +106,6 @@ export const decideApplicationService = async (userId, applicationId, status) =>
 
   const updated = await updateApplicationStatus(application.id, status);
   await logAction({ userId, action: `APPLICATION_${status.toUpperCase()}`, entityType: "Application", entityId: updated.id });
+  await notifyApplicationStatusChanged({ ...updated, internship: application.internship });
   return { success: true, message: `Application marked as ${status}`, application: updated };
 };

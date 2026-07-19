@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import useApplicationAlerts from '../../hooks/useApplicationAlerts';
 import useInternships from '../../hooks/useInternships';
+import NotificationBell from '../shared/NotificationBell';
 
 export default function StudentNavbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -147,6 +148,7 @@ export default function StudentNavbar() {
         </div>
 
         <div className="ml-auto hidden items-center gap-2 md:flex lg:ml-3">
+          <NotificationBell />
           <Link
             to="/user/settings"
             title="Settings"

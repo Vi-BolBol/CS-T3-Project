@@ -44,6 +44,13 @@ enum ApplicationStatus {
   rejected
 }
 
+enum NotificationType {
+  new_application
+  application_status_changed
+  new_internship_from_followed_company
+  internship_deadline_reminder
+}
+
 model User {
   id           Int      @id @default(autoincrement())
   email        String   @unique @db.VarChar(255)
@@ -60,6 +67,7 @@ model User {
   savedInternships SavedInternship[]
   followedCompanies FollowedCompany[]
   auditLogs       AuditLog[]
+  notifications   Notification[]
 
   @@map("users")
 }
@@ -187,6 +195,24 @@ model FollowedCompany {
 
   @@id([userId, companyId])
   @@map("followed_companies")
+}
+
+model Notification {
+  id          Int              @id @default(autoincrement())
+  recipientId Int
+  type        NotificationType
+  title       String           @db.VarChar(255)
+  message     String
+  entityType  String?          @db.VarChar(50)
+  entityId    Int?
+  isRead      Boolean          @default(false)
+  readAt      DateTime?
+  createdAt   DateTime         @default(now())
+
+  recipient User @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+
+  @@index([recipientId, isRead])
+  @@map("notifications")
 }
 
 model AuditLog {

@@ -7,6 +7,7 @@ import {
   updateInternship,
   deleteInternship,
 } from "../models/internship.model.js";
+import { notifyFollowersOfNewInternship } from "./notification.service.js";
 
 const WORK_ENV_MAP = {
   "on-site": "onsite",
@@ -110,6 +111,8 @@ export const publishInternshipService = async (userId, payload = {}) => {
     status: "open",
     ...toWizardDbFields(payload),
   });
+
+  await notifyFollowersOfNewInternship(internship, companyProfile);
 
   return { success: true, message: "Internship published successfully", internship };
 };

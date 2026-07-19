@@ -1,4 +1,6 @@
-import { BrowserRouter, Routes, Route, Navigate, useParams, useSearchParams } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
+import { listenForNotificationClicks } from "../services/browserNotificationService";
 
 import Home from "../pages/Home";
 import About from "../pages/About";
@@ -80,6 +82,17 @@ function CVBuilderRoutes() {
   );
 }
 
+/* Bridges public/sw.js's `notificationclick` -> postMessage("NOTIFICATION_CLICK")
+   into a normal client-side route change. Must render inside <BrowserRouter>
+   (useNavigate requires router context) but renders nothing itself. */
+function NotificationClickBridge() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    listenForNotificationClicks((url) => navigate(url));
+  }, [navigate]);
+  return null;
+}
+
 const student = (el) => <RequireRole roles={["student"]}>{el}</RequireRole>;
 const company = (el) => <RequireRole roles={["company"]}>{el}</RequireRole>;
 const admin   = (el) => <RequireRole roles={["admin"]}>{el}</RequireRole>;
@@ -87,6 +100,7 @@ const admin   = (el) => <RequireRole roles={["admin"]}>{el}</RequireRole>;
 export default function AppRoute() {
   return (
     <BrowserRouter>
+      <NotificationClickBridge />
       <Routes>
         {/* ---------- Public (no auth) ---------- */}
         <Route path="/" element={<Home />} />

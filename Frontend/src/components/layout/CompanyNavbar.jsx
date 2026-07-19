@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import useApplicantAlerts from '../../hooks/useApplicantAlerts';
 import { searchAll } from '../../api/companyApi';
+import NotificationBell from '../shared/NotificationBell';
 
 export default function CompanyNavbar() {
   const [open, setOpen] = useState(false);
@@ -133,6 +134,7 @@ export default function CompanyNavbar() {
         </div>
 
         <div className="ml-auto hidden items-center gap-2 md:flex lg:ml-3">
+          <NotificationBell />
           <Link
             to="/company/settings"
             aria-label="Settings"
