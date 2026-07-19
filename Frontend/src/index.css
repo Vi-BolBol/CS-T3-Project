@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Design tokens. "R G B" triplets so Tailwind opacity modifiers work (bg-surface/50).
+   Light is default; .dark on <html> flips the whole app. Never hardcode hex in JSX. */
+:root {
+  --c-surface: 246 248 251;
+  --c-raised: 255 255 255;
+  --c-muted: 238 242 247;
+  --c-line: 226 232 240;
+  --c-text: 15 23 42;
+  --c-text-2: 71 85 105;
+  --c-text-3: 148 163 184;
+  --c-accent: 16 185 129;
+  --c-accent-ink: 4 35 26;
+  --c-accent-soft: 236 253 245;
+  --c-warn: 245 158 11;
+  --c-danger: 239 68 68;
+  color-scheme: light;
+}
+
+.dark {
+  --c-surface: 11 18 32;
+  --c-raised: 17 26 46;
+  --c-muted: 22 34 58;
+  --c-line: 31 44 70;
+  --c-text: 230 237 247;
+  --c-text-2: 148 163 184;
+  --c-text-3: 100 116 139;
+  --c-accent: 52 211 153;
+  --c-accent-ink: 4 35 26;
+  --c-accent-soft: 12 42 34;
+  --c-warn: 251 191 36;
+  --c-danger: 248 113 113;
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  background-color: rgb(var(--c-surface));
+  color: rgb(var(--c-text));
+  font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  transition: background-color .2s ease, color .2s ease;
+}
+
+.custom-scrollbar::-webkit-scrollbar { width: 6px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: rgb(var(--c-text-3)); border-radius: 9999px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgb(var(--c-text-2)); }
+.custom-scrollbar { scrollbar-width: thin; scrollbar-color: rgb(var(--c-text-3)) transparent; }
+
+.phone-input-custom.PhoneInput {
+  display: flex; align-items: center; gap: .5rem;
+  background: rgb(var(--c-muted));
+  border: 1px solid rgb(var(--c-line));
+  border-radius: .5rem; padding: .5rem .75rem;
+}
+.phone-input-custom.PhoneInput--focus { border-color: rgb(var(--c-accent)); }
+.phone-input-custom .PhoneInputInput {
+  background: transparent; color: rgb(var(--c-text));
+  border: none; outline: none; font-size: .875rem;
+}
+.phone-input-custom .PhoneInputCountrySelect { background: rgb(var(--c-raised)); color: rgb(var(--c-text)); }
+.phone-input-custom .PhoneInputCountrySelectArrow { color: rgb(var(--c-text-3)); opacity: .8; }
+
+/* Auth role-switch: replays whenever the keyed block remounts (student <-> company). */
+@keyframes if-swap-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.if-swap { animation: if-swap-in .28s cubic-bezier(.22,.61,.36,1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .if-swap { animation: none; }
+}
+
+/* ─── Ambient background motion (general-user pages only) ──────────────────
+   Three slow orbs on deliberately mismatched durations (26/34/30s) so the loop
+   never lines up and reads as periodic. Plus a faint grid, masked to fade out. */
+@keyframes if-drift-a {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%      { transform: translate(6vw, -4vh) scale(1.12); }
+  66%      { transform: translate(-4vw, 5vh) scale(0.94); }
+}
+@keyframes if-drift-b {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(-7vw, 6vh) scale(1.15); }
+}
+@keyframes if-drift-c {
+  0%, 100% { transform: translate(0, 0) scale(1.05); }
+  50%      { transform: translate(5vw, 7vh) scale(0.9); }
+}
+
+.if-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+  will-change: transform;
+}
+.if-orb-a { animation: if-drift-a 26s ease-in-out infinite; }
+.if-orb-b { animation: if-drift-b 34s ease-in-out infinite; }
+.if-orb-c { animation: if-drift-c 30s ease-in-out infinite; }
+
+.if-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgb(var(--c-line) / 0.55) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(var(--c-line) / 0.55) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(80% 60% at 50% 0%, #000 0%, transparent 85%);
+          mask-image: radial-gradient(80% 60% at 50% 0%, #000 0%, transparent 85%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .if-orb-a, .if-orb-b, .if-orb-c { animation: none; }
+}

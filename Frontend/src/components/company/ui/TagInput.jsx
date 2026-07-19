@@ -1,0 +1,54 @@
+import React, { useState } from 'react';
+
+function TagInput({ tags, onChange, placeholder = 'Type and press Enter...' }) {
+  const [inputValue, setInputValue] = useState('');
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const trimmed = inputValue.trim();
+      if (trimmed === '') return;
+      if (tags.includes(trimmed)) { setInputValue(''); return; }
+      onChange([...tags, trimmed]);
+      setInputValue('');
+    }
+  };
+
+  const handleRemove = (tagToRemove) => {
+    onChange(tags.filter((tag) => tag !== tagToRemove));
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      <input
+        type="text"
+        value={inputValue}
+        onChange={(e) => setInputValue(e.target.value)}
+        onKeyDown={handleKeyDown}
+        placeholder={placeholder}
+        className="w-full bg-surface/60 border border-line rounded-xl px-4 py-3 text-sm text-content placeholder:text-faint focus:outline-none focus:border-accent/40 transition"
+      />
+      {tags.length > 0 && (
+        <div className="flex flex-wrap gap-2 mt-1">
+          {tags.map((tag) => (
+            <span
+              key={tag}
+              className="flex items-center gap-1.5 bg-accent/10 text-accent text-xs px-3 py-1.5 rounded-full border border-accent/20"
+            >
+              {tag}
+              <button
+                type="button"
+                onClick={() => handleRemove(tag)}
+                className="text-accent/70 hover:text-rose-400 transition leading-none"
+              >
+                ×
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default TagInput;
