@@ -451,3 +451,37 @@ Status: ✅ Fixed.
 | 7.2 | Public listing exposed company phone, Telegram, and internal `userId` | `include: { company: true }` on a public route | ✅ Fixed |
 | 7.3 | Company Settings "Log Out" was an `alert()` | Fake handler | ✅ Fixed (deleted) |
 | 7.4 | `/company/create-wizard` was a mock page | Never removed | ✅ Fixed (deleted) |
+
+## Session J
+
+| Bug | Why it mattered |
+|---|---|
+| **"Finish CV" did nothing** | `CVStep5Preview` called `saveCvToServer(cvData)`, but that name aliased `markCvCreated(source)` — whose parameter is a short *string*. The whole CV (base64 photo included) was written into the small `if-cv-status` key, throwing `QuotaExceededError` on any CV with a photo. The unguarded `setItem` rejected the async handler, so `navigate('/cv/manage')` never ran. Silent, and 100% reproducible once a photo existed. |
+| **Uploaded PDFs never parsed** | `api/cvApi.js` is the one module still on axios and sent **no `Authorization` header**. Session A had put `protect` on `/api/cv/*`, so parse, scoring, and AI headshots had all been returning 401 since then — surfaced only as "Failed to parse CV". |
+| **"Convert to Editable CV" threw** | `handleConvert` spread `...cvData`, but `cvData` was never destructured from `useCVBuilder()` in that file — a `ReferenceError` on click. Even with auth fixed, the parsed PDF could not reach the builder. |
+| **Applications badge always read 0** | `useApplicationAlerts` counted from `localStorage['if-applications']`; `useMyApplications` fetches from the API and never wrote that key. Students were never notified of an accept or reject. Now server-backed via `seenAt`. |
+| **Accept/Reject was a `console.log`** | `useApplications` was entirely mock-backed. A company could accept an applicant and nothing reached the database or the student. |
+| **Company navbar remounted every tab** | Each company page rendered its own `<CompanyNavbar />`. Every navigation unmounted and rebuilt it — search box cleared, applicant badge refetched, visible flicker. Fixed with a shared `CompanyLayout`. |
+| **Applicant profile showed the student navbar** | `/user/profile/:id` always rendered `StudentNavbar`, so a company reviewing an applicant got student navigation and no way back. Now viewer-aware, with a Back button. |
+| **Suspension was cosmetic for signed-in users** | `protect` never re-read the DB, so a suspended user kept full access until their token expired — up to a day. Now `enforceStatus` on mutations plus a page-load session check. |
+| **Deleting a company erased the student's application** | `applications.internshipId` cascaded. A student who had already been *accepted* lost the record entirely, with no notification. Now `ON DELETE SET NULL` plus a snapshot written before the delete. |
+| **Suspension had no reason or end date** | Nothing to show the suspended person and nothing for the next admin to review. Reason is now required server-side; duration is optional and self-lifting. |
+| **Suspended users could re-register** | Blocked, with an honest message instead of "email already exists". |
+| **`findStudentDirectory` selected non-existent columns** | Caught before shipping: `university` and `location` are not on `StudentProfile` — Prisma would have thrown at runtime. |
+
+## Session J.2 — 500 on the audit logs page
+
+| Bug | Why it mattered |
+|---|---|
+| **`GET /api/admin/audit-logs` returned 500 with no filters set** | `new URLSearchParams({ role: undefined })` does **not** skip the key — it stringifies it to the literal text `"undefined"`. The request went out as `?action=undefined&role=undefined&from=undefined&to=undefined`, so Prisma tried to match `"undefined"` against the `UserRole` enum and threw. The page was unusable on load, before touching a single filter. Introduced in J.2 itself: `getUserActivity` had been written with the values filtered out, `getAuditLogs` had not. |
+| **Any junk query param could 500 the admin API** | The deeper problem behind the above — query strings are untrusted input and were passed straight through to Prisma. A bad `role`, an unparseable date, or a non-numeric id all became server errors rather than being ignored. Now sanitised in the service layer: unknown roles, invalid dates, and bad ids are dropped, and `limit` is clamped to 1–2000. |
+
+**Fixes:** a single `qs()` helper in `adminApi.js` used by every admin GET, so a
+missing value can never become the string `"undefined"` again; plus `clean` /
+`cleanRole` / `cleanDate` / `cleanId` guards in `admin.service.js` so the server
+does not depend on the client behaving.
+
+**Noted, not changed:** `hooks/useAdmin.js` is dead code — it duplicates
+`api/adminApi.js` and is imported nowhere. It happens to filter its params
+correctly, so it is not a live bug, but it is a second copy of the admin client
+that will drift. Worth deleting.

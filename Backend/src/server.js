@@ -62,6 +62,9 @@ const authLimiter = rateLimit({
   max: 10,                               // 10 attempts per IP per window
   standardHeaders: true,
   legacyHeaders: false,
+  // Only credential POSTs are brute-forceable. GET /api/auth/session is polled
+  // on every page load, so limiting it would lock out a normal browsing session.
+  skip: (req) => req.method === "GET",
   message: { success: false, message: "Too many attempts. Try again in a minute." },
 });
 

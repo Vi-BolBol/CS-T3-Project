@@ -34,8 +34,25 @@ export const createUser = async ({ email, passwordHash, role, status = "active",
   });
 };
 
+/** Minimal projection used by the session check — no password hash. */
+export const findUserStatusById = (id) =>
+  prisma.user.findUnique({
+    where: { id: Number(id) },
+    select: {
+      id: true, email: true, role: true, status: true,
+      suspendedAt: true, suspendedUntil: true, suspensionReason: true,
+    },
+  });
+
+/** Clears a suspension once its end date has passed. */
+export const liftSuspension = (id) =>
+  prisma.user.update({
+    where: { id: Number(id) },
+    data: { status: "active", suspendedAt: null, suspendedUntil: null, suspensionReason: null },
+  });
+
 export const disconnectAuthModel = async () => {
   await prisma.$disconnect();
 };
 
-export default { findUserByEmail, createUser, disconnectAuthModel };
+export default { findUserByEmail, createUser, findUserStatusById, liftSuspension, disconnectAuthModel };

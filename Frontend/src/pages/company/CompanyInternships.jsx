@@ -1,7 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import CompanyNavbar from '../../components/layout/CompanyNavbar';
-import Footer from '../../components/layout/CompanyFooter';
 import Toast from '../../components/shared/Toast';
 import useToast from '../../hooks/useToast';
 import useApplicantAlerts from '../../hooks/useApplicantAlerts';
@@ -56,8 +54,7 @@ export default function CompanyInternships() {
     }`;
 
   return (
-    <div className="flex min-h-screen flex-col bg-surface">
-      <CompanyNavbar />
+    <div className="flex flex-1 flex-col bg-surface">
 
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
         <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
@@ -204,12 +201,22 @@ export default function CompanyInternships() {
                           <p className="text-sm text-subtle">No CV attached.</p>
                         )}
 
-                        <Link
-                          to={`/user/profile/${a.student?.id}`}
-                          className="mt-3 inline-block text-xs font-semibold text-accent hover:underline"
-                        >
-                          View full profile →
-                        </Link>
+                        <div className="mt-3 flex flex-wrap gap-3">
+                          <Link
+                            to={`/company/applicant/${a.student?.id}/profile`}
+                            className="text-xs font-semibold text-accent hover:underline"
+                          >
+                            View full profile →
+                          </Link>
+                          {a.cv && (
+                            <Link
+                              to={`/company/applicant/${a.id}/cv`}
+                              className="text-xs font-semibold text-accent hover:underline"
+                            >
+                              Open CV in full →
+                            </Link>
+                          )}
+                        </div>
                       </div>
                     </div>
                   )}
@@ -219,8 +226,6 @@ export default function CompanyInternships() {
           </ul>
         )}
       </main>
-
-      <Footer />
       <Toast message={toastMessage} onClose={clearToast} />
     </div>
   );

@@ -26,6 +26,68 @@ function StatusPill({ status }) {
   );
 }
 
+/*
+  Explains why an application has gone quiet.
+
+  A student whose company was deleted or suspended previously saw nothing at all
+  — the row either vanished or sat there looking normal forever. They are owed
+  both the fact and the reason.
+*/
+function CompanyStateNotice({ state, reason, until, at }) {
+  if (!state || state === 'active') return null;
+
+  const COPY = {
+    deleted: {
+      icon: 'bi-building-slash',
+      tone: 'border-danger/30 bg-danger/10 text-danger',
+      title: 'This company has been removed from the platform',
+      body: 'An administrator deleted this company account, so this listing no longer exists. Your application cannot progress any further.',
+    },
+    suspended: {
+      icon: 'bi-shield-exclamation',
+      tone: 'border-line bg-muted/60 text-content',
+      title: 'This company is currently suspended',
+      body: 'An administrator has suspended this company account. Your application is on hold until the suspension is lifted.',
+    },
+    listing_suspended: {
+      icon: 'bi-slash-circle',
+      tone: 'border-line bg-muted/60 text-content',
+      title: 'This listing has been suspended',
+      body: 'An administrator has suspended this particular listing. Your application is on hold.',
+    },
+  };
+
+  const copy = COPY[state];
+  if (!copy) return null;
+
+  return (
+    <div className={`mt-3 rounded-lg border px-3 py-2.5 text-xs ${copy.tone}`}>
+      <p className="flex items-center gap-1.5 font-bold">
+        <i className={`bi ${copy.icon}`} /> {copy.title}
+      </p>
+      <p className="mt-1 leading-relaxed opacity-90">{copy.body}</p>
+
+      {reason && (
+        <p className="mt-2 leading-relaxed">
+          <span className="font-semibold">Reason given: </span>{reason}
+        </p>
+      )}
+      {until && (
+        <p className="mt-1 opacity-90">
+          Expected back on {new Date(until).toLocaleDateString(undefined, {
+            year: 'numeric', month: 'long', day: 'numeric',
+          })}.
+        </p>
+      )}
+      {at && (
+        <p className="mt-1 opacity-75">
+          Removed {new Date(at).toLocaleDateString()}.
+        </p>
+      )}
+    </div>
+  );
+}
+
 export default function UserApplication() {
   const [searchParams, setSearchParams] = useSearchParams();
   const tab = searchParams.get('tab') === 'saved' ? 'saved' : 'applied';
@@ -97,7 +159,12 @@ export default function UserApplication() {
           ) : (
             <ul className="space-y-3">
               {apps.map((a) => (
-                <li key={a.id} className="rounded-xl border border-line bg-raised p-4">
+                <li
+                  key={a.id}
+                  className={`rounded-xl border bg-raised p-4 ${
+                    a.companyState === 'deleted' ? 'border-danger/30' : 'border-line'
+                  }`}
+                >
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="min-w-0">
                       <h3 className="truncate text-sm font-bold text-content">{a.title}</h3>
@@ -111,11 +178,12 @@ export default function UserApplication() {
 
                     <div className="flex flex-shrink-0 items-center gap-2">
                       <StatusPill status={a.status} />
+                      {/* Nothing left to withdraw from once the listing is gone. */}
                       <button
                         onClick={() => setConfirm(a)}
                         className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-subtle transition hover:text-danger"
                       >
-                        Withdraw
+                        {a.companyState === 'deleted' ? 'Remove' : 'Withdraw'}
                       </button>
                     </div>
                   </div>
@@ -125,10 +193,21 @@ export default function UserApplication() {
                       a.status === 'accepted' ? 'bg-accent-soft text-accent' : 'bg-danger/10 text-danger'
                     }`}>
                       {a.status === 'accepted'
-                        ? 'Congratulations! The company accepted your application — expect them to reach out by email or Telegram.'
+                        ? a.companyState === 'deleted'
+                          // An acceptance from a company that no longer exists is
+                          // the one case where the good news needs a caveat.
+                          ? 'You were accepted for this role, but the company has since been removed from the platform — you will not be contacted through Internship Finder.'
+                          : 'Congratulations! The company accepted your application — expect them to reach out by email or Telegram.'
                         : 'The company decided not to move forward this time. Keep applying — more listings are added often.'}
                     </div>
                   )}
+
+                  <CompanyStateNotice
+                    state={a.companyState}
+                    reason={a.companyStateReason}
+                    until={a.companyStateUntil}
+                    at={a.companyStateAt}
+                  />
                 </li>
               ))}
             </ul>

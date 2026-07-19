@@ -72,7 +72,7 @@ function Section({ title, children }) {
   );
 }
 
-export function InternshipPane({ job, onClose, actions }) {
+export function InternshipPane({ job, onClose, actions, detailTo }) {
   if (!job) return null;
 
   const skills = splitList(job.skills);
@@ -148,7 +148,7 @@ export function InternshipPane({ job, onClose, actions }) {
       {/* Everything else — education, benefits, culture, the full description —
           lives on the listing page rather than being crammed in here. */}
       <Link
-        to={`/internships/${job.id}`}
+        to={detailTo || `/internships/${job.id}`}
         className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg border border-accent px-3 py-2.5 text-xs font-bold text-accent transition-colors hover:bg-accent-soft"
       >
         View full details <i className="bi bi-arrow-right" />
@@ -225,6 +225,80 @@ export function CompanyPane({ company, listings = [], onClose, onSelectJob, acti
           <p className="mt-2 text-sm text-subtle">No open listings right now.</p>
         )}
       </Section>
+    </Shell>
+  );
+}
+
+
+/**
+ * A student, summarised.
+ *
+ * Companies browse people the same way they browse listings, so this uses the
+ * same Shell as the other two panes rather than opening a separate page.
+ */
+export function StudentPane({ student, onClose, actions, profileTo }) {
+  if (!student) return null;
+
+  const name = student.fullName || 'Student';
+  const skills = splitList(student.skills);
+
+  return (
+    <Shell title="Student details" onClose={onClose} actions={actions}>
+      <div className="flex items-start gap-4">
+        {student.profileImage ? (
+          <img
+            src={student.profileImage}
+            alt=""
+            className="h-16 w-16 flex-shrink-0 rounded-xl border border-line object-cover"
+          />
+        ) : (
+          <span className="grid h-16 w-16 flex-shrink-0 place-items-center rounded-xl bg-accent-soft text-xl font-black text-accent">
+            {name.charAt(0).toUpperCase()}
+          </span>
+        )}
+        <div className="min-w-0">
+          <h3 className="text-xl font-black tracking-tight text-content">{name}</h3>
+          <p className="mt-0.5 text-sm text-subtle">{student.education || 'Education not specified'}</p>
+        </div>
+      </div>
+
+      <div className="mt-4 flex flex-wrap gap-1.5">
+        <Tag icon="bi-mortarboard">{student.education}</Tag>
+        {skills.length > 0 && <Tag icon="bi-tools">{skills.length} skill{skills.length === 1 ? '' : 's'}</Tag>}
+      </div>
+
+      {student.bio && (
+        <Section title="About">
+          <p className="mt-1.5 whitespace-pre-line text-sm leading-relaxed text-subtle">{student.bio}</p>
+        </Section>
+      )}
+
+      {skills.length > 0 && (
+        <Section title="Skills">
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {skills.map((sk) => (
+              <span key={sk} className="rounded-md border border-line px-2 py-0.5 text-xs text-subtle">
+                {sk}
+              </span>
+            ))}
+          </div>
+        </Section>
+      )}
+
+      {!student.bio && skills.length === 0 && (
+        <p className="mt-6 text-sm text-subtle">
+          This student hasn&apos;t filled in their profile yet.
+        </p>
+      )}
+
+      {profileTo && (
+        <Link
+          to={profileTo}
+          className="mt-6 inline-flex items-center gap-1.5 text-sm font-bold text-accent hover:underline"
+        >
+          View full profile <i className="bi bi-arrow-right text-xs" />
+        </Link>
+      )}
     </Shell>
   );
 }

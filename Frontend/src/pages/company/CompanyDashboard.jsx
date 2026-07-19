@@ -1,6 +1,4 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import CompanyNavbar from '../../components/layout/CompanyNavbar';
-import CompanyFooter from '../../components/layout/CompanyFooter';
 import PostedJobsList from '../../components/company/Dashboard/postedjobsList';
 import SelectedJobView from '../../components/company/Dashboard/SelectedJobView';
 import useCompanyJobs from '../../hooks/useCompanyJobs';
@@ -33,8 +31,7 @@ export default function CompanyDashboard() {
   const activeJob = jobs.find((job) => job.id === selectedJobId) || jobs[0] || null;
 
   return (
-    <div className="min-h-screen bg-surface text-content flex flex-col justify-between selection:bg-accent selection:text-accent-ink">
-      <CompanyNavbar />
+    <div className="flex flex-1 flex-col bg-surface text-content">
 
       <main className="flex-1 mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {loading && jobs.length === 0 ? (
@@ -73,8 +70,6 @@ export default function CompanyDashboard() {
           </div>
         )}
       </main>
-
-      <CompanyFooter />
     </div>
   );
 }

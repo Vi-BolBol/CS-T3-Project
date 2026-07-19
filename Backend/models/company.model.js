@@ -65,6 +65,31 @@ export const findOtherCompanies = (excludeId, limit = 8) =>
     take: limit,
   });
 
+/*
+  Browsable student directory.
+
+  Company Search only ever returned students matching a typed query, so Explore
+  had nothing to show on arrival. Suspended and inactive accounts are excluded —
+  a company should not be able to reach out to an account that is locked out.
+*/
+export const findStudentDirectory = (limit = 60) =>
+  prisma.studentProfile.findMany({
+    where: { user: { status: "active" } },
+    // Only fields that actually exist on StudentProfile — there is no
+    // `university` or `location` column on this model.
+    select: {
+      id: true,
+      userId: true,
+      fullName: true,
+      skills: true,
+      education: true,
+      bio: true,
+      profileImage: true,
+    },
+    orderBy: { id: "desc" },
+    take: Number(limit),
+  });
+
 /** Unified search across students, companies, and internships. */
 export const searchAll = async (q) => {
   const like = { contains: q, mode: "insensitive" };

@@ -1,49 +1,65 @@
 import { useState, useEffect, useCallback } from 'react';
 
-/* Drives the badge on the Applications nav item.
-   Counts applications whose status changed to accepted/rejected and
-   haven't been seen yet. Reads the same local store as useMyApplications.
-   TODO(backend): replace with a `seen` flag on GET /api/applications/mine.
-   Keep the { count, refresh, clear } shape and the navbar won't change. */
-const APPS_KEY = 'if-applications';
-const SEEN_KEY = 'if-app-seen';
+/*
+  Badge on the Applications nav item.
 
-function computeCount() {
-  try {
-    const apps = JSON.parse(window.localStorage.getItem(APPS_KEY) || '[]');
-    const seen = JSON.parse(window.localStorage.getItem(SEEN_KEY) || '[]');
-    return apps.filter(
-      (a) => (a.status === 'accepted' || a.status === 'rejected') && !seen.includes(a.id)
-    ).length;
-  } catch {
-    return 0;
-  }
-}
+  This used to count from a localStorage key (`if-applications`) that nothing
+  ever wrote to — `useMyApplications` fetches from the API and never mirrored its
+  result there. The count was therefore permanently zero, so a student was never
+  told their application had been accepted or rejected.
+
+  It is now server-backed: `seenAt` lives on the application row, which also
+  means the badge follows the student across devices instead of resetting.
+
+  Counts both kinds of news:
+    - an accept/reject decision they haven't opened yet
+    - a listing that was removed out from under them (company deleted/suspended)
+*/
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const POLL_MS = 60000;
+
+const authHeaders = () => {
+  const token = localStorage.getItem('token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
 
 export default function useApplicationAlerts() {
   const [count, setCount] = useState(0);
 
-  const refresh = useCallback(() => setCount(computeCount()), []);
+  const refresh = useCallback(async () => {
+    if (!localStorage.getItem('token')) { setCount(0); return; }
+    try {
+      const res = await fetch(`${BASE_URL}/api/applications/alerts`, { headers: authHeaders() });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data?.success) setCount(Number(data.unseen) || 0);
+    } catch { /* offline — leave the last known count alone */ }
+  }, []);
 
   useEffect(() => {
     refresh();
+    const timer = setInterval(refresh, POLL_MS);
     const onChange = () => refresh();
-    window.addEventListener('storage', onChange);
     window.addEventListener('if-applications-changed', onChange);
+    window.addEventListener('focus', onChange);
     return () => {
-      window.removeEventListener('storage', onChange);
+      clearInterval(timer);
       window.removeEventListener('if-applications-changed', onChange);
+      window.removeEventListener('focus', onChange);
     };
   }, [refresh]);
 
-  // Called when the student opens the Applications page.
-  const clear = useCallback(() => {
+  /** Called when the student opens the Applications page. */
+  const clear = useCallback(async () => {
+    setCount(0);   // optimistic — the badge should vanish on the click, not after a round trip
     try {
-      const apps = JSON.parse(window.localStorage.getItem(APPS_KEY) || '[]');
-      window.localStorage.setItem(SEEN_KEY, JSON.stringify(apps.map((a) => a.id)));
-    } catch { /* ignore */ }
-    setCount(0);
-  }, []);
+      await fetch(`${BASE_URL}/api/applications/seen`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      });
+    } catch { /* it will clear on the next successful call */ }
+    refresh();
+  }, [refresh]);
 
   return { count, refresh, clear };
 }

@@ -175,6 +175,12 @@ export const getInternshipService = async (id, requester = null) => {
     return { success: false, message: "Internship not found" };
   }
 
+  // A suspended listing has been pulled by an admin. The owning company still
+  // sees it (with the reason, so they know why), the public does not.
+  if (internship.status === "suspended" && !isOwner && !isAdmin) {
+    return { success: false, message: "This listing is no longer available" };
+  }
+
   if (isOwner || isAdmin) {
     return { success: true, internship };
   }

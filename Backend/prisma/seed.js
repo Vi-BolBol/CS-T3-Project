@@ -186,6 +186,11 @@ async function main() {
         internshipId: internships[i % internships.length].id,
         cvId: cvs[i % cvs.length].id,
         status: appStatuses[i % appStatuses.length],
+        // A decided application needs a decision timestamp; seenAt stays null so
+        // the seeded student actually sees the notification badge on first login.
+        decidedAt: ["accepted", "rejected"].includes(appStatuses[i % appStatuses.length])
+          ? new Date()
+          : null,
       },
     });
     applications.push(application);

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, useParams, useSearchParams } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useParams, useSearchParams, useLocation } from "react-router-dom";
 
 import Home from "../pages/Home";
 import About from "../pages/About";
@@ -18,10 +18,13 @@ import CompanyInternships from "../pages/company/CompanyInternships";
 import CompanySearch from "../pages/company/CompanySearch";
 import CreateInternship from "../pages/company/CreateInternship";
 import ApplicantCVReview from "../pages/company/ApplicantCVReview";
+import CompanyExplore from "../pages/company/CompanyExplore";
+import CompanyLayout from "../components/layout/CompanyLayout";
 
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import AdminUsers from "../pages/admin/AdminUsers";
 import AdminAuditLogs from "../pages/admin/AdminAuditLogs";
+import AdminUserDetail from "../pages/admin/AdminUserDetail";
 
 import UserHome from "../pages/user/UserHome";
 import BrowseInternships from "../pages/user/BrowseInternships";
@@ -32,6 +35,8 @@ import UserApplication from "../pages/user/UserApplication";
 import StudentNavbar from "../components/layout/StudentNavbar";
 import StudentFooter from "../components/layout/StudentFooter";
 import RequireRole from "../components/shared/RequireRole";
+import AccountBlockedNotice from "../components/shared/AccountBlockedNotice";
+import useSessionGuard from "../hooks/useSessionGuard";
 import { CVBuilderProvider } from "../context/CVBuilderContext";
 import CVChoice from "../pages/cv/CVChoice";
 import CVUploadReview from "../pages/cv/CVUploadReview";
@@ -80,6 +85,32 @@ function CVBuilderRoutes() {
   );
 }
 
+/*
+  Re-checks the signed-in account against the database on every navigation.
+
+  Without this, an admin's "Suspend" or "Delete" had no effect on anyone already
+  signed in until their JWT expired — up to a full day of continued access. The
+  server enforces the same thing on sensitive routes (`enforceStatus`); this is
+  what turns it into something the user actually SEES rather than a string of
+  silent 403s.
+*/
+function SessionGate({ children }) {
+  const location = useLocation();
+  const { blocked, recheck, dismiss } = useSessionGuard(location.pathname);
+
+  if (blocked) {
+    return (
+      <AccountBlockedNotice
+        reason={blocked.reason}
+        suspension={blocked.suspension}
+        onRecheck={recheck}
+        onDismiss={dismiss}
+      />
+    );
+  }
+  return children;
+}
+
 const student = (el) => <RequireRole roles={["student"]}>{el}</RequireRole>;
 const company = (el) => <RequireRole roles={["company"]}>{el}</RequireRole>;
 const admin   = (el) => <RequireRole roles={["admin"]}>{el}</RequireRole>;
@@ -87,6 +118,7 @@ const admin   = (el) => <RequireRole roles={["admin"]}>{el}</RequireRole>;
 export default function AppRoute() {
   return (
     <BrowserRouter>
+      <SessionGate>
       <Routes>
         {/* ---------- Public (no auth) ---------- */}
         <Route path="/" element={<Home />} />
@@ -127,22 +159,37 @@ export default function AppRoute() {
             the public company detail now lives on /explore, so there is no
             dynamic /company/:id left to collide with /company/home. */}
         <Route path="/company" element={<Navigate to="/explore?type=companies" replace />} />
-        <Route path="/company/home" element={company(<CompanyHome />)} />
-        <Route path="/company/dashboard" element={company(<CompanyDashboard />)} />
-        <Route path="/company/profile" element={company(<CompanyProfile />)} />
-        <Route path="/company/settings" element={company(<CompanySetting />)} />
-        <Route path="/company/internships" element={company(<CompanyInternships />)} />
-        <Route path="/company/search" element={company(<CompanySearch />)} />
-        <Route path="/company/create-internship" element={company(<CreateInternship />)} />
-        <Route path="/company/applicant/:applicantId/cv" element={company(<ApplicantCVReview />)} />
+
+        {/* Nested under one shell so the navbar mounts ONCE and keeps its state
+            across tabs. Rendering it per-page remounted it on every navigation,
+            which cleared the search box and re-fetched the applicant badge. */}
+        <Route element={company(<CompanyLayout />)}>
+          <Route path="/company/home" element={<CompanyHome />} />
+          <Route path="/company/dashboard" element={<CompanyDashboard />} />
+          <Route path="/company/profile" element={<CompanyProfile />} />
+          <Route path="/company/settings" element={<CompanySetting />} />
+          <Route path="/company/internships" element={<CompanyInternships />} />
+          <Route path="/company/explore" element={<CompanyExplore />} />
+          {/* Full listing detail, rendered inside the company shell so the
+              company keeps its own navbar instead of the public one. */}
+          <Route path="/company/listing/:id" element={<InternshipDetail embedded />} />
+          <Route path="/company/search" element={<CompanySearch />} />
+          <Route path="/company/create-internship" element={<CreateInternship />} />
+          <Route path="/company/applicant/:applicantId/cv" element={<ApplicantCVReview />} />
+          {/* A company opening an applicant's profile stays inside its own shell,
+              so it keeps the company navbar instead of being handed the student one. */}
+          <Route path="/company/applicant/:id/profile" element={<UserProfile />} />
+        </Route>
 
         {/* ---------- Admin ---------- */}
         <Route path="/admin" element={admin(<AdminDashboard />)} />
         <Route path="/admin/users" element={admin(<AdminUsers />)} />
+        <Route path="/admin/users/:id" element={admin(<AdminUserDetail />)} />
         <Route path="/admin/audit" element={admin(<AdminAuditLogs />)} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>
+      </SessionGate>
     </BrowserRouter>
   );
 }

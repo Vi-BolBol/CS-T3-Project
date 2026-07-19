@@ -26,6 +26,7 @@ export const updateMyCompany = (body) =>
 export const getMyStats     = () => call('/api/company/stats');
 export const getConnections = () => call('/api/company/connections');
 export const searchAll      = (q) => call(`/api/company/search?q=${encodeURIComponent(q)}`);
+export const getStudentDirectory = () => call('/api/company/students');
 
 /* Applicants (built in Session B) */
 export const getCompanyApplications = () => call('/api/applications/company');

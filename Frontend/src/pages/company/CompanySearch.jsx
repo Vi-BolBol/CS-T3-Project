@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import CompanyNavbar from '../../components/layout/CompanyNavbar';
-import Footer from '../../components/layout/CompanyFooter';
 import { searchAll } from '../../api/companyApi';
 
 const TABS = [
@@ -41,8 +39,7 @@ export default function CompanySearch() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-surface">
-      <CompanyNavbar />
+    <div className="flex flex-1 flex-col bg-surface">
 
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
         <h1 className="mb-1 text-2xl font-black tracking-tight text-content">Search</h1>
@@ -90,7 +87,7 @@ export default function CompanySearch() {
           <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-raised">
             {tab === 'internships' && results.internships.map((i) => (
               <li key={i.id}>
-                <Link to={`/explore?job=${i.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-muted">
+                <Link to={`/company/explore?type=internships&job=${i.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-muted">
                   <i className="bi bi-briefcase text-faint" />
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-bold text-content">{i.title}</p>
@@ -104,7 +101,7 @@ export default function CompanySearch() {
 
             {tab === 'students' && results.students.map((s) => (
               <li key={s.id}>
-                <Link to={`/user/profile/${s.userId}`} className="flex items-center gap-3 px-4 py-3 hover:bg-muted">
+                <Link to={`/company/applicant/${s.userId}/profile`} className="flex items-center gap-3 px-4 py-3 hover:bg-muted">
                   {s.profileImage ? (
                     <img src={s.profileImage} alt="" className="h-9 w-9 rounded-full border border-line object-cover" />
                   ) : (
@@ -122,7 +119,7 @@ export default function CompanySearch() {
 
             {tab === 'companies' && results.companies.map((c) => (
               <li key={c.id}>
-                <Link to={`/explore?type=companies&company=${c.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-muted">
+                <Link to={`/company/explore?type=companies&company=${c.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-muted">
                   {c.logoUrl ? (
                     <img src={c.logoUrl} alt="" className="h-9 w-9 rounded-lg border border-line object-cover" />
                   ) : (
@@ -142,8 +139,6 @@ export default function CompanySearch() {
           </ul>
         )}
       </main>
-
-      <Footer />
     </div>
   );
 }

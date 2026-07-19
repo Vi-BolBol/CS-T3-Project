@@ -4,6 +4,7 @@ import {
   getCompanyStats,
   findOtherCompanies,
   searchAll,
+  findStudentDirectory,
 } from "../models/company.model.js";
 import { logAction } from "../utils/audit.js";
 
@@ -51,6 +52,12 @@ export const getConnectionsService = async (userId) => {
   const profile = await findCompanyProfileByUserId(userId);
   const companies = await findOtherCompanies(profile?.id);
   return { success: true, companies };
+};
+
+/** Powers the Explore > Students tab. */
+export const getStudentDirectoryService = async () => {
+  const students = await findStudentDirectory();
+  return { success: true, students };
 };
 
 export const searchService = async (q) => {

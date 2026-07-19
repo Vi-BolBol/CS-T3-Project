@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import AdminNavbar from '../../components/layout/AdminNavbar';
 import Toast from '../../components/shared/Toast';
-import ConfirmDialog from '../../components/shared/ConfirmDialog';
+import SuspendUserDialog from '../../components/admin/SuspendUserDialog';
+import DeleteUserDialog from '../../components/admin/DeleteUserDialog';
 import useToast from '../../hooks/useToast';
 import { getUsers, setUserStatus, deleteUser } from '../../api/adminApi';
 
@@ -16,8 +18,11 @@ export default function AdminUsers() {
   const [filters, setFilters] = useState({ role: '', status: '', search: '' });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [confirm, setConfirm] = useState(null);
+  const [suspendTarget, setSuspendTarget] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [busy, setBusy] = useState(false);
   const { message: toastMessage, showToast, clearToast } = useToast();
+  const navigate = useNavigate();
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -30,17 +35,37 @@ export default function AdminUsers() {
 
   useEffect(() => { load(); }, [load]);
 
-  const changeStatus = async (user, status) => {
-    const res = await setUserStatus(user.id, status);
-    showToast(res.success ? `${user.email} → ${status}` : res.message);
+  // Reactivating needs no extra input; suspending goes through the dialog so a
+  // reason and duration are always captured.
+  const reactivate = async (user) => {
+    const res = await setUserStatus(user.id, 'active');
+    showToast(res.success ? `${user.email} reactivated` : res.message);
     if (res.success) load();
   };
 
-  const doDelete = async () => {
-    const res = await deleteUser(confirm.id);
-    showToast(res.success ? `${confirm.email} deleted` : res.message);
-    setConfirm(null);
-    if (res.success) load();
+  const doSuspend = async ({ reason, days }) => {
+    setBusy(true);
+    const res = await setUserStatus(suspendTarget.id, 'suspended', { reason, days });
+    setBusy(false);
+    showToast(res.message);
+    if (res.success) { setSuspendTarget(null); load(); }
+  };
+
+  const doDelete = async ({ reason }) => {
+    setBusy(true);
+    const res = await deleteUser(deleteTarget.id, { reason });
+    setBusy(false);
+    if (res.success) {
+      showToast(
+        res.tombstoned
+          ? `${deleteTarget.email} deleted. ${res.tombstoned} application(s) marked as removed.`
+          : `${deleteTarget.email} deleted.`
+      );
+      setDeleteTarget(null);
+      load();
+    } else {
+      showToast(res.message);
+    }
   };
 
   const selectCls = 'rounded-lg border border-line bg-muted px-3 py-2 text-xs text-content focus:border-accent focus:outline-none';
@@ -52,7 +77,7 @@ export default function AdminUsers() {
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
         <header className="mb-6">
           <h1 className="text-2xl font-black tracking-tight text-content">Users</h1>
-          <p className="mt-1 text-sm text-subtle">Suspend, reactivate, or remove accounts.</p>
+          <p className="mt-1 text-sm text-subtle">Click any row to inspect an account\u2019s activity before acting on it.</p>
         </header>
 
         <div className="mb-4 flex flex-wrap gap-2">
@@ -104,7 +129,11 @@ export default function AdminUsers() {
                   const name = u.studentProfile?.fullName || u.companyProfile?.companyName;
                   const isAdmin = u.role === 'admin';
                   return (
-                    <tr key={u.id}>
+                    <tr
+                      key={u.id}
+                      onClick={() => navigate(`/admin/users/${u.id}`)}
+                      className="cursor-pointer transition hover:bg-muted/40"
+                    >
                       <td className="px-4 py-3">
                         <p className="font-semibold text-content">{name || u.email}</p>
                         {name && <p className="text-xs text-subtle">{u.email}</p>}
@@ -120,24 +149,34 @@ export default function AdminUsers() {
                       <td className="px-4 py-3 text-xs text-subtle">
                         {new Date(u.createdAt).toLocaleDateString()}
                       </td>
-                      <td className="px-4 py-3">
+                      {/* stopPropagation everywhere: the row itself navigates to the
+                          detail page, and an action button must not do both. */}
+                      <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                         <div className="flex justify-end gap-1.5">
+                          <Link
+                            to={`/admin/users/${u.id}`}
+                            className="rounded-lg border border-line px-2.5 py-1 text-xs font-semibold text-subtle transition hover:text-accent"
+                            title="View this account's activity and content"
+                          >
+                            <i className="bi bi-clock-history" /> Activity
+                          </Link>
+
                           {isAdmin ? (
-                            <span className="text-xs text-faint">Protected</span>
+                            <span className="px-1 text-xs text-faint">Protected</span>
                           ) : (
                             <>
                               {u.status === 'suspended' ? (
-                                <button onClick={() => changeStatus(u, 'active')}
+                                <button onClick={() => reactivate(u)}
                                   className="rounded-lg border border-line px-2.5 py-1 text-xs font-semibold text-subtle hover:text-accent">
                                   Reactivate
                                 </button>
                               ) : (
-                                <button onClick={() => changeStatus(u, 'suspended')}
+                                <button onClick={() => setSuspendTarget(u)}
                                   className="rounded-lg border border-line px-2.5 py-1 text-xs font-semibold text-subtle hover:text-warn">
                                   Suspend
                                 </button>
                               )}
-                              <button onClick={() => setConfirm(u)}
+                              <button onClick={() => setDeleteTarget(u)}
                                 className="rounded-lg border border-line px-2.5 py-1 text-xs font-semibold text-subtle hover:text-danger">
                                 Delete
                               </button>
@@ -155,13 +194,19 @@ export default function AdminUsers() {
       </main>
 
       <Toast message={toastMessage} onClose={clearToast} />
-      <ConfirmDialog
-        open={Boolean(confirm)}
-        title="Delete this user?"
-        message={confirm ? `This permanently deletes ${confirm.email} and cascades to their applications, CVs, and listings. This cannot be undone.` : ''}
-        confirmLabel="Delete"
+      <SuspendUserDialog
+        open={Boolean(suspendTarget)}
+        user={suspendTarget}
+        busy={busy}
+        onConfirm={doSuspend}
+        onCancel={() => setSuspendTarget(null)}
+      />
+      <DeleteUserDialog
+        open={Boolean(deleteTarget)}
+        user={deleteTarget}
+        busy={busy}
         onConfirm={doDelete}
-        onCancel={() => setConfirm(null)}
+        onCancel={() => setDeleteTarget(null)}
       />
     </div>
   );

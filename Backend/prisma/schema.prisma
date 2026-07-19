@@ -35,6 +35,7 @@ enum InternshipStatus {
   open
   closed
   draft
+  suspended
 }
 
 enum ApplicationStatus {
@@ -50,6 +51,14 @@ model User {
   passwordHash String   @db.VarChar(255)
   role         UserRole
   status       UserStatus @default(active)
+
+  // Suspension metadata. `status` alone could not answer "why?" or "until when?",
+  // so the admin panel had nothing to show the suspended user. suspendedUntil is
+  // null for an indefinite suspension.
+  suspendedAt      DateTime?
+  suspendedUntil   DateTime?
+  suspensionReason String?
+
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -140,6 +149,7 @@ model Internship {
   companyCulture     String?
   companyEmailLink   String?              @db.VarChar(255)
   telegramLink       String?              @db.VarChar(255)
+  suspensionReason   String?
   createdAt          DateTime             @default(now())
 
   company          CompanyProfile    @relation(fields: [companyId], references: [id], onDelete: Cascade)
@@ -152,15 +162,32 @@ model Internship {
 model Application {
   id           Int               @id @default(autoincrement())
   studentId    Int
-  internshipId Int
+  // Nullable so the application SURVIVES the internship being deleted. Without
+  // this the row cascaded away and the student silently lost the record of an
+  // application they had already been accepted or rejected for.
+  internshipId Int?
   cvId         Int?
   status       ApplicationStatus @default(pending)
+
+  // Tombstone snapshot. Written at delete time, because once the company row is
+  // gone there is nothing left to join to.
+  removedType     String?   @db.VarChar(20)   // "deleted" — suspension is derived live
+  removedReason   String?
+  removedAt       DateTime?
+  internshipTitle String?   @db.VarChar(255)
+  companyName     String?   @db.VarChar(200)
+
+  // Drives the Applications badge. Server-side so it survives a device change;
+  // the old localStorage mirror was never written to and always counted zero.
+  decidedAt DateTime?
+  seenAt    DateTime?
+
   appliedAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
 
-  student    User       @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  internship Internship @relation(fields: [internshipId], references: [id], onDelete: Cascade)
-  cv         Cv?        @relation(fields: [cvId], references: [id], onDelete: SetNull)
+  student    User        @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  internship Internship? @relation(fields: [internshipId], references: [id], onDelete: SetNull)
+  cv         Cv?         @relation(fields: [cvId], references: [id], onDelete: SetNull)
 
   @@unique([studentId, internshipId])
   @@map("applications")

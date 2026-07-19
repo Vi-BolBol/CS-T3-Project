@@ -276,7 +276,14 @@ function OtherRoleView({ job, role }) {
 
 /* ---------- Page ---------- */
 
-export default function InternshipDetail() {
+/**
+ * `embedded` is set when this page is rendered INSIDE a role shell that already
+ * supplies its own navbar and footer (the company area does this). Without it,
+ * a signed-in company opening a listing got the public signed-out header — the
+ * shell was chosen by "is this a student?", so every other role fell through to
+ * the anonymous one.
+ */
+export default function InternshipDetail({ embedded = false }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const role = readRole();
@@ -301,12 +308,16 @@ export default function InternshipDetail() {
   const isStudent = role === 'student';
   const Nav = isStudent ? StudentNavbar : Header;
   const Foot = isStudent ? StudentFooter : PublicFooter;
-  const backTo = isStudent ? '/user/internships' : '/explore';
+  const backTo = embedded
+    ? '/company/explore?type=internships'
+    : isStudent
+    ? '/user/internships'
+    : '/explore';
 
   return (
-    <div className="flex min-h-screen flex-col bg-surface">
-      {!isStudent && <AnimatedBackground />}
-      <Nav />
+    <div className={`flex flex-col bg-surface ${embedded ? 'flex-1' : 'min-h-screen'}`}>
+      {!isStudent && !embedded && <AnimatedBackground />}
+      {!embedded && <Nav />}
 
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
         <button
@@ -346,7 +357,7 @@ export default function InternshipDetail() {
         )}
       </main>
 
-      <Foot />
+      {!embedded && <Foot />}
     </div>
   );
 }

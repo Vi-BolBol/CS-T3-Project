@@ -25,32 +25,74 @@ function read() {
 }
 
 function write(next) {
-  localStorage.setItem(KEY, JSON.stringify(next));
+  // Guarded on purpose. This key used to be written with the whole CV object
+  // (photo included) stuffed into `source`, which blew the localStorage quota
+  // and threw — killing the Finish CV handler before it could navigate.
+  try {
+    localStorage.setItem(KEY, JSON.stringify(next));
+  } catch (err) {
+    console.warn('[cv-status] could not persist status:', err?.name || err);
+  }
   window.dispatchEvent(new Event('if-cv-changed'));
 }
 
-/** Save the CV to the database. Call when a CV is built or uploaded. */
-export async function markCvCreated(source = 'built') {
-  write({ ...read(), hasCv: true, source, updatedAt: new Date().toISOString() });
+/**
+ * Marks a CV as present locally.
+ * `source` is a short string ('built' | 'uploaded') — nothing else.
+ */
+export function markCvCreated(source = 'built') {
+  const label = typeof source === 'string' ? source : 'built';
+  write({ ...read(), hasCv: true, source: label, updatedAt: new Date().toISOString() });
+}
+
+/**
+ * Persists the CV to the database.
+ *
+ * Takes the CV object directly. It previously aliased `markCvCreated`, whose
+ * only parameter is a *source string* — so callers passing `cvData` were writing
+ * the entire CV (base64 photo and all) into the small status key. On any CV with
+ * a photo that threw QuotaExceededError, the async handler rejected silently,
+ * and the "Finish CV" button did nothing at all.
+ *
+ * Falls back to the locally mirrored CV when called with no argument.
+ */
+export async function saveCvToServer(cvData, source = 'built') {
+  let payload = cvData;
+  if (!payload || typeof payload !== 'object') {
+    try { payload = JSON.parse(localStorage.getItem(CV_KEY) || 'null'); }
+    catch { payload = null; }
+  }
+
+  if (!payload) {
+    return { success: false, message: 'There is no CV to save yet.' };
+  }
+
+  // Mirror locally first so the CV survives a failed request.
+  try { localStorage.setItem(CV_KEY, JSON.stringify(payload)); }
+  catch (err) { console.warn('[cv] could not mirror CV locally:', err?.name || err); }
+  markCvCreated(source);
 
   try {
-    const userCvData = JSON.parse(localStorage.getItem(CV_KEY) || 'null');
-    if (!userCvData) return { success: false };
     const res = await fetch(`${BASE_URL}/api/cv`, {
       method: 'POST',
       headers: authHeaders(),
-      body: JSON.stringify({ userCvData }),
+      body: JSON.stringify({ userCvData: payload }),
     });
-    const data = await res.json();
-    return { success: Boolean(data.success) };
+
+    if (res.status === 401) {
+      return { success: false, message: 'Your session has expired. Please log in again.' };
+    }
+
+    const data = await res.json().catch(() => ({}));
+    return {
+      success: Boolean(data.success),
+      message: data.message || (res.ok ? '' : 'Could not save your CV to the server.'),
+    };
   } catch {
     // Offline / server down — the local mirror still marks the CV as present.
-    return { success: false };
+    return { success: false, message: 'Saved on this device only — the server was unreachable.' };
   }
 }
-
-/** Alias kept for the CV pages that import this name. */
-export const saveCvToServer = markCvCreated;
 
 export function markCvSynced() {
   write({ ...read(), syncedToProfile: true });

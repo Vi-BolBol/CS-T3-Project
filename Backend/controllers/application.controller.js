@@ -5,6 +5,8 @@ import {
   getInternshipApplicantsService,
   getCompanyApplicationsService,
   decideApplicationService,
+  getMyApplicationAlertsService,
+  markApplicationsSeenService,
 } from "../services/application.service.js";
 
 /* Controllers only touch req/res — no business logic, no Prisma. */
@@ -61,4 +63,18 @@ export const decideApplication = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+};
+
+/** Badge count for the Applications nav item. */
+export const getMyAlerts = async (req, res, next) => {
+  try {
+    return res.status(200).json(await getMyApplicationAlertsService(req.user.id));
+  } catch (err) { next(err); }
+};
+
+/** Clears the badge — called when the student opens the Applications page. */
+export const markSeen = async (req, res, next) => {
+  try {
+    return res.status(200).json(await markApplicationsSeenService(req.user.id));
+  } catch (err) { next(err); }
 };

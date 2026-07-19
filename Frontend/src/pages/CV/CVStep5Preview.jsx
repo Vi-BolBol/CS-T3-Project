@@ -34,15 +34,26 @@ function CVStep5Preview() {
   const [activeTemplate, setActiveTemplate] = useState('classic');
   const [activePalette, setActivePalette] = useState(COLOR_PALETTES[0]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isFinishing, setIsFinishing] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
+  // Finishing must always land the user on the dashboard. A save failure is
+  // worth telling them about, but it is not a reason to trap them on this page —
+  // which is exactly what used to happen when the save threw.
   const handleFinish = async () => {
-    markStepComplete(5);
-    const res = await saveCvToServer(cvData);
-    if (!res.success) {
-      setToastMessage?.(res.message || 'Could not save your CV to the server.');
+    if (isFinishing) return;
+    setIsFinishing(true);
+    try {
+      markStepComplete(5);
+      const res = await saveCvToServer(cvData, 'built');
+      if (!res?.success && res?.message) setToastMessage(res.message);
+    } catch (err) {
+      console.error('Finish CV failed:', err);
+      setToastMessage('Saved on this device — we could not reach the server.');
+    } finally {
+      setIsFinishing(false);
+      navigate('/cv/manage');
     }
-    navigate('/cv/manage');
   };
 
   const handleDownload = async () => {
@@ -94,9 +105,14 @@ function CVStep5Preview() {
 
             <button
               onClick={handleFinish}
-              className="w-full py-2.5 bg-accent text-accent-ink font-bold rounded-lg text-sm hover:bg-accent transition shadow-md shadow-accent/20"
+              disabled={isFinishing}
+              className={`w-full py-2.5 font-bold rounded-lg text-sm transition shadow-md shadow-accent/20 ${
+                isFinishing
+                  ? 'bg-muted text-faint cursor-not-allowed'
+                  : 'bg-accent text-accent-ink hover:bg-accent'
+              }`}
             >
-              ✓ Finish CV
+              {isFinishing ? 'Saving…' : '✓ Finish CV'}
             </button>
 
             <button

@@ -1,6 +1,4 @@
 import { useState, useEffect } from 'react';
-import CompanyNavbar from '../../components/layout/CompanyNavbar';
-import Footer from '../../components/layout/CompanyFooter';
 import Toast from '../../components/shared/Toast';
 import useToast from '../../hooks/useToast';
 import { getMyCompany, updateMyCompany } from '../../api/companyApi';
@@ -50,8 +48,7 @@ export default function CompanyProfile() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen flex-col bg-surface">
-        <CompanyNavbar />
+      <div className="flex flex-1 flex-col bg-surface">
         <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8">
           <div className="h-64 animate-pulse rounded-2xl border border-line bg-muted" />
         </main>
@@ -60,8 +57,7 @@ export default function CompanyProfile() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-surface">
-      <CompanyNavbar />
+    <div className="flex flex-1 flex-col bg-surface">
 
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
         <section className="overflow-hidden rounded-2xl border border-line bg-raised">
@@ -194,8 +190,6 @@ export default function CompanyProfile() {
           </div>
         </section>
       </main>
-
-      <Footer />
       <Toast message={toastMessage} onClose={clearToast} />
     </div>
   );

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import Navbar from '../../components/layout/StudentNavbar';
 import Footer from '../../components/layout/StudentFooter';
 import Toast from '../../components/shared/Toast';
@@ -49,6 +49,19 @@ const inputCls =
 export default function UserProfile() {
   const { id } = useParams();          // present => viewing someone else
   const isOwner = !id;
+  const navigate = useNavigate();
+
+  /*
+    Companies and admins reach this page from an applicant row or the user table.
+    It used to render the STUDENT navbar for them regardless of who was looking,
+    which meant a company reviewing an applicant saw student navigation and had
+    no way back to where they came from. The company shell supplies its own
+    navbar, so here we only render one when the viewer is a student.
+  */
+  let viewerRole = null;
+  try { viewerRole = JSON.parse(localStorage.getItem('user') || 'null')?.role || null; }
+  catch { viewerRole = null; }
+  const viewerIsStudent = viewerRole === 'student';
 
   const { message: toastMessage, showToast, clearToast } = useToast();
   const { hasCv, syncedToProfile, markCvSynced, getCvAsProfile } = useCvStatus();
@@ -101,10 +114,23 @@ export default function UserProfile() {
   const skills = (profile.skills || '').split(',').map((s) => s.trim()).filter(Boolean);
 
   return (
-    <div className="flex min-h-screen flex-col bg-surface">
-      <Navbar />
+    <div className={`flex flex-col bg-surface ${viewerIsStudent ? "min-h-screen" : "flex-1"}`}>
+      {viewerIsStudent && <Navbar />}
 
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
+        {/* Viewing someone else's profile is always a detour from somewhere —
+            an applicant row, a search result, the admin user table. Without a
+            way back, the only escape was the browser button. */}
+        {!isOwner && (
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="mb-5 inline-flex items-center gap-1.5 text-xs font-semibold text-subtle transition hover:text-content"
+          >
+            <i className="bi bi-arrow-left" /> Back
+          </button>
+        )}
+
         {/* CV sync prompt — owner only */}
         {isOwner && hasCv && !syncedToProfile && (
           <div className="mb-6 flex flex-col gap-3 rounded-xl border border-accent/40 bg-accent-soft p-4 sm:flex-row sm:items-center sm:justify-between">

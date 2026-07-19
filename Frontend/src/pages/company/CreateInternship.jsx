@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import CompanyNavbar from '../../components/layout/CompanyNavbar';
-import CompanyFooter from '../../components/layout/CompanyFooter';
 import useCompanyJobs from '../../hooks/useCompanyJobs';
 import useToast from '../../hooks/useToast';
 import Toast from '../../components/shared/Toast';
@@ -61,10 +59,9 @@ export default function CreateInternship() {
   };
 
   return (
-    <div className="min-h-screen bg-surface text-content selection:bg-accent selection:text-accent-ink flex flex-col justify-between">
-      <CompanyNavbar />
+    <div className="flex flex-1 flex-col bg-surface text-content">
 
-      <main className="min-h-screen w-full flex flex-col px-4 pt-4 pb-12 sm:px-6 lg:px-8">
+      <main className="w-full flex flex-1 flex-col px-4 pt-4 pb-12 sm:px-6 lg:px-8">
         <WizardProgress currentStep={step} />
 
         <div className="flex-1 flex flex-col items-center justify-center">
@@ -93,8 +90,6 @@ export default function CreateInternship() {
           )}
         </div>
       </main>
-
-      <CompanyFooter />
       <Toast message={toastMessage} onClose={clearToast} />
     </div>
   );

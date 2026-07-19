@@ -4,6 +4,7 @@ import {
   getMyStatsService,
   getConnectionsService,
   searchService,
+  getStudentDirectoryService,
 } from "../services/company.service.js";
 
 export const getMyCompany = async (req, res, next) => {
@@ -36,5 +37,12 @@ export const getConnections = async (req, res, next) => {
 export const search = async (req, res, next) => {
   try {
     return res.status(200).json(await searchService(req.query.q));
+  } catch (err) { next(err); }
+};
+
+/** Browsable student directory for the Explore page. */
+export const getStudentDirectory = async (req, res, next) => {
+  try {
+    return res.status(200).json(await getStudentDirectoryService());
   } catch (err) { next(err); }
 };

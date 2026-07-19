@@ -18,6 +18,8 @@ export default function CompanyNavbar() {
     { label: 'Home', path: '/company/home' },
     { label: 'Dashboard', path: '/company/dashboard' },
     { label: 'Internships', path: '/company/internships', alert: true },
+    // Explore is browsing (who's out there); Search is lookup (find this thing).
+    { label: 'Explore', path: '/company/explore' },
   ];
 
   // Live suggestions across students, companies, and internships.
@@ -42,15 +44,15 @@ export default function CompanyNavbar() {
   const flat = useMemo(() => [
     ...(suggestions.internships || []).slice(0, 3).map((i) => ({
       key: `i-${i.id}`, icon: 'bi-briefcase', label: i.title,
-      sub: i.company?.companyName || 'Internship', to: `/explore?job=${i.id}`,
+      sub: i.company?.companyName || 'Internship', to: `/company/explore?type=internships&job=${i.id}`,
     })),
     ...(suggestions.students || []).slice(0, 3).map((s) => ({
       key: `s-${s.id}`, icon: 'bi-person', label: s.fullName || 'Student',
-      sub: s.education || 'Student', to: `/user/profile/${s.userId}`,
+      sub: s.education || 'Student', to: `/company/applicant/${s.userId}/profile`,
     })),
     ...(suggestions.companies || []).slice(0, 2).map((c) => ({
       key: `c-${c.id}`, icon: 'bi-building', label: c.companyName || 'Company',
-      sub: c.industry || 'Company', to: `/explore?type=companies&company=${c.id}`,
+      sub: c.industry || 'Company', to: `/company/explore?type=companies&company=${c.id}`,
     })),
   ], [suggestions]);
 

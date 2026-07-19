@@ -6,7 +6,16 @@ const prisma = new PrismaClient();
 const studentInclude = {
   internship: {
     include: {
-      company: { select: { id: true, companyName: true, logoUrl: true, industry: true } },
+      company: {
+        select: {
+          id: true, companyName: true, logoUrl: true, industry: true,
+          // The company's account status is what tells the student their
+          // application is stuck because the company was suspended.
+          user: {
+            select: { status: true, suspensionReason: true, suspendedUntil: true },
+          },
+        },
+      },
     },
   },
 };
@@ -31,10 +40,10 @@ export const createApplication = ({ studentId, internshipId, cvId = null }) =>
     include: studentInclude,
   });
 
+// findFirst, not findUnique: internshipId is nullable now (tombstones), and a
+// compound unique containing a nullable column is not safely addressable.
 export const findApplication = (studentId, internshipId) =>
-  prisma.application.findUnique({
-    where: { studentId_internshipId: { studentId, internshipId } },
-  });
+  prisma.application.findFirst({ where: { studentId, internshipId } });
 
 export const findApplicationById = (id) =>
   prisma.application.findUnique({
@@ -64,7 +73,35 @@ export const findApplicationsByCompany = (companyId) =>
   });
 
 export const updateApplicationStatus = (id, status) =>
-  prisma.application.update({ where: { id }, data: { status } });
+  prisma.application.update({
+    where: { id },
+    data: {
+      status,
+      // A decision the student has not seen yet is what lights up the badge.
+      ...(status === "accepted" || status === "rejected"
+        ? { decidedAt: new Date(), seenAt: null }
+        : {}),
+    },
+  });
+
+/** Unseen accept/reject decisions, plus listings removed out from under them. */
+export const countUnseenForStudent = (studentId) =>
+  prisma.application.count({
+    where: {
+      studentId,
+      seenAt: null,
+      OR: [
+        { status: { in: ["accepted", "rejected"] } },
+        { removedType: { not: null } },
+      ],
+    },
+  });
+
+export const markAllSeenForStudent = (studentId) =>
+  prisma.application.updateMany({
+    where: { studentId, seenAt: null },
+    data: { seenAt: new Date() },
+  });
 
 export const deleteApplication = (id) =>
   prisma.application.delete({ where: { id } });

@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import CompanyNavbar from '../../components/layout/CompanyNavbar';
-import Footer from '../../components/layout/CompanyFooter';
 import { getMyStats, getConnections } from '../../api/companyApi';
 
 const ONBOARD_KEY = 'if-company-onboarded';
@@ -52,8 +50,7 @@ export default function CompanyHome() {
   const maxApplicants = Math.max(1, ...(stats?.perInternship || []).map((i) => i.applicants));
 
   return (
-    <div className="flex min-h-screen flex-col bg-surface">
-      <CompanyNavbar />
+    <div className="flex flex-1 flex-col bg-surface">
 
       {/* New-company prompt */}
       {showOnboard && (
@@ -211,7 +208,7 @@ export default function CompanyHome() {
                       {connections.map((c) => (
                         <Link
                           key={c.id}
-                          to={`/explore?type=companies&company=${c.id}`}
+                          to={`/company/explore?type=companies&company=${c.id}`}
                           className="flex items-center gap-3 rounded-xl border border-line bg-raised p-3 transition hover:border-accent/60"
                         >
                           {c.logoUrl ? (
@@ -237,8 +234,6 @@ export default function CompanyHome() {
           </div>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 }

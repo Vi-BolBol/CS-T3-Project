@@ -14,16 +14,32 @@ const authHeaders = () => {
   };
 };
 
-// Flatten the API shape into what the UI renders.
+/*
+  Flatten the API shape into what the UI renders.
+
+  `displayTitle` / `displayCompany` come from the server already resolved: for a
+  live listing they're read off the relation, and for one whose company was
+  deleted they're read off the tombstone snapshot (the relation is null by then).
+  Reading `a.internship?.title` alone would show "Untitled internship" for every
+  removed listing.
+*/
 const normalize = (a) => ({
   id: a.id,
   internshipId: a.internshipId,
-  title: a.internship?.title || 'Untitled internship',
-  companyName: a.internship?.company?.companyName || 'Unknown company',
+  title: a.displayTitle || a.internship?.title || a.internshipTitle || 'Untitled internship',
+  companyName: a.displayCompany || a.internship?.company?.companyName || a.companyName || 'Unknown company',
   companyId: a.internship?.company?.id ?? null,
   location: a.internship?.location || 'Not specified',
   status: a.status,
   appliedAt: a.appliedAt,
+  decidedAt: a.decidedAt || null,
+
+  // How the company/listing behind this application is doing.
+  // 'active' | 'suspended' | 'listing_suspended' | 'deleted'
+  companyState: a.companyState || 'active',
+  companyStateReason: a.companyStateReason || null,
+  companyStateUntil: a.companyStateUntil || null,
+  companyStateAt: a.companyStateAt || null,
 });
 
 export default function useMyApplications() {

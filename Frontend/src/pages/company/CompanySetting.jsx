@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import useLogout from '../../hooks/useLogout';
-import CompanyNavbar from '../../components/layout/CompanyNavbar';
-import Footer from '../../components/layout/CompanyFooter';
 import ThemeToggle from '../../components/shared/ThemeToggle';
 import Toast from '../../components/shared/Toast';
 import ConfirmDialog from '../../components/shared/ConfirmDialog';
@@ -50,8 +48,7 @@ export default function CompanySetting() {
   const logout = useLogout();
 
   return (
-    <div className="flex min-h-screen flex-col bg-surface">
-      <CompanyNavbar />
+    <div className="flex flex-1 flex-col bg-surface">
 
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
         <header className="mb-6">
@@ -129,8 +126,6 @@ export default function CompanySetting() {
           </div>
         </div>
       </main>
-
-      <Footer />
       <Toast message={toastMessage} onClose={clearToast} />
       <ConfirmDialog
         open={confirmLogout}

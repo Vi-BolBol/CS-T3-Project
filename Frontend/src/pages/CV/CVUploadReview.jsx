@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { saveCvToServer } from '../../hooks/useCvStatus';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useCVBuilder } from '../../context/CVBuilderContext.jsx';
@@ -10,7 +10,12 @@ import { useCVBuilder } from '../../context/CVBuilderContext.jsx';
 function CVUploadReview() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { updatePersonal, updateAbout, updateExperience, markStepComplete } = useCVBuilder();
+  // `cvData` was referenced inside handleConvert but never pulled out of the
+  // context — clicking "Convert to Editable CV" threw a ReferenceError and the
+  // parsed PDF never made it into the builder.
+  const { cvData, updatePersonal, updateAbout, updateExperience, markStepComplete } = useCVBuilder();
+  const [isConverting, setIsConverting] = useState(false);
+  const [error, setError] = useState('');
 
   const parsed = location?.state?.parsed;
 
@@ -29,6 +34,10 @@ function CVUploadReview() {
   const { personal, about, experience } = parsed;
 
   const handleConvert = async () => {
+    if (isConverting) return;
+    setIsConverting(true);
+    setError('');
+
     if (personal) updatePersonal(personal);
     if (about) updateAbout(about);
     if (experience) updateExperience(experience);
@@ -40,15 +49,27 @@ function CVUploadReview() {
     if (about?.aboutMe || about?.skills?.length) markStepComplete(3);
     if (experience?.workExperience?.length || experience?.education?.length) markStepComplete(4);
 
-    // Save the freshly parsed data directly — React state updates above are
-    // async, so `cvData` would still hold the previous (empty) value here.
-    await saveCvToServer({
+    // Save the freshly parsed data directly — the React state updates above are
+    // async, so `cvData` still holds the previous (empty) value at this point.
+    // Merge field-by-field so a PDF that yielded no education doesn't wipe
+    // anything the user had already entered by hand.
+    const merged = {
       ...cvData,
-      ...(personal ? { personal } : {}),
-      ...(about ? { about } : {}),
-      ...(experience ? { experience } : {}),
-    });
-    navigate('/cv/manage');
+      personal:   { ...(cvData.personal || {}),   ...(personal || {}) },
+      about:      { ...(cvData.about || {}),      ...(about || {}) },
+      experience: { ...(cvData.experience || {}), ...(experience || {}) },
+    };
+
+    try {
+      const res = await saveCvToServer(merged, 'uploaded');
+      if (!res?.success && res?.message) setError(res.message);
+    } catch (err) {
+      console.error('Convert failed:', err);
+      setError('Converted on this device — we could not reach the server.');
+    } finally {
+      setIsConverting(false);
+      navigate('/cv/manage');
+    }
   };
 
   const handleDiscard = () => {
@@ -178,6 +199,10 @@ function CVUploadReview() {
           )}
         </div>
 
+        {error && (
+          <p className="text-xs text-danger text-center mb-4">{error}</p>
+        )}
+
         <p className="text-xs text-faint text-center mb-6">
           Note: a photo isn't extracted from uploaded PDFs — you can add one from the builder after converting.
         </p>
@@ -191,9 +216,14 @@ function CVUploadReview() {
           </button>
           <button
             onClick={handleConvert}
-            className="px-6 py-2.5 bg-accent text-accent-ink text-sm font-bold rounded-lg hover:bg-accent transition shadow-md shadow-accent/20"
+            disabled={isConverting}
+            className={`px-6 py-2.5 text-sm font-bold rounded-lg transition shadow-md shadow-accent/20 ${
+              isConverting
+                ? 'bg-muted text-faint cursor-not-allowed'
+                : 'bg-accent text-accent-ink hover:bg-accent'
+            }`}
           >
-            Convert to Editable CV →
+            {isConverting ? 'Converting…' : 'Convert to Editable CV →'}
           </button>
         </div>
       </div>
