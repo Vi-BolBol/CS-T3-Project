@@ -4,6 +4,12 @@ import AuthLayout from './AuthLayout';
 import RolePitch from './RolePitch';
 import SocialSignIn from '../../components/auth/SocialSignIn';
 import { registerUser } from '../../api/authApi';
+import useToast from '../../hooks/useToast';
+import Toast from '../../components/shared/Toast';
+import {
+  requestNotificationPermission,
+  showRegistrationNotification,
+} from '../../services/browserNotificationService';
 
 /**
  * Everything that differs between the two account types lives here, so the form
@@ -91,6 +97,7 @@ export default function Signup() {
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const { message: toastMessage, showToast, clearToast } = useToast();
 
   const cfg = ROLES[role];
   const isCompany = role === 'company';
@@ -133,7 +140,23 @@ export default function Signup() {
 
         localStorage.setItem('token', res.token);
         localStorage.setItem('user', JSON.stringify(res.user));
-        navigate(next && role === 'student' ? next : cfg.home, { replace: true });
+
+        const targetPath = next && role === 'student' ? next : cfg.home;
+
+        // Backend has now genuinely confirmed account creation + a session.
+        // Ask for permission (no-op if already decided) and try a real
+        // system notification before falling back to a toast.
+        await requestNotificationPermission();
+        const { shown } = await showRegistrationNotification();
+
+        if (shown) {
+          navigate(targetPath, { replace: true });
+        } else {
+          showToast(
+            'Account created! Complete your profile to receive better internship recommendations.'
+          );
+          setTimeout(() => navigate(targetPath, { replace: true }), 1400);
+        }
         return;
       }
 
@@ -308,6 +331,10 @@ export default function Signup() {
       </form>
 
       <SocialSignIn action="Sign up" />
+
+      {/* Fallback shown only when a real browser notification couldn't be
+          displayed (unsupported browser, denied, etc). */}
+      <Toast message={toastMessage} onClose={clearToast} variant="success" />
     </AuthLayout>
   );
 }

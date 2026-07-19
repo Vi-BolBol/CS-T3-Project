@@ -14,7 +14,9 @@ import applicationRoutes from "../routes/application.routes.js";
 import adminRoutes from "../routes/admin.routes.js";
 import companyRoutes from "../routes/company.routes.js";
 import publicRoutes from "../routes/public.routes.js";
+import notificationRoutes from "../routes/notification.route.js";
 import { notFound, errorHandler } from "../middleware/error.middleware.js";
+import { startInternshipDeadlineJob } from "../jobs/internshipDeadline.job.js";
 
 const prisma = new PrismaClient();
 const app = express();
@@ -33,6 +35,12 @@ app.use(helmet());                       // security headers
 const defaultOrigins = [
   "http://localhost:5173",
   "http://127.0.0.1:5173",
+  "http://localhost:5174",
+  "http://127.0.0.1:5174",
+  "http://localhost:5175",
+  "http://127.0.0.1:5175",
+  "http://localhost:5176",
+  "http://127.0.0.1:5176",
 ];
 
 const allowedOrigins = [
@@ -89,6 +97,7 @@ app.use("/api/applications", applicationRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/company", companyRoutes);
 app.use("/api/public", publicRoutes);   // logged-out browsing: companies + unified search
+app.use("/api/notifications", notificationRoutes);
 
 /* ---------- Error handling (must come last) ---------- */
 app.use(notFound);
@@ -97,6 +106,7 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 3000;
 const server = app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  startInternshipDeadlineJob();
 });
 
 /* ---------- Graceful shutdown ---------- */

@@ -6,6 +6,12 @@ import AuthLayout from './AuthLayout';
 import RolePitch from './RolePitch';
 import SocialSignIn from '../../components/auth/SocialSignIn';
 import { loginUser } from '../../api/authApi';
+import useToast from '../../hooks/useToast';
+import Toast from '../../components/shared/Toast';
+import {
+  requestNotificationPermission,
+  showLoginNotification,
+} from '../../services/browserNotificationService';
 
 const HOME_FOR = {
   admin: '/admin',
@@ -31,6 +37,7 @@ export default function Login() {
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const { message: toastMessage, showToast, clearToast } = useToast();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -57,7 +64,25 @@ export default function Login() {
           setError('This account has an unrecognised role. Contact an administrator.');
           return;
         }
-        navigate(next || home, { replace: true });
+        const targetPath = next || home;
+
+        // Only now — after the backend has actually confirmed the login —
+        // do we ask for notification permission (a no-op if the browser
+        // already recorded a decision) and try to show a real system
+        // notification. Nothing here can throw, and no token/password/
+        // personal data is ever put in the notification body.
+        await requestNotificationPermission();
+        const { shown } = await showLoginNotification();
+
+        if (shown) {
+          navigate(targetPath, { replace: true });
+        } else {
+          // Notifications unsupported / denied / unavailable right now:
+          // fall back to a normal in-app toast instead of alert(), and give
+          // it a moment on screen before moving to the dashboard.
+          showToast('You logged in successfully. Check your recommended internships.');
+          setTimeout(() => navigate(targetPath, { replace: true }), 1400);
+        }
         return;
       }
 
@@ -157,6 +182,10 @@ export default function Login() {
 
       {/* Circular provider icons at the foot of the form, same as signup. */}
       <SocialSignIn action="Log in" />
+
+      {/* Fallback shown only when a real browser notification couldn't be
+          displayed (unsupported browser, denied, etc). */}
+      <Toast message={toastMessage} onClose={clearToast} variant="success" />
     </AuthLayout>
   );
 }

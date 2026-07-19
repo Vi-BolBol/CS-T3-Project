@@ -1,6 +1,12 @@
 import { useEffect, useState } from 'react';
 
-function Toast({ message, onClose, duration = 5000 }) {
+const VARIANT_STYLES = {
+  error: { border: 'border-danger', icon: '⚠' },
+  success: { border: 'border-accent', icon: '✓' },
+  info: { border: 'border-accent', icon: 'ℹ' },
+};
+
+function Toast({ message, onClose, duration = 5000, variant = 'error' }) {
   const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
@@ -13,12 +19,14 @@ function Toast({ message, onClose, duration = 5000 }) {
 
   if (hidden || !message) return null;
 
+  const style = VARIANT_STYLES[variant] || VARIANT_STYLES.error;
+
   return (
     <div
       style={{ zIndex: 9999 }}
-      className="fixed bottom-5 right-5 flex items-start gap-3 bg-muted text-content px-4 py-3 rounded-xl shadow-2xl max-w-sm border border-danger animate-in"
+      className={`fixed bottom-5 right-5 flex items-start gap-3 bg-muted text-content px-4 py-3 rounded-xl shadow-2xl max-w-sm border ${style.border} animate-in`}
     >
-      <span className="text-lg leading-none mt-0.5">⚠</span>
+      <span className="text-lg leading-none mt-0.5">{style.icon}</span>
       <p className="text-sm font-medium leading-snug flex-1">{message}</p>
       <button
         onClick={() => { setHidden(true); onClose?.(); }}

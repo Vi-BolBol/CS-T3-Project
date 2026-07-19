@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback } from 'react';
   Now backed by the real API — /api/applications was built in Session B.
   (Distinct from useApplications.js, which is the COMPANY view.)
 */
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const BASE_URL = import.meta.env.VITE_API_URL || '';
 const authHeaders = () => {
   const token = localStorage.getItem('token');
   return {
