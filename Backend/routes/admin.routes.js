@@ -13,6 +13,7 @@ import {
   getUserInternships,
   getUserCv,
   moderateInternship,
+  getInternshipDetail,
   deleteInternship,
 } from "../controllers/admin.controller.js";
 
@@ -39,6 +40,7 @@ router.patch("/users/:id/status", updateUserStatus);
 router.delete("/users/:id", deleteUser);
 
 // Moderating an individual listing without touching the whole company account.
+router.get("/internships/:id", getInternshipDetail);   // full listing + applicants
 router.patch("/internships/:id/status", moderateInternship);
 router.delete("/internships/:id", deleteInternship);
 

@@ -100,3 +100,28 @@ export default {
   findFollowedCompanies,
   findRecommendedInternships,
 };
+
+
+/* ---------- Student profile ----------
+   The frontend kept the whole profile in localStorage with a TODO. That meant a
+   profile never followed the student to another device, and — worse — a company
+   opening an applicant's profile was shown its OWN cached profile, because the
+   page had no way to fetch anyone else's. These are the missing endpoints.     */
+
+/** Fields a student may write. `userId` and `id` are never client-supplied. */
+export const PROFILE_EDITABLE = [
+  "fullName", "phone", "bio", "education", "skills", "profileImage",
+];
+
+export const findStudentProfile = (userId) =>
+  prisma.studentProfile.findUnique({
+    where: { userId: Number(userId) },
+    include: { user: { select: { id: true, email: true, status: true, createdAt: true } } },
+  });
+
+export const upsertStudentProfile = (userId, data) =>
+  prisma.studentProfile.upsert({
+    where: { userId: Number(userId) },
+    update: data,
+    create: { userId: Number(userId), ...data },
+  });

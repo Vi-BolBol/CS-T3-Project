@@ -76,7 +76,9 @@ function CVDashboard() {
 
   const handleUploadInstead = () => {
     setConfirmAction(null);
-    navigate('/cv');
+    // `?replace=1` tells CVChoice this visit is deliberate, so its
+    // "you already have a CV" redirect doesn't bounce us straight back.
+    navigate('/cv?replace=1');
   };
 
   const handleDownload = async () => {

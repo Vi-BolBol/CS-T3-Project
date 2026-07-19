@@ -96,7 +96,7 @@ model StudentProfile {
   bio          String?
   education    String?
   skills       String?
-  profileImage String?  @db.VarChar(500)
+  profileImage String?
   createdAt    DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -113,8 +113,8 @@ model CompanyProfile {
   website     String?  @db.VarChar(255)
   contact     String?  @db.VarChar(50)
   telegramLink String? @db.VarChar(255)
-  logoUrl     String?  @db.VarChar(500)
-  coverUrl    String?  @db.VarChar(500)
+  logoUrl     String?
+  coverUrl    String?
   location      String? @db.VarChar(150)
   employeeCount Int?
   createdAt   DateTime @default(now())

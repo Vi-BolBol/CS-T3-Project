@@ -58,6 +58,9 @@ export default function CompanyExplore() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [searchQuery, setSearchQuery] = useState(() => searchParams.get('q') || '');
+
+  // Arriving from the navbar search: ?q= is the query, and it should apply
+  // immediately rather than needing a re-type.
   const [filters, setFilters] = useState(() => ({
     ...INITIAL,
     type: TYPES.some((t) => t.value === searchParams.get('type'))
@@ -95,6 +98,12 @@ export default function CompanyExplore() {
     })();
     return () => { alive = false; };
   }, []);
+
+  useEffect(() => {
+    const q = searchParams.get('q');
+    if (q !== null && q !== searchQuery) setSearchQuery(q);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   // Deep links from the navbar search and the home page.
   useEffect(() => {
@@ -527,6 +536,7 @@ export default function CompanyExplore() {
             {selectedJob && (
               <InternshipPane
                 job={selectedJob}
+                onSelectCompany={(c) => { setFilters((p) => ({ ...p, type: "companies" })); select("company", c.id); }}
                 detailTo={`/company/listing/${selectedJob.id}`}
                 onClose={() => setSelected(null)}
               />

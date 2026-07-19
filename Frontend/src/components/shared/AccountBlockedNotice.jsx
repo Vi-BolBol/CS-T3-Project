@@ -124,18 +124,20 @@ export default function AccountBlockedNotice({ reason, suspension, onRecheck, on
         )}
       </div>
 
-      <div className="mt-6 flex flex-col gap-2 sm:flex-row">
-        <button
-          onClick={onRecheck}
-          className="rounded-lg bg-accent px-5 py-2.5 text-sm font-bold text-accent-ink transition hover:opacity-90"
-        >
-          Check again
-        </button>
+      {/*
+        Log out is the ONLY action here.
+
+        A "check again" button invited the user to sit on a dead screen retrying
+        a state that cannot change from their side. A timed suspension lifts
+        itself on the next login attempt, so logging out and signing back in is
+        both the correct action and the one that actually resolves it.
+      */}
+      <div className="mt-6">
         <button
           onClick={goHome}
-          className="rounded-lg border border-line px-5 py-2.5 text-sm font-semibold text-content transition hover:bg-muted"
+          className="w-full rounded-lg bg-accent px-5 py-2.5 text-sm font-bold text-accent-ink transition hover:opacity-90 sm:w-auto"
         >
-          Log out
+          <i className="bi bi-box-arrow-right mr-1.5" /> Log out
         </button>
       </div>
     </Shell>

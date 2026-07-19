@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+import useFollowedCompanies from '../../hooks/useFollowedCompanies';
 import { Link } from 'react-router-dom';
 
 /**
@@ -63,6 +65,70 @@ function Shell({ title, onClose, actions, children }) {
   );
 }
 
+/*
+  Follow / unfollow, shown only to signed-in students.
+
+  The follow API and the FollowedCompany table have existed since Session D, and
+  the student home page already lists followed companies — but nothing on the
+  browsing side could actually follow one, so that list could only ever be empty.
+  Companies and admins see nothing here: following is a student action.
+*/
+function FollowCompanyButton({ companyId }) {
+  const { followCompany, unfollowCompany, fetchFollowed } = useFollowedCompanies();
+  const [busy, setBusy] = useState(false);
+  const [following, setFollowing] = useState(false);
+
+  let role = null;
+  try { role = JSON.parse(localStorage.getItem('user') || 'null')?.role || null; }
+  catch { role = null; }
+  const isStudent = role === 'student';
+
+  // The hook exposes the followed list, not a membership test — derive it.
+  useEffect(() => {
+    if (!isStudent || !companyId) return;
+    let cancelled = false;
+    (async () => {
+      const res = await fetchFollowed();
+      if (cancelled || !res?.success) return;
+      setFollowing((res.companies || []).some(
+        (c) => String(c.id) === String(companyId) || String(c.companyId) === String(companyId)
+      ));
+    })();
+    return () => { cancelled = true; };
+  }, [companyId, isStudent, fetchFollowed]);
+
+  if (!isStudent || !companyId) return null;
+
+  const toggle = async () => {
+    setBusy(true);
+    // Optimistic: the button should respond to the click, not to the round trip.
+    const next = !following;
+    setFollowing(next);
+    try {
+      const res = next ? await followCompany(companyId) : await unfollowCompany(companyId);
+      if (!res?.success) setFollowing(!next);   // roll back on failure
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={toggle}
+      disabled={busy}
+      className={`mb-4 inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition disabled:opacity-50 ${
+        following
+          ? 'border border-line text-subtle hover:text-danger'
+          : 'bg-accent text-accent-ink hover:opacity-90'
+      }`}
+    >
+      <i className={`bi ${following ? 'bi-check2' : 'bi-plus-lg'}`} />
+      {busy ? 'Saving…' : following ? 'Following' : 'Follow company'}
+    </button>
+  );
+}
+
 function Section({ title, children }) {
   return (
     <section className="mt-5">
@@ -72,7 +138,7 @@ function Section({ title, children }) {
   );
 }
 
-export function InternshipPane({ job, onClose, actions, detailTo }) {
+export function InternshipPane({ job, onClose, actions, detailTo, onSelectCompany }) {
   if (!job) return null;
 
   const skills = splitList(job.skills);
@@ -90,7 +156,21 @@ export function InternshipPane({ job, onClose, actions, detailTo }) {
         )}
         <div className="min-w-0">
           <h3 className="text-lg font-black leading-snug text-content">{job.title}</h3>
-          <p className="truncate text-sm text-subtle">{job.company?.companyName || 'Unknown company'}</p>
+          {/* The company name is the natural way into the company's profile.
+              It was plain text, so there was no route from a listing to the
+              company behind it — and therefore no way to follow them. */}
+          {onSelectCompany && job.company?.id ? (
+            <button
+              type="button"
+              onClick={() => onSelectCompany(job.company)}
+              className="truncate text-sm font-semibold text-accent transition hover:underline"
+            >
+              {job.company.companyName || 'Unknown company'}
+              <i className="bi bi-arrow-right ml-1 text-[10px]" />
+            </button>
+          ) : (
+            <p className="truncate text-sm text-subtle">{job.company?.companyName || 'Unknown company'}</p>
+          )}
         </div>
       </div>
 
@@ -162,6 +242,7 @@ export function CompanyPane({ company, listings = [], onClose, onSelectJob, acti
 
   return (
     <Shell title="Company details" onClose={onClose} actions={actions}>
+      <FollowCompanyButton companyId={company.id} />
       <div className="flex items-start gap-4">
         {company.logoUrl ? (
           <img src={company.logoUrl} alt="" className="h-14 w-14 flex-shrink-0 rounded-xl border border-line object-cover" />

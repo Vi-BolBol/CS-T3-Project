@@ -5,20 +5,24 @@ import Footer from '../../components/layout/StudentFooter';
 import Toast from '../../components/shared/Toast';
 import useCvStatus from '../../hooks/useCvStatus';
 import useToast from '../../hooks/useToast';
+import ImageUploadField from '../../components/shared/ImageUploadField';
+import { getMyStudentProfile, updateMyStudentProfile, getStudentProfileById } from '../../api/studentApi';
 
 /* One component, two modes:
    /user/profile      -> own profile  (edit, share, view-as-public)
    /user/profile/:id  -> someone else -> read-only
 
-   TODO(backend): GET /api/student/profile and PUT /api/student/profile do not
-   exist yet (only /api/student/saved-internships etc. are implemented). Until
-   then the profile persists locally. Swap the read/write below for fetch calls
-   and nothing else on this page changes. */
+   Backed by GET/PUT /api/student/profile and GET /api/student/profile/:id.
+   It previously lived in localStorage only, which meant the profile never
+   followed the student to another device AND — the worse half — a company
+   opening an applicant's profile was shown its own cached one, because there
+   was no way to fetch anybody else's. localStorage is now only a fast first
+   paint for the owner; the server is the source of truth. */
 const KEY = 'if-student-profile';
 
 const EMPTY = {
   fullName: '', headline: '', role: '', bio: '', location: '',
-  email: '', university: '', skills: '', portfolio: '',
+  email: '', phone: '', university: '', skills: '', portfolio: '',
   photo: null, cover: null,
 };
 
@@ -42,6 +46,30 @@ const readProfile = () => {
   try { return { ...EMPTY, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; }
   catch { return { ...EMPTY }; }
 };
+
+/* StudentProfile has fewer columns than this page shows. The extras (headline,
+   role, portfolio, cover) have no home in the schema, so they stay local while
+   everything the server does store round-trips properly. */
+const fromServer = (p, local = {}) => ({
+  ...EMPTY,
+  ...local,
+  fullName: p?.fullName ?? local.fullName ?? '',
+  bio: p?.bio ?? local.bio ?? '',
+  university: p?.education ?? local.university ?? '',
+  skills: p?.skills ?? local.skills ?? '',
+  phone: p?.phone ?? local.phone ?? '',
+  email: p?.user?.email ?? local.email ?? '',
+  photo: p?.profileImage ?? local.photo ?? null,
+});
+
+const toServer = (d) => ({
+  fullName: d.fullName || null,
+  bio: d.bio || null,
+  education: d.university || null,
+  skills: d.skills || null,
+  phone: d.phone || null,
+  profileImage: d.photo || null,
+});
 
 const inputCls =
   'w-full rounded-lg border border-line bg-muted px-3 py-2 text-sm text-content placeholder:text-faint focus:border-accent focus:outline-none';
@@ -71,13 +99,48 @@ export default function UserProfile() {
   const [editing, setEditing] = useState(false);
   const [previewPublic, setPreviewPublic] = useState(false);
 
-  useEffect(() => { setProfile(readProfile()); }, []);
+  const [loading, setLoading] = useState(true);
 
-  const save = () => {
-    localStorage.setItem(KEY, JSON.stringify(draft));
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      if (isOwner) {
+        // Paint from the local mirror first so the page isn't blank, then
+        // reconcile with the server.
+        const local = readProfile();
+        setProfile(local);
+        setDraft(local);
+        const res = await getMyStudentProfile();
+        if (!cancelled && res.success && res.profile) {
+          const merged = fromServer(res.profile, local);
+          setProfile(merged);
+          setDraft(merged);
+          try { localStorage.setItem(KEY, JSON.stringify(merged)); } catch { /* quota */ }
+        }
+      } else {
+        // Somebody else's profile: never fall back to the local mirror, or the
+        // viewer would be shown their own details under another person's name.
+        const res = await getStudentProfileById(id);
+        if (!cancelled) {
+          if (res.success && res.profile) setProfile(fromServer(res.profile));
+          else { setProfile({ ...EMPTY }); showToast(res.message || 'Profile not found.'); }
+        }
+      }
+      if (!cancelled) setLoading(false);
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, isOwner]);
+
+  const save = async () => {
+    // Mirror locally first so the edit survives a failed request.
+    try { localStorage.setItem(KEY, JSON.stringify(draft)); } catch { /* quota */ }
     setProfile(draft);
     setEditing(false);
-    showToast('Profile updated.');
+
+    const res = await updateMyStudentProfile(toServer(draft));
+    showToast(res.success ? 'Profile updated.' : (res.message || 'Saved on this device only.'));
   };
 
   const share = async () => {
@@ -103,10 +166,15 @@ export default function UserProfile() {
     Object.entries(fromCv).forEach(([k, v]) => {
       if (v !== null && v !== undefined && v !== '') merged[k] = v;
     });
+    // The CV's photo is the natural profile picture — map it across rather than
+    // leaving `photo` as an orphan key the profile UI never reads.
+    if (fromCv.photo) merged.photo = fromCv.photo;
     localStorage.setItem(KEY, JSON.stringify(merged));
     setProfile(merged);
     setDraft(merged);
     markCvSynced();
+    // Push it to the server as well, or the sync would vanish on next load.
+    updateMyStudentProfile(toServer(merged));
     showToast('CV synced — your profile has been filled in.');
   };
 
@@ -252,10 +320,26 @@ export default function UserProfile() {
           {/* Edit form */}
           {isOwner && editing && !previewPublic ? (
             <div className="mt-8 space-y-3 border-t border-line pt-6">
+              {/* Profile picture. There was no way to set one at all before —
+                  the avatar could only ever be initials or whatever the CV
+                  sync happened to carry across. */}
+              <ImageUploadField
+                label="Profile picture"
+                shape="circle"
+                value={draft.photo}
+                fallback={draft.fullName || 'S'}
+                onChange={(v) => setDraft({ ...draft, photo: v })}
+                hint="Shown to companies reviewing your application. JPG or PNG, up to 5 MB."
+              />
+
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
                   <label className="mb-1 block text-xs font-semibold text-subtle">Full name</label>
                   <input value={draft.fullName} onChange={(e) => setDraft({ ...draft, fullName: e.target.value })} className={inputCls} placeholder="Your full name" />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-semibold text-subtle">Phone</label>
+                  <input value={draft.phone || ''} onChange={(e) => setDraft({ ...draft, phone: e.target.value })} className={inputCls} placeholder="+855 ..." />
                 </div>
                 <div>
                   <label className="mb-1 block text-xs font-semibold text-subtle">Target role</label>

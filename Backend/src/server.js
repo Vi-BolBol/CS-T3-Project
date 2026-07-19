@@ -17,6 +17,7 @@ import publicRoutes from "../routes/public.routes.js";
 import notificationRoutes from "../routes/notification.route.js";
 import { notFound, errorHandler } from "../middleware/error.middleware.js";
 import { startInternshipDeadlineJob } from "../jobs/internshipDeadline.job.js";
+import { openapiSpec } from "../docs/openapi.js";
 
 const prisma = new PrismaClient();
 const app = express();
@@ -98,6 +99,44 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/company", companyRoutes);
 app.use("/api/public", publicRoutes);   // logged-out browsing: companies + unified search
 app.use("/api/notifications", notificationRoutes);
+
+/* ---------------------------------------------------------------- API docs --
+   Swagger UI at /api/docs, with testable requests.
+
+   Two deliberate choices:
+
+   1. The raw spec is ALWAYS served at /api/docs.json with no dependency at all,
+      so the contract is available even if the UI package is missing. It can be
+      imported straight into Postman or Insomnia.
+
+   2. The UI itself is mounted inside a try/catch. A documentation dependency
+      must never be able to stop the API from booting — if `swagger-ui-express`
+      is absent, the server logs a hint and carries on serving the API.
+                                                                             */
+app.get("/api/docs.json", (req, res) => res.json(openapiSpec));
+
+try {
+  const swaggerUi = (await import("swagger-ui-express")).default;
+  app.use(
+    "/api/docs",
+    swaggerUi.serve,
+    swaggerUi.setup(openapiSpec, {
+      customSiteTitle: "Internship Finder API",
+      swaggerOptions: {
+        persistAuthorization: true,   // keep the bearer token across page reloads
+        docExpansion: "none",         // 60 operations — collapsed is readable
+        filter: true,                 // search box over the endpoint list
+        tryItOutEnabled: true,
+      },
+    })
+  );
+  console.log("API docs available at /api/docs");
+} catch {
+  console.warn(
+    "swagger-ui-express not installed — /api/docs.json still serves the spec. " +
+    "Run `npm install` in Backend to enable the browsable UI."
+  );
+}
 
 /* ---------- Error handling (must come last) ---------- */
 app.use(notFound);

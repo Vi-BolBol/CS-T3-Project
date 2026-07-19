@@ -39,6 +39,7 @@ function Section({ title, children }) {
 function Body({ job }) {
   const skills = splitList(job.skills);
   const requirements = splitList(job.requirements, '\n');
+  const viewerRole = readRole();
 
   return (
     <div className="rounded-2xl border border-line bg-raised p-6 sm:p-8">
@@ -57,6 +58,23 @@ function Body({ job }) {
           </p>
           {job.company?.industry && (
             <p className="text-xs text-faint">{job.company.industry}</p>
+          )}
+
+          {/*
+            Route from a listing to the company behind it.
+
+            The company name was plain text on every page that showed a listing,
+            so there was no way to read the company's profile — or follow them —
+            from the role you were actually looking at. The destination follows
+            the viewer's role so nobody is thrown out of their own shell.
+          */}
+          {job.company?.id && (
+            <Link
+              to={companyProfileTo(job.company.id, viewerRole)}
+              className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-line px-2.5 py-1 text-xs font-semibold text-accent transition hover:bg-muted"
+            >
+              <i className="bi bi-building" /> View company profile
+            </Link>
           )}
         </div>
       </div>
@@ -283,6 +301,13 @@ function OtherRoleView({ job, role }) {
  * shell was chosen by "is this a student?", so every other role fell through to
  * the anonymous one.
  */
+/** Explore lives at a different path per role; keep the viewer in their shell. */
+function companyProfileTo(companyId, role) {
+  if (role === 'company' || role === 'admin') return `/company/explore?type=companies&company=${companyId}`;
+  if (role === 'student') return `/user/internships?type=companies&company=${companyId}`;
+  return `/explore?type=companies&company=${companyId}`;
+}
+
 export default function InternshipDetail({ embedded = false }) {
   const { id } = useParams();
   const navigate = useNavigate();

@@ -10,6 +10,7 @@ import {
   getUserInternshipsService,
   getUserCvService,
   moderateInternshipService,
+  getInternshipDetailService,
   deleteInternshipService,
 } from "../services/admin.service.js";
 
@@ -69,6 +70,13 @@ export const getUserCv = async (req, res, next) => {
   try {
     const result = await getUserCvService(req.params.id);
     return res.status(result.success ? 200 : 400).json(result);
+  } catch (err) { next(err); }
+};
+
+export const getInternshipDetail = async (req, res, next) => {
+  try {
+    const result = await getInternshipDetailService(req.params.id);
+    return res.status(result.success ? 200 : 404).json(result);
   } catch (err) { next(err); }
 };
 

@@ -31,8 +31,8 @@ const initialCvData = {
 // The provider only wraps /cv/* routes, so it unmounts the moment the person
 // navigates to Home/Profile/etc. Without persistence the whole CV was lost and
 // the builder fell back to the "upload or create" choice screen. Persist to
-// localStorage so a CV survives navigation and refreshes.
-// TODO(backend): replace with POST/GET /api/cv once the Cv model is wired up.
+// localStorage is a fast first paint; the SERVER is the source of truth.
+// Hydrated from GET /api/cv/mine on mount — see the effect in the provider.
 const CV_KEY = 'if-cv-data'
 const STEPS_KEY = 'if-cv-steps'
 
@@ -59,12 +59,66 @@ function loadSteps(){
 
 export function CVBuilderProvider({ children }){
     const [cvData, setCvData] = useState(loadCvData)
+    const [hydrated, setHydrated] = useState(false)
 
     // Track which steps have been fully completed (clicked Next successfully)
     const [completedSteps, setCompletedSteps] = useState(loadSteps)
 
     // Persist on every change so nothing is lost when the provider unmounts.
+    /*
+      Pull the saved CV back from the server on mount.
+
+      The context only ever initialised from localStorage, so a CV was lost the
+      moment that storage was cleared, the browser was changed, or another tab
+      reset it — the student was dropped back to the "build or upload?" choice
+      with their finished CV apparently gone. The row was in the database the
+      whole time; nothing ever read it back into the builder.
+
+      Local data wins while it has content, so an in-progress edit is never
+      overwritten by an older server copy.
+    */
     useEffect(() => {
+        let cancelled = false
+        ;(async () => {
+            const token = localStorage.getItem('token')
+            if (!token) { setHydrated(true); return }
+            try {
+                const base = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+                const res = await fetch(`${base}/api/cv/mine`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                })
+                if (!res.ok) return
+                const data = await res.json()
+                if (cancelled || !data?.success || !data.cv?.userCvData) return
+
+                const local = (() => {
+                    try { return JSON.parse(localStorage.getItem(CV_KEY) || 'null') }
+                    catch { return null }
+                })()
+                const localHasContent = Boolean(local?.personal?.fullName || local?.about?.aboutMe)
+
+                if (!localHasContent) {
+                    const server = data.cv.userCvData
+                    setCvData({
+                        ...initialCvData,
+                        ...server,
+                        personal: { ...initialCvData.personal, ...(server.personal || {}) },
+                        about: { ...initialCvData.about, ...(server.about || {}) },
+                        experience: { ...initialCvData.experience, ...(server.experience || {}) },
+                    })
+                    // A CV that came back from the server has been completed.
+                    setCompletedSteps(new Set([1, 2, 3, 4, 5]))
+                }
+            } catch { /* offline — the local mirror stands */ }
+            finally { if (!cancelled) setHydrated(true) }
+        })()
+        return () => { cancelled = true }
+    }, [])
+
+    useEffect(() => {
+        // Don't persist the empty initial state over a good local copy before
+        // hydration has had a chance to run.
+        if (!hydrated && !cvData?.personal?.fullName) return
         try { localStorage.setItem(CV_KEY, JSON.stringify(cvData)) } catch { /* quota */ }
     }, [cvData])
 

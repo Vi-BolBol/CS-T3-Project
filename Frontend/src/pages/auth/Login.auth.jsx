@@ -86,7 +86,24 @@ export default function Login() {
         return;
       }
 
-      setError(result.message || 'Login failed. Check your email and password.');
+      // A suspended account is not a wrong password — say so plainly, with the
+      // reason and the return date when the admin supplied them.
+      if (result.suspended) {
+        const parts = ['Account suspended.'];
+        if (result.suspension?.reason) parts.push(`Reason: ${result.suspension.reason}`);
+        if (result.suspension?.until) {
+          parts.push(
+            `Access returns on ${new Date(result.suspension.until).toLocaleDateString(undefined, {
+              year: 'numeric', month: 'long', day: 'numeric',
+            })}.`
+          );
+        } else {
+          parts.push('Contact an administrator to appeal.');
+        }
+        setError(parts.join(' '));
+      } else {
+        setError(result.message || 'Login failed. Check your email and password.');
+      }
     } catch {
       setError('Could not reach the server. Is the backend running on port 3000?');
     } finally {

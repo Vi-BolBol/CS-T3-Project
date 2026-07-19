@@ -38,6 +38,9 @@ export default function CompanyInternships() {
     [applications, filter]
   );
 
+  /** Anything past `pending` means the CV has been reviewed at least once. */
+  const reviewed = (app) => ['reviewed', 'accepted', 'rejected'].includes(app.status);
+
   const decide = async (app, status) => {
     setBusy(app.id);
     const res = await decideApplication(app.id, status);
@@ -143,23 +146,39 @@ export default function CompanyInternships() {
                         <i className="bi bi-file-earmark-person mr-1" /> {isOpen ? 'Hide' : 'View CV'}
                       </button>
 
-                      {a.status !== 'accepted' && (
+                      {/* Accept/Reject stay locked until the CV has been marked
+                          reviewed. A decision notifies the student, so it should
+                          follow actually reading the CV rather than sitting one
+                          stray click away in a list. */}
+                      {!reviewed(a) ? (
                         <button
                           disabled={busy === a.id}
-                          onClick={() => decide(a, 'accepted')}
+                          onClick={() => decide(a, 'reviewed')}
                           className="rounded-lg bg-accent px-3 py-1.5 text-xs font-bold text-accent-ink transition hover:opacity-90 disabled:opacity-50"
                         >
-                          Accept
+                          <i className="bi bi-check2-square mr-1" /> Reviewed CV
                         </button>
-                      )}
-                      {a.status !== 'rejected' && (
-                        <button
-                          disabled={busy === a.id}
-                          onClick={() => decide(a, 'rejected')}
-                          className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-subtle transition hover:border-danger hover:text-danger disabled:opacity-50"
-                        >
-                          Reject
-                        </button>
+                      ) : (
+                        <>
+                          {a.status !== 'accepted' && (
+                            <button
+                              disabled={busy === a.id}
+                              onClick={() => decide(a, 'accepted')}
+                              className="rounded-lg bg-accent px-3 py-1.5 text-xs font-bold text-accent-ink transition hover:opacity-90 disabled:opacity-50"
+                            >
+                              Accept
+                            </button>
+                          )}
+                          {a.status !== 'rejected' && (
+                            <button
+                              disabled={busy === a.id}
+                              onClick={() => decide(a, 'rejected')}
+                              className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-subtle transition hover:border-danger hover:text-danger disabled:opacity-50"
+                            >
+                              Reject
+                            </button>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>

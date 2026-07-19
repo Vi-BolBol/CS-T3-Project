@@ -45,6 +45,11 @@ export const loginUser = async (loginData) => {
     if (!response.ok) {
       return {
         success: false,
+        // The server returns 403 + suspension details for a suspended account.
+        // Passing them through lets the login page say WHY sign-in failed
+        // instead of the generic "check your password".
+        suspended: Boolean(data.suspended),
+        suspension: data.suspension || null,
         message: data.message || "Invalid email or password",
       };
     }

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Toast from '../../components/shared/Toast';
 import useToast from '../../hooks/useToast';
 import { getMyCompany, updateMyCompany } from '../../api/companyApi';
+import ImageUploadField from '../../components/shared/ImageUploadField';
 
 const COVERS = [
   'linear-gradient(135deg, #10b981 0%, #0ea5e9 100%)',
@@ -41,6 +42,7 @@ export default function CompanyProfile() {
       website: draft.website,
       contact: draft.contact,
       telegramLink: draft.telegramLink,
+      logoUrl: draft.logoUrl ?? null,
     });
     showToast(res.success ? 'Profile updated.' : res.message);
     if (res.success) { setProfile(res.profile); setDraft(res.profile); setEditing(false); }
@@ -117,6 +119,17 @@ export default function CompanyProfile() {
                     <label className="mb-1 block text-xs font-semibold text-subtle">Company name</label>
                     <input value={draft.companyName || ''} onChange={(e) => setDraft({ ...draft, companyName: e.target.value })} className={inputCls} />
                   </div>
+                  <div className="sm:col-span-2">
+                    <ImageUploadField
+                      label="Company logo"
+                      shape="rounded"
+                      value={draft.logoUrl}
+                      fallback={draft.companyName || 'C'}
+                      onChange={(v) => setDraft({ ...draft, logoUrl: v })}
+                      hint="Shown on your listings and in search results. JPG or PNG, up to 5 MB."
+                    />
+                  </div>
+
                   <div>
                     <label className="mb-1 block text-xs font-semibold text-subtle">Industry</label>
                     <input value={draft.industry || ''} onChange={(e) => setDraft({ ...draft, industry: e.target.value })} className={inputCls} placeholder="e.g. Technology" />

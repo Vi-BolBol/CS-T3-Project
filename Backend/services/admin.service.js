@@ -12,6 +12,7 @@ import {
   findCvByUser,
   setInternshipStatus,
   findInternshipById,
+  findInternshipDetail,
   removeInternship,
   snapshotApplicationsForInternships,
   findInternshipIdsByUser,
@@ -238,6 +239,13 @@ export const getUserCvService = async (userId) => {
   }
   const cv = await findCvByUser(userId);
   return { success: true, cv: cv || null };
+};
+
+/** Full listing + applicants, for the admin drill-down. */
+export const getInternshipDetailService = async (internshipId) => {
+  const internship = await findInternshipDetail(internshipId);
+  if (!internship) return { success: false, message: "Internship not found" };
+  return { success: true, internship };
 };
 
 /* ---------- Moderating a single listing ---------- */

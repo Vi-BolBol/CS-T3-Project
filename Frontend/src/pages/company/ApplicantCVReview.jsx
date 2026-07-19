@@ -42,6 +42,12 @@ export default function ApplicantCVReview() {
     }
   };
 
+  // Any status past `pending` means the CV has been opened and reviewed at
+  // least once, so a decided application keeps its buttons visible.
+  const hasReviewed = applicant
+    ? ['reviewed', 'accepted', 'rejected'].includes(applicant.status)
+    : false;
+
   const TemplateComponent = applicant ? TEMPLATE_COMPONENTS[applicant.template] || ClassicTemplate : null;
 
   return (
@@ -92,12 +98,6 @@ export default function ApplicantCVReview() {
                     <span>School</span>
                     <span className="text-content">{applicant.university}</span>
                   </div>
-                  {applicant.matchScore != null && (
-                    <div className="flex justify-between">
-                      <span>CV score</span>
-                      <span className="font-bold text-accent">{applicant.matchScore}%</span>
-                    </div>
-                  )}
                   <div className="flex justify-between">
                     <span>Status</span>
                     <span className="text-content capitalize">{applicant.status}</span>
@@ -105,31 +105,56 @@ export default function ApplicantCVReview() {
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-line bg-raised p-5 space-y-2">
-                <button
-                  type="button"
-                  disabled={isProcessing}
-                  onClick={() => handleStatusChange('accepted')}
-                  className="w-full py-2.5 rounded-xl bg-accent hover:bg-accent text-accent-ink text-xs font-bold transition disabled:opacity-40"
-                >
-                  Shortlist Candidate
-                </button>
-                <button
-                  type="button"
-                  disabled={isProcessing}
-                  onClick={() => handleStatusChange('reviewed')}
-                  className="w-full py-2.5 rounded-xl border border-line bg-raised/5 text-xs text-subtle hover:bg-raised/10 transition disabled:opacity-40"
-                >
-                  Mark as Reviewed
-                </button>
-                <button
-                  type="button"
-                  disabled={isProcessing}
-                  onClick={() => handleStatusChange('rejected')}
-                  className="w-full py-2.5 rounded-xl border border-rose-500/20 text-rose-400 bg-rose-500/5 hover:bg-rose-500/10 text-xs transition disabled:opacity-40"
-                >
-                  Reject
-                </button>
+              {/*
+                Accept / Reject are gated behind "Reviewed CV".
+
+                A decision is a real message to a student — accepted or rejected
+                lands in their notifications and on their applications page. It
+                should not be one stray click away from a list. Marking the CV
+                reviewed is an explicit statement that someone actually opened
+                and read it, and only then do the decision buttons unlock.
+
+                `reviewed` was already in the ApplicationStatus enum and already
+                accepted by the API, so this needed no schema change.
+              */}
+              <div className="space-y-2 rounded-2xl border border-line bg-raised p-5">
+                {!hasReviewed ? (
+                  <>
+                    <button
+                      type="button"
+                      disabled={isProcessing}
+                      onClick={() => handleStatusChange('reviewed')}
+                      className="w-full rounded-xl bg-accent py-2.5 text-xs font-bold text-accent-ink transition hover:opacity-90 disabled:opacity-40"
+                    >
+                      <i className="bi bi-check2-square mr-1" /> Reviewed CV
+                    </button>
+                    <p className="pt-1 text-center text-[11px] leading-relaxed text-faint">
+                      Mark this CV as reviewed to unlock Accept and Reject.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="pb-1 text-center text-[11px] font-semibold text-accent">
+                      <i className="bi bi-check-circle mr-1" /> CV reviewed
+                    </p>
+                    <button
+                      type="button"
+                      disabled={isProcessing || applicant.status === 'accepted'}
+                      onClick={() => handleStatusChange('accepted')}
+                      className="w-full rounded-xl bg-accent py-2.5 text-xs font-bold text-accent-ink transition hover:opacity-90 disabled:opacity-40"
+                    >
+                      {applicant.status === 'accepted' ? 'Accepted' : 'Accept'}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isProcessing || applicant.status === 'rejected'}
+                      onClick={() => handleStatusChange('rejected')}
+                      className="w-full rounded-xl border border-rose-500/20 bg-rose-500/5 py-2.5 text-xs text-rose-400 transition hover:bg-rose-500/10 disabled:opacity-40"
+                    >
+                      {applicant.status === 'rejected' ? 'Rejected' : 'Reject'}
+                    </button>
+                  </>
+                )}
               </div>
             </div>
 

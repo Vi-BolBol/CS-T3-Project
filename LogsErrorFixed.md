@@ -485,3 +485,33 @@ does not depend on the client behaving.
 `api/adminApi.js` and is imported nowhere. It happens to filter its params
 correctly, so it is not a live bug, but it is a second copy of the admin client
 that will drift. Worth deleting.
+
+## Session K — post-merge test findings
+
+Fourteen issues found by manual testing after the three-branch merge. Four turned
+out to have root causes different from the reported symptom.
+
+| Bug | Root cause |
+|---|---|
+| **"Sync with profile" did nothing** | `getCvAsProfile` is exported at module level but was **missing from the `useCvStatus` hook's return object**. `UserProfile` destructures it from the hook, so it was `undefined` and the click threw a TypeError — silently, because nothing caught it. |
+| **Company contact never saved** | `contact` and `telegramLink` were absent from the backend's `EDITABLE` whitelist in `company.service.js`. The form sent them correctly; the server discarded them on every request. |
+| **A company viewing an applicant saw its own profile** | The student profile lived **entirely in localStorage** behind a TODO — there was no `GET /api/student/profile`. `/user/profile/:id` therefore read the *viewer's* cached profile and displayed it under the applicant's name. |
+| **CV lost on refresh** | `CVBuilderContext` initialised from localStorage and **never read the CV back from the server**, despite the row existing in the database since Session B. Any clearing of local storage looked like the CV had been deleted. |
+| `% Match` on applicant cards | Derived from a stored CV *quality* score with no relation to the listing. Presented as a match it implied AI matching the platform does not do. Removed. |
+| Shortlist button | No state, no request — did nothing at all. Removed. |
+| 404 sent signed-in users to the public homepage | The page always rendered the public `Header`, so a signed-in student was shown signed-out navigation and a "Go to dashboard" prompt. Now role-aware. |
+| Suspended screen offered "Check again" | Invited retrying a state the user cannot change. Log out is now the only action; the login page reports the suspension reason and end date. |
+| Company navbar search opened a second results page | Now routes to Explore with `?q=`, matching the student side. |
+| No profile/logo picture anywhere | Added upload for both roles. Required widening `logoUrl`, `coverUrl`, `profileImage` from `VARCHAR(500)` to `TEXT` — base64 images far exceed 500 chars (migration `20260719000000_widen_image_columns`). |
+| No route from a listing to the company | Company names are now clickable, and the company pane has Follow/Unfollow. The follow API and `FollowedCompany` table existed since Session D but nothing could call them, so the student's followed list could only ever be empty. |
+| Admin could not open a listing | Added `GET /api/admin/internships/:id` returning the listing plus every applicant, so a reported listing can be read — and the number of students a delete will affect is visible where the decision is made. |
+| Accept/Reject one click away in a list | Now gated behind an explicit "Reviewed CV" action. `reviewed` already existed in `ApplicationStatus` and was already accepted by the API, so no schema change was needed. |
+| `data.description` in the admin listing panel | Caught by a schema check before shipping: the column is `jobDescription`. The section would have silently never rendered. |
+
+## Session K.1 — follow-up test findings
+
+| Bug | Root cause |
+|---|---|
+| **Could not replace an existing CV** | **Self-inflicted in Session K.** The `/cv` → `/cv/manage` redirect added to stop a refresh looking like the CV had vanished had no escape hatch, so "Upload a CV instead" bounced straight back to the dashboard. `?replace=1` now marks a deliberate visit. |
+| **Uploaded CV synced only partially** | Key mismatch between the two CV sources. The PDF parser returns `personal.phoneNumber` and education as `{ institution, degree }`; `getCvAsProfile` read neither. Phone was dropped entirely despite `StudentProfile` having a `phone` column, and the degree was discarded leaving only the institution. Both key sets are now read, education renders as "Degree — School", and `phone` round-trips to the server with a field in the edit form. |
+| **No route from a listing to the company** | The company name was plain text on the full detail page and in company search, so a student could not open the company's profile — or follow them — from the listing they were reading. Added a "View company profile" action that resolves per viewer role, so nobody is thrown out of their own shell. |

@@ -5,6 +5,7 @@ import Toast from '../../components/shared/Toast';
 import ConfirmDialog from '../../components/shared/ConfirmDialog';
 import SuspendUserDialog from '../../components/admin/SuspendUserDialog';
 import DeleteUserDialog from '../../components/admin/DeleteUserDialog';
+import AdminInternshipDetail from '../../components/admin/AdminInternshipDetail';
 import ClassicTemplate from '../../components/cv/templates/ClassicTemplate';
 import useToast from '../../hooks/useToast';
 import {
@@ -83,6 +84,7 @@ export default function AdminUserDetail() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [listingAction, setListingAction] = useState(null); // { internship, mode }
+  const [openListing, setOpenListing] = useState(null);      // internship id being inspected
 
   /* ---------- load the account ---------- */
   const loadUser = useCallback(async () => {
@@ -223,12 +225,21 @@ export default function AdminUserDetail() {
                   {user._count?.auditLogs ?? 0} logged event(s)
                 </p>
 
+                {/* Both roles get a link to what the rest of the platform sees. */}
                 {user.role === 'student' && (
                   <Link
                     to={`/user/profile/${user.id}`}
                     className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-accent hover:underline"
                   >
                     View public profile <i className="bi bi-box-arrow-up-right text-[10px]" />
+                  </Link>
+                )}
+                {user.role === 'company' && user.companyProfile?.id && (
+                  <Link
+                    to={`/explore?type=companies&company=${user.companyProfile.id}`}
+                    className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-accent hover:underline"
+                  >
+                    View company profile <i className="bi bi-box-arrow-up-right text-[10px]" />
                   </Link>
                 )}
               </div>
@@ -391,7 +402,16 @@ export default function AdminUserDetail() {
                   <li key={it.id} className="rounded-xl border border-line bg-raised p-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-bold text-content">{it.title}</p>
+                        {/* Open the full listing: an admin should be able to read
+                            what a reported listing says, and see who applied,
+                            before suspending or deleting it. */}
+                        <button
+                          type="button"
+                          onClick={() => setOpenListing(it.id)}
+                          className="truncate text-left text-sm font-bold text-content transition hover:text-accent"
+                        >
+                          {it.title} <i className="bi bi-box-arrow-up-right ml-1 text-[10px]" />
+                        </button>
                         <p className="mt-0.5 text-xs text-subtle">
                           {[it.location, it.internshipCategory].filter(Boolean).join(' · ') || 'No details'}
                         </p>
@@ -405,6 +425,12 @@ export default function AdminUserDetail() {
                       </div>
 
                       <div className="flex flex-shrink-0 items-center gap-1.5">
+                        <button
+                          onClick={() => setOpenListing(it.id)}
+                          className="rounded-lg border border-line px-2.5 py-1 text-xs font-semibold text-subtle transition hover:text-accent"
+                        >
+                          View
+                        </button>
                         <span className={`rounded-md px-2 py-1 text-[11px] font-semibold ${
                           it.status === 'suspended'
                             ? 'bg-danger/10 text-danger'
@@ -507,6 +533,12 @@ export default function AdminUserDetail() {
         onConfirm={doListingAction}
         onCancel={() => setListingAction(null)}
       />
+      {openListing && (
+        <AdminInternshipDetail
+          internshipId={openListing}
+          onClose={() => setOpenListing(null)}
+        />
+      )}
       <Toast message={toastMessage} onClose={clearToast} />
     </AdminLayout>
   );

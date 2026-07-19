@@ -122,6 +122,39 @@ export const findInternshipsByUser = async (userId) => {
   });
 };
 
+/*
+  One listing in full, with its applicants.
+
+  The admin panel could list a company's internships but not open one, so there
+  was no way to see what a reported listing actually says or who had applied to
+  it — which is exactly the information needed before suspending or deleting it.
+*/
+export const findInternshipDetail = (id) =>
+  prisma.internship.findUnique({
+    where: { id: Number(id) },
+    include: {
+      company: {
+        select: {
+          id: true, companyName: true, industry: true, location: true,
+          logoUrl: true, contact: true,
+          user: { select: { id: true, email: true, status: true } },
+        },
+      },
+      applications: {
+        orderBy: { appliedAt: "desc" },
+        include: {
+          student: {
+            select: {
+              id: true, email: true,
+              studentProfile: { select: { fullName: true, education: true, profileImage: true } },
+            },
+          },
+          cv: { select: { id: true, score: true, updatedAt: true } },
+        },
+      },
+    },
+  });
+
 /** The student's CV, so an admin can check it isn't being used maliciously. */
 export const findCvByUser = (userId) =>
   prisma.cv.findFirst({

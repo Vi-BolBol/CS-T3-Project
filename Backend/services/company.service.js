@@ -12,6 +12,11 @@ import { logAction } from "../utils/audit.js";
 const EDITABLE = [
   "companyName", "industry", "location", "description",
   "website", "logoUrl", "employeeCount", "coverUrl",
+  // `contact` and `telegramLink` were missing here, so the profile form appeared
+  // to save them and the server quietly discarded them every time. They are
+  // columns on CompanyProfile and are shown to students on a listing, so they
+  // have to be editable.
+  "contact", "telegramLink",
 ];
 
 export const getMyCompanyService = async (userId) => {

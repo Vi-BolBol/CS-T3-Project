@@ -6,6 +6,9 @@ import {
   unfollowCompanyService,
   listFollowedCompaniesService,
   listRecommendedInternshipsService,
+  getMyProfileService,
+  updateMyProfileService,
+  getPublicStudentProfileService,
 } from "../services/student.service.js";
 
 // ── Saved Internships ──────────────────────────────────────────────
@@ -90,4 +93,26 @@ export const getRecommendedInternships = async (req, res) => {
     console.error("List recommended internships error:", error);
     return res.status(500).json({ success: false, message: "Server error" });
   }
+};
+
+/* ---------- Student profile ---------- */
+
+export const getMyProfile = async (req, res, next) => {
+  try { return res.status(200).json(await getMyProfileService(req.user.id)); }
+  catch (err) { next(err); }
+};
+
+export const updateMyProfile = async (req, res, next) => {
+  try {
+    const result = await updateMyProfileService(req.user.id, req.body);
+    return res.status(result.success ? 200 : 400).json(result);
+  } catch (err) { next(err); }
+};
+
+/** Read another student's profile — company reviewing an applicant, or admin. */
+export const getStudentProfileById = async (req, res, next) => {
+  try {
+    const result = await getPublicStudentProfileService(req.params.id, req.user.role);
+    return res.status(result.success ? 200 : 404).json(result);
+  } catch (err) { next(err); }
 };

@@ -61,7 +61,11 @@ export default function CompanyNavbar() {
     e.preventDefault();
     const q = query.trim();
     setShowSuggest(false);
-    navigate(q ? `/company/search?q=${encodeURIComponent(q)}` : '/company/search');
+    // Submitting goes to Explore with the query applied, not to a separate
+    // results page. Explore already has the filters, the detail pane and the
+    // pagination — sending the user somewhere else meant a second, weaker
+    // results list and a dead end. This mirrors the student side.
+    navigate(q ? `/company/explore?q=${encodeURIComponent(q)}` : '/company/explore');
   };
 
   const isActive = (p) => location.pathname.startsWith(p);

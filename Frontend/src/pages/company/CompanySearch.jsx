@@ -119,7 +119,12 @@ export default function CompanySearch() {
 
             {tab === 'companies' && results.companies.map((c) => (
               <li key={c.id}>
-                <Link to={`/company/explore?type=companies&company=${c.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-muted">
+                {/* Whole row is clickable, but an explicit label makes it
+                    obvious the destination is the company's profile. */}
+                <Link
+                  to={`/company/explore?type=companies&company=${c.id}`}
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-muted"
+                >
                   {c.logoUrl ? (
                     <img src={c.logoUrl} alt="" className="h-9 w-9 rounded-lg border border-line object-cover" />
                   ) : (
@@ -132,6 +137,11 @@ export default function CompanySearch() {
                     <p className="truncate text-xs text-subtle">
                       {c.industry || 'Company'} {c.location ? `· ${c.location}` : ''}
                     </p>
+                  </div>
+                  <span className="flex-shrink-0 rounded-lg border border-line px-2.5 py-1 text-[11px] font-semibold text-accent">
+                    View profile
+                  </span>
+                  <div className="hidden">
                   </div>
                 </Link>
               </li>

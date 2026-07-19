@@ -25,7 +25,14 @@ export const createUser = async ({ email, passwordHash, role, status = "active",
       });
     } else if (role === "company") {
       await tx.companyProfile.create({
-        data: { userId: user.id, companyName: companyName || null },
+        data: {
+          userId: user.id,
+          companyName: companyName || null,
+          // Default the public contact to the address they signed up with, so a
+          // brand-new company is reachable before anyone edits the profile.
+          // Editable afterwards like any other field.
+          contact: email,
+        },
       });
     }
     // admin has no profile table by design

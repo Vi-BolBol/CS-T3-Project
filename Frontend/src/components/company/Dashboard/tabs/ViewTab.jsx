@@ -6,7 +6,7 @@ export default function ViewTab({ job }) {
   const { fetchApplicants, loading } = useApplications();
   const [applicants, setApplicants] = useState([]);
   const [search, setSearch] = useState('');
-  const [sort, setSort] = useState('top');
+  const [sort, setSort] = useState('recent');
 
   useEffect(() => {
     let cancelled = false;
@@ -25,8 +25,11 @@ export default function ViewTab({ job }) {
       a.name.toLowerCase().includes(search.toLowerCase()) ||
       a.university.toLowerCase().includes(search.toLowerCase())
     );
-    if (sort === 'top') {
-      list = [...list].sort((a, b) => b.matchScore - a.matchScore);
+    // Sorting by "match" is gone with the score it depended on. Recency and
+    // review status are things the platform actually knows.
+    if (sort === 'status') {
+      const ORDER = { pending: 0, reviewed: 1, accepted: 2, rejected: 3 };
+      list = [...list].sort((a, b) => (ORDER[a.status] ?? 9) - (ORDER[b.status] ?? 9));
     } else {
       list = [...list].sort((a, b) => new Date(b.appliedAt) - new Date(a.appliedAt));
     }
@@ -38,7 +41,7 @@ export default function ViewTab({ job }) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
         <div>
           <h3 className="text-sm font-bold uppercase tracking-wider text-content">New Applicants</h3>
-          <p className="text-[11px] text-subtle">Review candidate matches algorithmically indexed by platform score tools</p>
+          <p className="text-[11px] text-subtle">Open a CV to review it, then accept or reject.</p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -54,8 +57,8 @@ export default function ViewTab({ job }) {
             onChange={(e) => setSort(e.target.value)}
             className="px-2 py-1.5 rounded-lg border border-line bg-surface/60 text-xs text-subtle focus:outline-none"
           >
-            <option value="top">Top Match</option>
-            <option value="recent">Recent</option>
+            <option value="recent">Most recent</option>
+            <option value="status">Review status</option>
           </select>
         </div>
       </div>

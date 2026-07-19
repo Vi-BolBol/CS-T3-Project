@@ -48,7 +48,9 @@ export default function StudentNavbar() {
     { label: 'Home', path: '/user/home' },
     { label: 'CV', path: '/cv' },
     { label: 'Applications', path: '/user/applications', alert: true },
-    { label: 'Internships', path: '/user/internships' },
+    // Named "Explore" to match the company side and the public page — the tab
+    // does filtering and browsing, not just a list of internships.
+    { label: 'Explore', path: '/user/internships' },
   ];
 
   const isActive = (path) =>

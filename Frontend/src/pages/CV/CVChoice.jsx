@@ -1,10 +1,29 @@
-import { useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRef, useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import useCvStatus from '../../hooks/useCvStatus';
 import Toast from '../../components/shared/Toast.jsx';
 import { parseUploadedCV } from '../../api/cvApi.js';
 
 function CVChoice() {
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const { hasCv } = useCvStatus();
+
+  /*
+    A student who already has a CV should not be asked to build or upload one
+    again on arrival — landing here after a refresh made it look as though the
+    finished CV had been thrown away.
+
+    BUT the redirect must not trap them either. "Upload a CV instead" on the
+    dashboard sends the student here deliberately, and without an escape hatch
+    the redirect bounced them straight back to /cv/manage — making it impossible
+    to ever replace an existing CV. `?replace=1` says "I meant to come here".
+  */
+  const replacing = params.get('replace') === '1';
+
+  useEffect(() => {
+    if (hasCv && !replacing) navigate('/cv/manage', { replace: true });
+  }, [hasCv, replacing, navigate]);
   const fileInputRef = useRef(null);
   const [toastMessage, setToastMessage] = useState('');
   const [isParsing, setIsParsing] = useState(false);

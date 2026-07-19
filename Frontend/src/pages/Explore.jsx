@@ -462,6 +462,7 @@ export default function Explore() {
               {selectedJob && (
                 <InternshipPane
                   job={selectedJob}
+                onSelectCompany={(c) => { setFilters((p) => ({ ...p, type: "companies" })); select("company", c.id); }}
                   onClose={() => setSelected(null)}
                   actions={applyGate(selectedJob.id)}
                 />

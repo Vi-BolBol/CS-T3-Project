@@ -59,6 +59,9 @@ export const getUserActivity    = (id, q = {}) => call(`/users/${id}/activity${q
 export const getUserInternships = (id) => call(`/users/${id}/internships`);
 export const getUserCv          = (id) => call(`/users/${id}/cv`);
 
+/** Full listing with its applicants — the admin listing drill-down. */
+export const getInternshipDetail = (id) => call(`/internships/${id}`);
+
 /* ---------- Moderating one listing ---------- */
 export const setInternshipStatus = (id, status, reason) =>
   call(`/internships/${id}/status`, {

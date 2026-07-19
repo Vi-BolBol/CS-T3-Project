@@ -541,6 +541,7 @@ export default function BrowseInternships() {
               {selectedJob && (
                 <InternshipPane
                   job={selectedJob}
+                onSelectCompany={(c) => { setFilters((p) => ({ ...p, type: "companies" })); select("company", c.id); }}
                   onClose={() => setSelected(null)}
                   actions={jobActions(selectedJob)}
                 />

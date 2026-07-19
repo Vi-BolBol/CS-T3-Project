@@ -109,17 +109,31 @@ export function getCvAsProfile() {
     const firstEdu = Array.isArray(exp.education) && exp.education[0] ? exp.education[0] : {};
     const firstLink = Array.isArray(a.links) && a.links[0] ? a.links[0] : {};
 
+    /*
+      Key names differ between the two ways a CV is created.
+
+      The PDF parser returns `personal.phoneNumber`, and education entries as
+      `{ institution, degree }`. The manual builder uses its own names. Reading
+      only one set meant an uploaded CV synced partially — phone was dropped
+      entirely (even though StudentProfile has a `phone` column) and the degree
+      was thrown away, leaving just the institution name.
+    */
+    const degree = firstEdu.degree || firstEdu.fieldOfStudy || '';
+    const school = firstEdu.school || firstEdu.institution || firstEdu.university || '';
+
     return {
       fullName: p.fullName || '',
       location: p.location || '',
       email: p.email || '',
+      phone: p.phoneNumber || p.phone || '',
       bio: a.aboutMe || '',
       skills: Array.isArray(a.skills)
         ? a.skills.map((s) => (typeof s === 'string' ? s : s?.name || s?.label || '')).filter(Boolean).join(', ')
-        : '',
-      university: firstEdu.school || firstEdu.institution || firstEdu.university || '',
+        : (typeof a.skills === 'string' ? a.skills : ''),
+      // "BSc Computer Science — CADT" reads better than either half alone.
+      university: [degree, school].filter(Boolean).join(' — ') || school,
       portfolio: typeof firstLink === 'string' ? firstLink : firstLink.url || '',
-      photo: cv.photo || null,
+      photo: cv.photo || p.photo || null,
     };
   } catch {
     return null;
@@ -164,5 +178,9 @@ export default function useCvStatus() {
     };
   }, [refresh]);
 
-  return { ...status, refresh, markCvCreated, markCvSynced };
+  // `getCvAsProfile` is exported at module level, but UserProfile destructures
+  // it from this hook. It was missing here, so it came back `undefined` and the
+  // "Sync with profile" button threw a TypeError on click — silently, because
+  // nothing caught it. Exposing it fixes the sync.
+  return { ...status, refresh, markCvCreated, markCvSynced, getCvAsProfile };
 }
