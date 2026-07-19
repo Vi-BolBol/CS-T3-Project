@@ -68,8 +68,16 @@ export const getUsersService = async (filters = {}) => {
     role: cleanRole(filters.role),
     status: VALID_STATUS.includes(clean(filters.status)) ? clean(filters.status) : undefined,
     search: clean(filters.search),
+    page: filters.page,
+    pageSize: filters.pageSize,
   });
-  return { success: true, users };
+
+  return {
+    success: true,
+    users,
+    page: Number(filters.page) || 1,
+    pageSize: Math.min(Math.max(Number(filters.pageSize) || 200, 1), 200),
+  };
 };
 
 export const updateUserStatusService = async (adminId, userId, status, { reason, days } = {}) => {

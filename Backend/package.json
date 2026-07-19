@@ -17,9 +17,6 @@
     "test": "echo \"No tests specified\" && exit 0",
     "make-admin": "node scripts/makeAdmin.js"
   },
-  "prisma": {
-    "seed": "node prisma/seed.js"
-  },
   "dependencies": {
     "@faker-js/faker": "^10.5.0",
     "@google/generative-ai": "^0.24.1",

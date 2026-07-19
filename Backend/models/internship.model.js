@@ -33,16 +33,36 @@ export const findInternshipById = async (id) => {
   });
 };
 
-export const findPublicInternships = async ({ status = "open" } = {}) => {
-  return prisma.internship.findMany({
-    where: status ? { status } : undefined,
-    orderBy: { createdAt: "desc" },
-    include: {
-      company: {
-        select: { id: true, companyName: true, logoUrl: true, industry: true },
-      },
-    },
-  });
+export const findPublicInternships = async ({
+  status = "open",
+  category,
+  location,
+  q,
+  page = 1,
+  pageSize = 100,
+} = {}) => {
+  const take = Math.min(Math.max(Number(pageSize) || 100, 1), 100);
+  const skip = (Math.max(Number(page) || 1, 1) - 1) * take;
+
+  const where = {
+    ...(status ? { status } : {}),
+    ...(category ? { internshipCategory: { contains: category, mode: "insensitive" } } : {}),
+    ...(location ? { location: { contains: location, mode: "insensitive" } } : {}),
+    ...(q ? { OR: [
+        { title: { contains: q, mode: "insensitive" } },
+        { skills: { contains: q, mode: "insensitive" } },
+      ] } : {}),
+  };
+
+  const [internships, total] = await Promise.all([
+    prisma.internship.findMany({
+      where, orderBy: { createdAt: "desc" }, skip, take,
+      include: { company: { select: { id: true, companyName: true, logoUrl: true, industry: true } } },
+    }),
+    prisma.internship.count({ where }),
+  ]);
+
+  return { internships, total, page: Math.max(Number(page) || 1, 1), pageSize: take };
 };
 
 export const updateInternship = async (id, data) => {
@@ -52,6 +72,7 @@ export const updateInternship = async (id, data) => {
 export const deleteInternship = async (id) => {
   return prisma.internship.delete({ where: { id } });
 };
+
 
 export default {
   findCompanyProfileByUserId,

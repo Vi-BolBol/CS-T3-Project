@@ -138,10 +138,17 @@ export const listPublicInternshipsService = async (query = {}) => {
   const requested = String(query.status || "").toLowerCase();
   const status = PUBLIC_STATUSES.includes(requested) ? requested : "open";
 
-  const internships = await findPublicInternships({ status });
-  return { success: true, internships };
-};
+  const { internships, total, page, pageSize } = await findPublicInternships({
+    status, category: query.category, location: query.location,
+    q: query.q, page: query.page, pageSize: query.pageSize,
+  });
 
+  return {
+    success: true,
+    internships,
+    pagination: { total, page, pageSize, totalPages: Math.max(Math.ceil(total / pageSize), 1) },
+  };
+};
 /**
  * `findInternshipById` includes the WHOLE CompanyProfile row — which carries
  * `contact` (phone), `telegramLink`, and `userId`, the internal link back to the
