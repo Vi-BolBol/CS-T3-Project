@@ -7,6 +7,11 @@ import { getCompanyApplications } from '../api/companyApi';
 */
 const SEEN_KEY = 'if-company-seen-applicants';
 
+const readSeen = () => {
+  try { return JSON.parse(localStorage.getItem(SEEN_KEY) || '[]'); }
+  catch { return []; }
+};
+
 export default function useApplicantAlerts() {
   const [count, setCount] = useState(0);
   const [applications, setApplications] = useState([]);
@@ -17,18 +22,27 @@ export default function useApplicantAlerts() {
     const apps = res.applications || [];
     setApplications(apps);
 
-    let seen = [];
-    try { seen = JSON.parse(localStorage.getItem(SEEN_KEY) || '[]'); } catch { /* ignore */ }
+    const seen = readSeen();
     setCount(apps.filter((a) => !seen.includes(a.id)).length);
   }, []);
 
   useEffect(() => { refresh(); }, [refresh]);
+
+  useEffect(() => {
+    const onSeen = () => {
+      const seen = readSeen();
+      setCount(applications.filter((a) => !seen.includes(a.id)).length);
+    };
+    window.addEventListener('if-applicants-seen', onSeen);
+    return () => window.removeEventListener('if-applicants-seen', onSeen);
+  }, [applications]);
 
   const markAllSeen = useCallback(() => {
     try {
       localStorage.setItem(SEEN_KEY, JSON.stringify(applications.map((a) => a.id)));
     } catch { /* ignore */ }
     setCount(0);
+    window.dispatchEvent(new Event('if-applicants-seen'));
   }, [applications]);
 
   return { count, applications, refresh, markAllSeen };

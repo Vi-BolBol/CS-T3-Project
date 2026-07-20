@@ -9,6 +9,7 @@ import useSavedInternships from '../../hooks/useSavedInternships';
 import useFollowedCompanies from '../../hooks/useFollowedCompanies';
 import useMyApplications from '../../hooks/useMyApplications';
 import useCvStatus from '../../hooks/useCvStatus';
+import { getMyStudentProfile, updateMyStudentProfile } from '../../api/studentApi';
 import useToast from '../../hooks/useToast';
 
 function Section({ title, subtitle, action, children }) {
@@ -45,7 +46,7 @@ export default function UserHome() {
   const { savedInternships, fetchSaved, saveInternship, unsaveInternship } = useSavedInternships();
   const { followedCompanies, fetchFollowed } = useFollowedCompanies();
   const { apply, hasApplied } = useMyApplications();
-  const { hasCv, syncedToProfile, markCvSynced } = useCvStatus();
+  const { hasCv, syncedToProfile, markCvSynced, getCvAsProfile } = useCvStatus();
   const { message: toastMessage, showToast, clearToast } = useToast();
 
   const [savedIds, setSavedIds] = useState(new Set());
@@ -66,10 +67,68 @@ export default function UserHome() {
     setSavedIds(new Set(savedList.map((j) => j.id)));
   }, [savedInternships]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // "Sync your CV to your profile" prompt — shown once a CV exists but hasn't been synced.
+  /*
+    "Sync your CV to your profile" prompt.
+
+    Two conditions have to hold, not one. `syncedToProfile` lives in
+    localStorage, so logging out wipes it and the prompt would reappear for a
+    profile that was already filled in. Checking the SERVER profile as well
+    makes the dismissal durable: if the profile already carries the fields a
+    sync would write, there is nothing to offer.
+  */
+  const [profileAlreadyFilled, setProfileAlreadyFilled] = useState(false);
+
   useEffect(() => {
-    setShowSyncPrompt(hasCv && !syncedToProfile);
-  }, [hasCv, syncedToProfile]);
+    let cancelled = false;
+    (async () => {
+      const res = await getMyStudentProfile();
+      if (cancelled || !res.success) return;
+      const p = res.profile;
+      setProfileAlreadyFilled(Boolean(p?.fullName && (p?.education || p?.skills)));
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    setShowSyncPrompt(hasCv && !syncedToProfile && !profileAlreadyFilled);
+  }, [hasCv, syncedToProfile, profileAlreadyFilled]);
+
+  /*
+    Actually performs the sync.
+
+    This button previously called markCvSynced() and nothing else — it flipped
+    the flag and announced "CV synced to your profile" while copying no data at
+    all. It now runs the same merge the profile page does: CV fields fill empty
+    profile fields, existing profile data is never overwritten, and the result
+    is persisted to the server.
+  */
+  const runSync = async () => {
+    const fromCv = getCvAsProfile?.();
+    if (!fromCv) {
+      showToast('No CV data found to sync.');
+      return;
+    }
+
+    const current = await getMyStudentProfile();
+    const existing = current.success && current.profile ? current.profile : {};
+
+    const merged = {
+      fullName:     existing.fullName     || fromCv.fullName   || null,
+      bio:          existing.bio          || fromCv.bio        || null,
+      education:    existing.education    || fromCv.university || null,
+      skills:       existing.skills       || fromCv.skills     || null,
+      phone:        existing.phone        || fromCv.phone      || null,
+      profileImage: existing.profileImage || fromCv.photo      || null,
+    };
+
+    const res = await updateMyStudentProfile(merged);
+    markCvSynced();
+    setShowSyncPrompt(false);
+    setProfileAlreadyFilled(true);
+    showToast(res.success
+      ? 'CV synced — your profile has been filled in.'
+      : (res.message || 'Synced on this device only.'));
+  };
 
   const runSearch = (e) => {
     e.preventDefault();
@@ -127,7 +186,7 @@ export default function UserHome() {
             </div>
             <div className="flex flex-shrink-0 gap-2">
               <button
-                onClick={() => { markCvSynced(); setShowSyncPrompt(false); showToast('CV synced to your profile.'); }}
+                onClick={runSync}
                 className="rounded-lg bg-accent px-4 py-2 text-xs font-bold text-accent-ink transition hover:opacity-90"
               >
                 Sync now

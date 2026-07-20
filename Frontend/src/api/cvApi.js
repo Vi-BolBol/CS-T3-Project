@@ -25,7 +25,7 @@ function toMessage(err, fallback) {
     const status = err?.response?.status
     if (status === 401) return 'Your session has expired. Please log in again.'
     if (status === 403) return err?.response?.data?.message || 'Your account cannot use this feature right now.'
-    if (status === 429) return 'Too many requests right now — please try again in a little while.'
+    if (status === 429) return 'AI limit reached — CV parsing and scoring are capped at 60 per hour. Your saved CV is unaffected; try again shortly.'
     return err?.response?.data?.message || fallback
 }
 

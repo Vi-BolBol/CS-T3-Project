@@ -515,3 +515,45 @@ out to have root causes different from the reported symptom.
 | **Could not replace an existing CV** | **Self-inflicted in Session K.** The `/cv` → `/cv/manage` redirect added to stop a refresh looking like the CV had vanished had no escape hatch, so "Upload a CV instead" bounced straight back to the dashboard. `?replace=1` now marks a deliberate visit. |
 | **Uploaded CV synced only partially** | Key mismatch between the two CV sources. The PDF parser returns `personal.phoneNumber` and education as `{ institution, degree }`; `getCvAsProfile` read neither. Phone was dropped entirely despite `StudentProfile` having a `phone` column, and the degree was discarded leaving only the institution. Both key sets are now read, education renders as "Degree — School", and `phone` round-trips to the server with a field in the edit form. |
 | **No route from a listing to the company** | The company name was plain text on the full detail page and in company search, so a student could not open the company's profile — or follow them — from the listing they were reading. Added a "View company profile" action that resolves per viewer role, so nobody is thrown out of their own shell. |
+
+## Session K.2 — rate limiter scoping
+
+| Bug | Root cause |
+|---|---|
+| **CV disappears after logout/login — but an admin can still see it** | The AI rate limiter (30/hour) was mounted on the **entire `/api/cv` router**, so `GET /api/cv/mine` — a plain database read with no AI involved — consumed the same budget as Gemini calls. After a testing session the budget was exhausted, the CV load returned 429, and both the hydration effect and the status check swallowed it silently. The row was in the database the whole time, which is exactly why the admin panel could still display it. |
+| **`POST /api/cv/parse-upload` 429** | Same limiter, same exhausted budget. The two reports were one bug seen from two directions. |
+| **Duplicate footers on an applicant's profile** | Self-inflicted in Session J: `UserProfile`'s navbar was made viewer-aware but the **footer was not**, so a company opening `/company/applicant/:id/profile` got the student footer stacked above the company shell's own. |
+
+**Fixes.** The limiter now has a `skip` predicate so only `POST` to `/score`,
+`/parse-upload` and `/generate-photo` are counted; CV persistence is untouched.
+The cap was also raised 30 → 60, since one genuine CV review costs several calls
+(parse, score, retry). The footer is now guarded by the same `viewerIsStudent`
+check as the navbar.
+
+Both failure paths now log the HTTP status instead of returning silently — a
+failed load is not the same thing as "no CV saved", and treating them alike is
+what disguised this bug in the first place.
+
+**Verified by execution:** with a budget of 3, a 4th AI POST returns 429 while
+`GET /mine`, `POST /` and `DELETE /mine` all still return 200, and the other two
+AI endpoints remain limited. 6/6 assertions pass.
+
+## Session K.3 — CV sync prompt
+
+| Bug | Root cause |
+|---|---|
+| **"Sync now" on the home page copied nothing** | The handler called `markCvSynced()` and nothing else — it flipped the flag, hid the prompt, and announced "CV synced to your profile" while transferring **no data at all**. The real merge existed only on the profile page. Same family as the earlier `getCvAsProfile` bug, in the other location. |
+| **Prompt reappears after logging out and back in** | `syncedToProfile` lives in the `if-cv-status` localStorage key, which `wipeLocalAccountData` clears on logout. A profile that had already been synced was offered the sync again on the next login. |
+
+**Fixes.** The home button now performs the real merge: CV fields fill *empty*
+profile fields, existing profile data is never overwritten, and the result is
+persisted through `PUT /api/student/profile`.
+
+Both prompts now also check the **server** profile, not just the local flag — if
+the profile already carries the fields a sync would write (`fullName` plus
+`education` or `skills`), there is nothing to offer and the prompt stays hidden.
+That makes the dismissal durable across logout and across devices, which a
+localStorage flag never could.
+
+The two prompts share `syncedToProfile`, so syncing in either place has always
+hidden both — that part was already correct.

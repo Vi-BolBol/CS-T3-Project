@@ -152,7 +152,10 @@ export default function useCvStatus() {
     (async () => {
       try {
         const res = await fetch(`${BASE_URL}/api/cv/mine`, { headers: authHeaders() });
-        if (!res.ok) return;
+        if (!res.ok) {
+          console.warn(`[cv-status] server check failed (HTTP ${res.status})`);
+          return;
+        }
         const data = await res.json();
         if (cancelled || !data.success) return;
         if (data.cv) {

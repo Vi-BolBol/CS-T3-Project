@@ -78,12 +78,31 @@ const authLimiter = rateLimit({
 });
 
 // The CV routes call paid AI APIs — cap them separately.
+/*
+  Limits the AI endpoints only — they call paid third-party APIs.
+
+  `skip` matters more than the limit here. This was mounted across the whole
+  /api/cv router, so GET /api/cv/mine — plain database reads with no AI involved —
+  consumed the same 30/hour budget. Once a student exhausted it by testing the
+  parser, loading their own CV started returning 429 and the CV appeared to have
+  been deleted, even though the row was still in the database and an admin could
+  still see it. Two reported bugs, one cause.
+
+  Only POSTs to the three AI paths are counted now.
+*/
+const AI_PATHS = ["/score", "/parse-upload", "/generate-photo"];
+
 const aiLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,              // 1 hour
-  max: 30,
+  max: 60,                               // raised: one CV review legitimately
+                                         // costs several calls (parse, score, retry)
   standardHeaders: true,
   legacyHeaders: false,
-  message: { success: false, message: "AI request limit reached. Try again later." },
+  skip: (req) => !(req.method === "POST" && AI_PATHS.some((p) => req.path.startsWith(p))),
+  message: {
+    success: false,
+    message: "AI request limit reached. CV scoring and parsing are limited to 60 per hour — please try again later.",
+  },
 });
 
 /* ---------- Routes ---------- */

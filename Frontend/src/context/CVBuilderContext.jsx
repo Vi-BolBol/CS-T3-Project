@@ -87,7 +87,13 @@ export function CVBuilderProvider({ children }){
                 const res = await fetch(`${base}/api/cv/mine`, {
                     headers: { Authorization: `Bearer ${token}` },
                 })
-                if (!res.ok) return
+                if (!res.ok) {
+                    // A failed load is NOT the same as "no CV saved". Silently
+                    // returning here is what made a rate-limited response look
+                    // like the CV had been deleted.
+                    console.warn(`[cv] could not load saved CV (HTTP ${res.status}) — keeping local copy`)
+                    return
+                }
                 const data = await res.json()
                 if (cancelled || !data?.success || !data.cv?.userCvData) return
 

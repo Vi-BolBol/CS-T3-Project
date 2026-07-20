@@ -200,7 +200,10 @@ export default function UserProfile() {
         )}
 
         {/* CV sync prompt — owner only */}
-        {isOwner && hasCv && !syncedToProfile && (
+        {/* Hidden once the profile already carries what a sync would write —
+            `syncedToProfile` alone lives in localStorage and does not survive a
+            logout, which made the prompt reappear on an already-synced profile. */}
+        {isOwner && hasCv && !syncedToProfile && !(profile.fullName && (profile.university || profile.skills)) && (
           <div className="mb-6 flex flex-col gap-3 rounded-xl border border-accent/40 bg-accent-soft p-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-start gap-3">
               <i className="bi bi-arrow-repeat mt-0.5 text-accent" />
@@ -455,7 +458,7 @@ export default function UserProfile() {
         </section>
       </main>
 
-      <Footer />
+      {viewerIsStudent && <Footer />}
       <Toast message={toastMessage} onClose={clearToast} />
     </div>
   );
